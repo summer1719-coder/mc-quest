@@ -1,0 +1,2465 @@
+<!doctype html>
+<html lang="zh-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b0622">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="麥塊任務島">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⛏️</text></svg>">
+<title>麥塊任務島</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700;900&family=Press+Start+2P&display=swap">
+<style>
+:root{
+  --ink:#0b0820;
+  --tex:linear-gradient(transparent,transparent);
+  --f-cn:'Noto Sans TC','PingFang TC','Microsoft JhengHei',sans-serif;
+  --f-px:'Press Start 2P',ui-monospace,monospace;
+  /* night — 暗夜洞穴 */
+  --page:#0b0622;
+  --panel:#1a1540;--panel2:#262058;--panel-ink:#07051a;--panel-hi:#5242a6;--panel-lip:rgba(0,0,0,.35);
+  --text:#f4efff;--muted:#b6a8e0;--dim:#8878b8;--slot:#0d0a2a;--slot-hi:rgba(255,255,255,.08);
+  --gem:#7cf05a;--gold:#ffd23a;--stroke:#120c2c;--scrim:rgba(4,2,16,.78);
+  --rb1:#3c3478;--rb2:#221c4e;--rb-hi:#6a5cc0;--rb-lo:#140f34;--rb-ring:rgba(160,140,255,.18);
+  --done-tint:rgba(92,200,54,.16);
+}
+body[data-mode="day"]{
+  --page:#8fd0ff;
+  --panel:#ffffff;--panel2:#f0f7ff;--panel-ink:#1f2a60;--panel-hi:#ffffff;--panel-lip:rgba(31,42,96,.12);
+  --text:#1a2352;--muted:#56609a;--dim:#8a92bc;--slot:#dde9f8;--slot-hi:rgba(255,255,255,.9);
+  --gem:#23941a;--gold:#c87000;--stroke:#16225a;--scrim:rgba(10,24,60,.55);
+  --rb1:#ffffff;--rb2:#dcecff;--rb-hi:#ffffff;--rb-lo:#b4cbea;--rb-ring:rgba(255,255,255,.35);
+  --done-tint:rgba(92,200,54,.14);
+}
+*,*::before,*::after{box-sizing:border-box}
+html,body{height:100%}
+html{background:#0b0622}
+body{margin:0;background:var(--page);color:var(--text);font-family:var(--f-cn);font-size:16px;line-height:1.5;overflow:hidden;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;background:none;border:0;padding:0;text-align:inherit}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid #ffd23a;outline-offset:3px}
+button:disabled{cursor:default}
+svg{display:block;width:100%;height:100%}
+img{max-width:100%}
+
+/* ── world ── */
+#bg,#bgfx{position:fixed;left:0;top:0;image-rendering:pixelated;z-index:0;pointer-events:none}
+#bgfx{z-index:1}
+.screen{position:fixed;inset:0;z-index:2;display:none;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;
+  padding:calc(14px + env(safe-area-inset-top,0px)) 16px calc(28px + env(safe-area-inset-bottom,0px))}
+.screen.active{display:block}
+.wrap{max-width:560px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
+.wrap.wide{max-width:760px}
+
+/* ── text ── */
+.stroke{--st:var(--stroke);color:#fff;text-shadow:2px 0 var(--st),-2px 0 var(--st),0 2px var(--st),0 -2px var(--st),2px 2px var(--st),-2px 2px var(--st),2px -2px var(--st),-2px -2px var(--st),0 4px 0 var(--st)}
+.num-px{font-family:var(--f-px);font-variant-numeric:tabular-nums}
+
+/* ── panel & slot ── */
+.panel{background:linear-gradient(180deg,var(--panel2),var(--panel));color:var(--text);border:3px solid var(--panel-ink);border-radius:14px;
+  box-shadow:inset 0 2px 0 var(--panel-hi),inset 0 -4px 0 var(--panel-lip),0 4px 0 var(--panel-ink),0 10px 22px rgba(0,0,0,.3)}
+.slot{background:var(--slot);border-radius:10px;border:2px solid var(--panel-ink);box-shadow:inset 0 3px 0 rgba(0,0,0,.28),inset 0 -2px 0 var(--slot-hi);display:grid;place-items:center;padding:6px;flex-shrink:0;overflow:hidden}
+.slot img{width:100%;height:100%;object-fit:cover;border-radius:6px}
+.emo{font-size:26px;line-height:1}
+
+/* ── buttons ── */
+.btn{--c1:#72d43e;--c2:#3f9a22;--hl:#b6f07a;--lip:#2a6e14;--st:#1d4a0c;
+  position:relative;display:flex;align-items:center;justify-content:center;gap:12px;width:100%;
+  min-height:62px;padding:0 18px;border-radius:14px;border:3px solid var(--ink);
+  background:var(--tex) 0 0/24px 24px repeat,linear-gradient(180deg,var(--c1),var(--c2));image-rendering:pixelated;
+  box-shadow:inset 0 3px 0 var(--hl),inset 3px 0 0 rgba(255,255,255,.12),inset 0 -6px 0 var(--lip),0 5px 0 var(--ink),0 10px 18px rgba(0,0,0,.35);
+  font-weight:900;font-size:22px;letter-spacing:2px;color:#fff;text-align:center;
+  text-shadow:2px 0 var(--st),-2px 0 var(--st),0 2px var(--st),0 -2px var(--st),2px 2px var(--st),-2px 2px var(--st),2px -2px var(--st),-2px -2px var(--st),0 4px 0 var(--st);
+  transition:transform .06s,box-shadow .06s,filter .1s;user-select:none;-webkit-user-select:none}
+.btn:hover{filter:brightness(1.06)}
+.btn:active:not(:disabled){transform:translateY(4px);box-shadow:inset 0 3px 0 var(--hl),inset 0 -3px 0 var(--lip),0 1px 0 var(--ink),0 3px 8px rgba(0,0,0,.35)}
+.btn .ico{width:30px;height:30px;flex-shrink:0;filter:drop-shadow(0 2px 0 rgba(0,0,0,.45))}
+.btn .ico.sm{width:26px;height:26px}
+.btn.primary{box-shadow:inset 0 3px 0 var(--hl),inset 3px 0 0 rgba(255,255,255,.12),inset 0 -6px 0 var(--lip),0 5px 0 var(--ink),0 0 0 7px rgba(143,224,90,.18),0 10px 22px rgba(0,0,0,.4)}
+.btn.stone{--c1:#606a9c;--c2:#3b4170;--hl:#939dd0;--lip:#262a4e;--st:#141632;min-height:56px;font-size:19px}
+.btn.gold{--c1:#ffac3c;--c2:#e0701a;--hl:#ffd690;--lip:#a2480a;--st:#5a2604}
+.btn.red{--c1:#f06a6a;--c2:#c83434;--hl:#ffb0b0;--lip:#8a1c1c;--st:#4a0c0c}
+.btn.sm{min-height:44px;font-size:15px;letter-spacing:1px;border-radius:11px;padding:0 10px;gap:6px;
+  box-shadow:inset 0 2px 0 var(--hl),inset 0 -4px 0 var(--lip),0 3px 0 var(--ink)}
+.btn.sm .ico{width:18px;height:18px}
+.btn.sq{width:62px;flex:0 0 62px;padding:0}
+.btn:disabled{filter:saturate(.35) brightness(.85)}
+.btn.glow{animation:glow 1.2s steps(2,jump-none) infinite}
+@keyframes glow{0%{filter:brightness(1)}100%{filter:brightness(1.18)}}
+
+.rbtn{width:48px;height:48px;flex:0 0 48px;border-radius:50%;border:3px solid var(--ink);display:grid;place-items:center;padding:11px;
+  background:var(--tex) 0 0/24px 24px repeat,linear-gradient(180deg,var(--rb1),var(--rb2));image-rendering:pixelated;
+  box-shadow:inset 0 3px 0 var(--rb-hi),inset 0 -4px 0 var(--rb-lo),0 4px 0 var(--ink),0 0 0 4px var(--rb-ring);transition:transform .06s}
+.rbtn:active{transform:translateY(3px)}
+.rbtn.sm{width:40px;height:40px;flex-basis:40px;padding:9px;box-shadow:inset 0 2px 0 var(--rb-hi),inset 0 -3px 0 var(--rb-lo),0 3px 0 var(--ink)}
+.rbtn.flip svg{transform:scaleX(-1)}
+.rbtn{color:#fff}
+body[data-mode="day"] .rbtn{color:#26306a}
+.check,.tick,.btn .ico{color:#fff}
+
+.fab{position:fixed;right:max(20px,calc(50% - 280px + 4px));bottom:calc(22px + env(safe-area-inset-bottom,0px));z-index:40;width:66px;height:66px;border-radius:50%;
+  border:3px solid var(--ink);padding:16px;display:grid;place-items:center;
+  background:var(--tex) 0 0/24px 24px repeat,linear-gradient(180deg,#72d43e,#3f9a22);image-rendering:pixelated;
+  box-shadow:inset 0 3px 0 #b6f07a,inset 0 -6px 0 #2a6e14,0 5px 0 var(--ink),0 0 0 6px rgba(143,224,90,.22),0 10px 20px rgba(0,0,0,.4)}
+.fab.gold{background:var(--tex) 0 0/24px 24px repeat,linear-gradient(180deg,#ffac3c,#e0701a);box-shadow:inset 0 3px 0 #ffd690,inset 0 -6px 0 #a2480a,0 5px 0 var(--ink),0 0 0 6px rgba(255,190,80,.22),0 10px 20px rgba(0,0,0,.4)}
+.fab:active{transform:translateY(4px)}
+
+/* ── bar (inner screen header) ── */
+.bar{display:flex;align-items:center;gap:12px;min-height:52px}
+.bar-title{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;margin:0;font-size:21px;font-weight:900;letter-spacing:2px;line-height:1.2;text-align:center}
+.bar-title i{width:26px;height:26px;display:block;flex-shrink:0;filter:drop-shadow(0 2px 0 rgba(0,0,0,.4))}
+.bar-spacer{width:48px;flex:0 0 48px}
+.date-chip{flex:0 0 auto;font-size:13px;font-weight:900;padding:4px 10px;border-radius:999px;background:rgba(10,6,30,.72);border:2px solid var(--ink);color:#fff;white-space:nowrap}
+.section-label{font-weight:900;font-size:15px;letter-spacing:2px;margin:6px 2px -2px}
+
+/* gem chip / badge */
+.gem-badge{display:flex;align-items:center;gap:8px;padding:8px 10px 8px 9px;border-radius:10px;background:var(--slot);border:2px solid var(--panel-ink);box-shadow:inset 0 3px 0 rgba(0,0,0,.3);color:var(--text)}
+.gem-badge i{width:16px;height:21px;display:block}
+.gem-badge b{font-family:var(--f-px);font-size:14px;font-weight:400;color:var(--gem);font-variant-numeric:tabular-nums}
+.bar .gem-badge{background:rgba(10,6,30,.78);border-color:var(--ink)}
+.bar .gem-badge b{color:#7cf05a}
+body[data-mode="night"] .gem-badge b{text-shadow:0 0 10px rgba(124,240,90,.55)}
+.reward-chip{display:inline-flex;align-items:center;gap:5px;padding:5px 8px;border-radius:8px;background:var(--slot);border:2px solid var(--panel-ink);font-family:var(--f-px);font-size:10px;color:var(--gem);white-space:nowrap;font-variant-numeric:tabular-nums;flex-shrink:0}
+.reward-chip i{width:10px;height:13px;display:block}
+.reward-chip.gold{color:var(--gold)}
+
+/* bars */
+.mini-bar{display:block;height:10px;border-radius:5px;background:var(--slot);border:2px solid var(--panel-ink);overflow:hidden}
+.mini-bar i{display:block;height:100%;background:linear-gradient(180deg,#b6f07a 0 35%,#3fb52a 35%);transition:width .4s}
+.seg-bar{display:flex;gap:5px;margin-top:9px}
+.seg-bar i{flex:1;height:18px;border-radius:5px;border:2px solid var(--panel-ink);background:var(--slot);box-shadow:inset 0 3px 0 rgba(0,0,0,.3);transition:background .2s}
+.seg-bar i.on{background:linear-gradient(180deg,#b6f07a 0 26%,#5cc836 26% 70%,#3e9a22 70%);box-shadow:inset 0 -2px 0 rgba(0,0,0,.2),0 0 10px rgba(120,220,70,.35)}
+.seg-bar.thin i{height:12px}
+.row-between{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.lbl{font-weight:900;font-size:16px}
+.num{font-family:var(--f-px);font-size:12px;color:var(--gem);font-variant-numeric:tabular-nums}
+
+/* ── TITLE ── */
+.title-wrap{max-width:440px;align-items:center;gap:0;min-height:100%}
+.top-row{align-self:stretch;display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:52px}
+.logo-wrap{text-align:center;margin-top:0}
+.logo{display:grid;justify-content:center;margin:0;font-weight:900;font-size:min(56px,15vw);line-height:1.08;letter-spacing:2px}
+.logo>span{grid-area:1/1}
+.logo-back{color:#7a3a0c;-webkit-text-stroke:12px #2a1204;text-shadow:0 4px 0 #2a1204,0 7px 0 #2a1204}
+.logo-front{background:linear-gradient(180deg,#fff8c8 0 20%,#ffe066 20% 46%,#ffbe2a 46% 72%,#f0861a 72% 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+body[data-mode="night"] .logo{filter:drop-shadow(0 0 18px rgba(255,160,40,.55))}
+body[data-mode="day"] .logo{filter:drop-shadow(0 6px 0 rgba(20,40,110,.25))}
+.logo-sub{margin-top:10px;font-weight:900;font-size:min(18px,4.8vw);letter-spacing:3px}
+.logo-sub .dash{display:inline-block;width:18px;height:4px;background:#fff;vertical-align:middle;margin:0 8px 3px;box-shadow:0 0 0 2px var(--stroke)}
+.stage{position:relative;width:240px;height:246px;margin-top:2px;flex-shrink:0}
+#island,#islandfx{position:absolute;left:0;top:78px;width:240px;height:168px;image-rendering:pixelated}
+.hero-sprite{position:absolute;top:0;left:48px;width:96px;height:144px;animation:bob 1.1s steps(2,jump-none) infinite;filter:drop-shadow(0 4px 0 rgba(0,0,0,.25));z-index:1}
+.pet-sprite{position:absolute;top:96px;left:138px;width:48px;height:48px;animation:bob 1.4s steps(2,jump-none) infinite .3s;z-index:1}
+@keyframes bob{0%{transform:translateY(0)}100%{transform:translateY(-3px)}}
+.title-bottom{position:relative;z-index:3;width:100%;margin-top:-62px;display:flex;flex-direction:column;gap:12px}
+.pick-label{align-self:center;font-weight:900;font-size:14px;letter-spacing:2px;padding:1px 14px 3px;border-radius:999px;background:rgba(10,6,30,.72);border:2px solid var(--ink);animation:blink 1.2s steps(2,jump-none) infinite}
+@keyframes blink{0%{opacity:1}100%{opacity:.55}}
+.hero-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.hero-card{position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 4px 11px;text-align:center;transition:transform .08s;min-width:0}
+.hero-card:active{transform:translateY(3px)}
+.hero-card .slot{width:54px;height:50px;padding:5px}
+.hc-name{font-weight:900;font-size:15px;line-height:1.3;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:0 4px}
+.hc-gem{display:flex;align-items:center;gap:4px;font-family:var(--f-px);font-size:10px;color:var(--gem);font-variant-numeric:tabular-nums}
+.hc-gem i{width:12px;height:15px;display:block}
+.hc-sub{font-size:12px;color:var(--muted);font-weight:700;line-height:1.4}
+.hero-card .mini-bar{width:78%;height:8px;margin-top:2px}
+.hero-card[aria-pressed="true"]{border-color:#9be45c;box-shadow:inset 0 2px 0 var(--panel-hi),inset 0 -4px 0 var(--panel-lip),0 4px 0 #2a6e14,0 0 0 4px rgba(143,224,90,.35),0 0 22px rgba(143,224,90,.45)}
+.hero-card .tick{position:absolute;top:-9px;right:-7px;width:26px;height:26px;border-radius:50%;background:#4cb82a;border:3px solid var(--ink);padding:4px;display:none}
+.hero-card[aria-pressed="true"] .tick{display:block}
+.hero-card.add .slot{background:transparent;border-style:dashed;box-shadow:none}
+.hero-card.add .slot span{width:26px;height:26px}
+.title-foot{margin-top:auto;padding-top:18px;text-align:center;font-weight:700;font-size:12px;letter-spacing:2px}
+
+/* ── CREATE ── */
+.step-dots{display:flex;gap:10px;justify-content:center;margin:2px 0 4px}
+.step-dots i{width:16px;height:16px;border-radius:4px;border:3px solid var(--ink);background:rgba(10,6,30,.6)}
+.step-dots i.done{background:#3e9a22}
+.step-dots i.active{background:#9be45c;box-shadow:0 0 10px rgba(155,228,92,.7)}
+.create-step{display:none;flex-direction:column;gap:12px}
+.create-step.active{display:flex}
+.step-title{text-align:center;font-weight:900;font-size:22px;letter-spacing:2px;margin:4px 0}
+.type-card{display:flex;align-items:center;gap:16px;padding:14px 16px;width:100%}
+.type-card:active{transform:translateY(3px)}
+.type-card .slot{width:64px;height:64px;padding:10px}
+.type-card b{display:block;font-weight:900;font-size:19px}
+.type-card small{display:block;color:var(--muted);font-size:14px;line-height:1.55;margin-top:2px}
+.form-card{padding:14px 16px;display:flex;flex-direction:column;gap:8px}
+.field-label{font-weight:900;font-size:14px;color:var(--muted);letter-spacing:1px}
+.inp{width:100%;background:var(--slot);color:var(--text);border:3px solid var(--panel-ink);border-radius:12px;padding:12px 14px;font:700 18px/1.4 var(--f-cn);
+  box-shadow:inset 0 3px 0 rgba(0,0,0,.28);-webkit-appearance:none;appearance:none}
+.inp::placeholder{color:var(--dim);font-weight:500}
+.inp:focus{outline:none;border-color:#5cc836;box-shadow:inset 0 3px 0 rgba(0,0,0,.28),0 0 0 3px rgba(92,200,54,.3)}
+textarea.inp{resize:none;line-height:1.6;font-weight:500}
+.step-nav{display:flex;gap:12px;margin-top:4px}
+.look-card{display:grid;grid-template-columns:auto 1fr;gap:14px;padding:14px;align-items:center}
+.look-preview{width:84px;height:126px;margin:0 6px}
+.look-opts{display:flex;flex-direction:column;gap:6px;min-width:0}
+.swatch-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:4px}
+.swatch{width:34px;height:34px;border-radius:9px;border:3px solid var(--panel-ink);box-shadow:inset 0 3px 0 rgba(255,255,255,.3),inset 0 -4px 0 rgba(0,0,0,.25)}
+.swatch[aria-pressed="true"]{outline:3px solid #9be45c;outline-offset:2px}
+.photo-row{flex-direction:row;align-items:center;gap:14px}
+.photo-row .slot{width:64px;height:64px;padding:12px}
+.photo-row .slot.has{padding:3px;border-color:#5cc836}
+.photo-row b{display:block;font-weight:900}
+.photo-row small{display:block;color:var(--muted);font-size:13px}
+.photo-row .grow{flex:1;min-width:0}
+.link-btn{font-weight:900;font-size:14px;color:var(--muted);padding:8px 6px;text-decoration:underline}
+.confirm-card{display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:center;padding:16px}
+.confirm-sprite{width:88px;height:132px}
+.cf-name{font-weight:900;font-size:24px;line-height:1.3}
+.cf-type{color:var(--muted);font-weight:700;font-size:14px;margin:2px 0 10px}
+.mini-list{display:flex;flex-direction:column;gap:8px}
+.mini-row{display:flex;align-items:center;gap:12px;padding:8px 12px}
+.mini-row .slot{width:40px;height:40px;padding:6px}
+.mini-row .emo{font-size:20px}
+.mini-row span.t{flex:1;font-weight:900;min-width:0}
+
+/* ── HUB ── */
+.hub-top{display:flex;align-items:center;gap:10px}
+.hub-top .ttl{flex:1;text-align:center;font-weight:900;font-size:18px;letter-spacing:3px}
+.hdr{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:12px;padding:12px 14px;position:relative}
+.hdr .slot{width:66px;height:62px;padding:6px}
+.hdr .slot.photo{padding:2px}
+.hdr-name{font-weight:900;font-size:22px;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hdr-streak{display:flex;align-items:center;gap:6px;margin-top:4px;font-weight:700;font-size:14px;color:var(--muted)}
+.hdr-streak i{width:14px;height:18px;display:block}
+.hdr-streak b{font-family:var(--f-px);font-size:11px;color:var(--gold);font-weight:400}
+.lantern{position:absolute;top:-14px;right:-6px;width:20px;height:44px;filter:drop-shadow(0 0 10px rgba(255,170,50,.8))}
+.xp{padding:11px 14px 13px}
+.wish-teaser{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:center;padding:11px 14px;width:100%}
+.wish-teaser .slot{width:52px;height:52px;padding:7px}
+.wish-k{font-size:12px;font-weight:700;color:var(--muted);line-height:1.3}
+.wish-n{font-weight:900;font-size:16px;line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wish-bar{display:flex;align-items:center;gap:8px;margin-top:5px}
+.wish-bar .mini-bar{flex:1}
+.wish-bar span.n{font-family:var(--f-px);font-size:9px;color:var(--gem);white-space:nowrap;font-variant-numeric:tabular-nums}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.tile{--c1:#72d43e;--c2:#3f9a22;--hl:#b6f07a;--lip:#2a6e14;--st:#1d4a0c;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;min-height:132px;padding:10px 6px 12px;
+  border-radius:16px;border:3px solid var(--ink);
+  background:var(--tex) 0 0/24px 24px repeat,linear-gradient(180deg,var(--c1),var(--c2));image-rendering:pixelated;
+  box-shadow:inset 0 3px 0 var(--hl),inset 0 -6px 0 var(--lip),0 5px 0 var(--ink),0 10px 18px rgba(0,0,0,.3);transition:transform .06s,box-shadow .06s}
+.tile:active{transform:translateY(4px);box-shadow:inset 0 3px 0 var(--hl),inset 0 -3px 0 var(--lip),0 1px 0 var(--ink)}
+.tile .t-slot{width:56px;height:52px;border-radius:12px;background:rgba(10,6,30,.35);border:2px solid rgba(0,0,0,.45);box-shadow:inset 0 3px 0 rgba(0,0,0,.25),inset 0 -2px 0 rgba(255,255,255,.18);display:grid;place-items:center;padding:7px}
+.tile .t-label{font-weight:900;font-size:19px;letter-spacing:1px;color:#fff;line-height:1.2;
+  text-shadow:2px 0 var(--st),-2px 0 var(--st),0 2px var(--st),0 -2px var(--st),2px 2px var(--st),-2px 2px var(--st),2px -2px var(--st),-2px -2px var(--st),0 3px 0 var(--st)}
+.tile .t-badge{font-family:var(--f-px);font-size:9px;color:#fff;background:rgba(0,0,0,.38);border:2px solid rgba(0,0,0,.35);border-radius:6px;padding:4px 8px;line-height:1.4;font-variant-numeric:tabular-nums}
+.tile.orange{--c1:#ffac3c;--c2:#e0701a;--hl:#ffd690;--lip:#a2480a;--st:#5a2604}
+.tile.purple{--c1:#9c6ce2;--c2:#6a3ab8;--hl:#cdb0ff;--lip:#48238e;--st:#2a1258}
+.tile.blue{--c1:#4ca4f2;--c2:#1f68c8;--hl:#a2d4ff;--lip:#134a98;--st:#0a2a60}
+
+/* ── TASKS ── */
+.summary .chip-btn{display:inline-flex;align-items:center;gap:6px;font-weight:900;font-size:14px;padding:6px 12px;border-radius:999px;background:var(--slot);border:2px solid var(--panel-ink);color:var(--muted)}
+.summary .chip-btn i{width:16px;height:16px;display:block}
+.summary .grow{flex:1}
+.task-list{display:grid;grid-template-columns:1fr;gap:10px}
+.task{display:flex;align-items:center;gap:12px;padding:10px 12px;width:100%;min-height:74px;transition:transform .08s,background .2s}
+.task:active{transform:translateY(3px)}
+.task .slot{width:52px;height:52px;padding:8px}
+.t-info{flex:1;min-width:0;display:flex;flex-direction:column}
+.t-name{font-weight:900;font-size:18px;line-height:1.3}
+.t-sub{font-size:13px;color:var(--muted);font-weight:700}
+.check{width:38px;height:38px;flex:0 0 38px;border-radius:50%;border:3px solid var(--panel-ink);background:var(--slot);box-shadow:inset 0 3px 0 rgba(0,0,0,.3);padding:8px}
+.task.done{background:linear-gradient(180deg,var(--done-tint),var(--done-tint)),linear-gradient(180deg,var(--panel2),var(--panel));border-color:#2a6e14}
+.task.done .t-name{text-decoration:line-through;text-decoration-thickness:3px;text-decoration-color:rgba(92,200,54,.7)}
+.task.done .check{background:#4cb82a;border-color:var(--ink);box-shadow:inset 0 2px 0 #b6f07a,0 0 12px rgba(120,220,70,.5)}
+.task.flash{animation:flash .45s steps(3,end)}
+@keyframes flash{0%{filter:brightness(1.6)}100%{filter:brightness(1)}}
+
+/* ── WISHLIST ── */
+.wish-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;padding-bottom:70px}
+.wcard{display:flex;flex-direction:column;overflow:hidden;padding:0}
+.w-img{aspect-ratio:1;max-width:100%;background:var(--slot);display:grid;place-items:center;border-bottom:3px solid var(--panel-ink);overflow:hidden}
+.w-img img{width:100%;height:100%;object-fit:cover}
+.w-img .ph{width:46%;height:46%}
+.w-info{padding:9px 10px 11px;display:flex;flex-direction:column;gap:6px;flex:1}
+.w-name{font-weight:900;font-size:15px;line-height:1.35;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.w-meta{display:flex;align-items:center;justify-content:space-between;gap:6px}
+.w-days{font-size:12px;color:var(--muted);font-weight:700}
+.wcard .btn{margin-top:auto}
+.wcard.redeemed .w-img{filter:saturate(.4)}
+.stamp{position:relative}
+.stamp::after{content:'已兌換';position:absolute;top:10px;left:-30px;transform:rotate(-30deg);background:#e04848;color:#fff;font-weight:900;font-size:13px;padding:2px 34px;border-top:2px solid var(--ink);border-bottom:2px solid var(--ink)}
+.empty{display:flex;flex-direction:column;align-items:center;gap:6px;padding:28px 18px;text-align:center}
+.empty .slot{width:72px;height:72px;padding:14px;margin-bottom:4px}
+.empty b{font-weight:900;font-size:18px}
+.empty small{color:var(--muted);font-weight:700}
+
+/* ── CALENDAR ── */
+.streak-card{display:flex;align-items:center;gap:14px;padding:12px 16px}
+.streak-card .big-flame{width:40px;height:52px;filter:drop-shadow(0 0 12px rgba(255,160,40,.6))}
+.streak-num{font-weight:900;font-size:18px}
+.streak-num b{font-family:var(--f-px);font-weight:400;font-size:24px;color:var(--gold);margin-right:6px}
+.streak-best{color:var(--muted);font-weight:700;font-size:13px}
+.stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.stat{padding:10px 6px;text-align:center}
+.stat b{display:block;font-family:var(--f-px);font-weight:400;font-size:16px;color:var(--gem);line-height:1.6}
+.stat.gold b{color:var(--gold)}
+.stat span{font-size:12px;font-weight:700;color:var(--muted)}
+.cal-card{padding:12px 10px 14px}
+.cal-nav{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px;padding:0 4px}
+.cal-month{font-weight:900;font-size:19px;letter-spacing:1px}
+.cal-dow,.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.cal-dow span{text-align:center;font-weight:900;font-size:13px;color:var(--muted);padding:2px 0}
+.cday{position:relative;aspect-ratio:1;max-width:100%;border-radius:7px;border:2px solid var(--panel-ink);background:var(--slot);box-shadow:inset 0 3px 0 rgba(0,0,0,.25);
+  display:flex;align-items:center;justify-content:center;font-family:var(--f-px);font-size:10px;color:var(--dim);font-variant-numeric:tabular-nums}
+.cday.pad{visibility:hidden}
+.cday.future{opacity:.45}
+.cday.full{background:linear-gradient(180deg,#9be45c 0 14%,#5bc236 14% 58%,#3e9a22 58% 66%,#8a5a2a 66% 100%);color:#fff;box-shadow:inset 0 -3px 0 rgba(0,0,0,.25);text-shadow:1px 1px 0 #2a1204,-1px 1px 0 #2a1204,1px -1px 0 #2a1204,-1px -1px 0 #2a1204}
+.cday.partial{background:radial-gradient(circle at 30% 35%,#c89050 0 8%,transparent 9%),radial-gradient(circle at 70% 70%,#6a3f1a 0 8%,transparent 9%),#9a6632;color:#fff;text-shadow:1px 1px 0 #2a1204,-1px 1px 0 #2a1204,1px -1px 0 #2a1204,-1px -1px 0 #2a1204}
+.cday.today{outline:3px solid #ffd23a;outline-offset:1px;color:var(--text)}
+.cday.full.today,.cday.partial.today{color:#fff}
+.cday .bstar{position:absolute;top:-5px;right:-5px;width:14px;height:14px}
+.legend{display:flex;flex-wrap:wrap;gap:8px 16px;margin-top:12px;padding:0 4px;font-size:13px;font-weight:700;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend .cday{width:18px;height:18px;aspect-ratio:auto;border-radius:4px;font-size:0}
+.legend .bstar{position:static;width:14px;height:14px;display:inline-block}
+
+/* ── BONUS ── */
+.filter-row{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:6px}
+.fchip{display:flex;align-items:center;justify-content:center;gap:6px;min-height:42px;border-radius:10px;font-weight:900;font-size:15px;color:var(--muted);border:2px solid transparent}
+.fchip i{width:18px;height:18px;display:block}
+.fchip[aria-pressed="true"]{background:var(--slot);border-color:var(--panel-ink);color:var(--text);box-shadow:inset 0 3px 0 rgba(0,0,0,.25)}
+.bonus-list{display:grid;grid-template-columns:1fr;gap:10px;padding-bottom:70px}
+.bitem{display:flex;align-items:center;gap:12px;padding:10px 12px}
+.bitem .slot{width:48px;height:48px;padding:8px}
+.b-info{flex:1;min-width:0}
+.b-title{font-weight:900;font-size:17px;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.b-meta{font-size:13px;color:var(--muted);font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* ── TASK SETTINGS ── */
+.hint{display:flex;align-items:center;gap:10px;padding:10px 14px;font-size:14px;font-weight:700;color:var(--muted)}
+.hint i{width:24px;height:22px;display:block;flex-shrink:0}
+.ts-list{display:grid;grid-template-columns:1fr;gap:10px}
+.tsrow{display:flex;align-items:center;gap:12px;padding:10px 12px}
+.tsrow .slot{width:48px;height:48px;padding:8px}
+.tsrow.arch{opacity:.55}
+.ts-info{flex:1;min-width:0}
+.ts-name{font-weight:900;font-size:17px;line-height:1.3}
+.ts-reward{display:flex;align-items:center;gap:5px;font-size:13px;font-weight:700;color:var(--muted)}
+.ts-reward i{width:10px;height:13px;display:block}
+.ts-actions{display:flex;gap:8px}
+
+/* ── SHEETS ── */
+.sheet{position:fixed;inset:0;z-index:100;background:var(--scrim);display:none;align-items:flex-end;justify-content:center}
+.sheet.open{display:flex}
+.sheet-body{width:100%;max-width:560px;max-height:92vh;overflow-y:auto;border-radius:22px 22px 0 0;border-bottom:0;
+  padding:18px 18px calc(22px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:14px;animation:sheetUp .18s steps(4,end)}
+@keyframes sheetUp{from{transform:translateY(40px);opacity:.3}to{transform:none;opacity:1}}
+.sheet-head{display:flex;align-items:center;gap:10px}
+.sheet-head h3{flex:1;margin:0;font-weight:900;font-size:21px;display:flex;align-items:center;gap:8px}
+.sheet-head h3 i{width:26px;height:26px;display:block}
+.sheet-actions{display:flex;gap:12px}
+.sheet-actions .btn{min-height:56px;font-size:19px}
+.stepper{display:flex;align-items:center;gap:10px}
+.stepper .inp{text-align:center;font-family:var(--f-px);font-size:16px;color:var(--gem);flex:1;min-width:0}
+.stepper .btn{width:52px;flex:0 0 52px;min-height:50px;padding:0;font-size:26px}
+.stepper .gem-i{width:20px;height:26px;flex-shrink:0}
+.note{font-size:13px;font-weight:700;color:var(--muted);line-height:1.6}
+.icon-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
+.icon-opt{aspect-ratio:1;max-width:100%;border-radius:10px;background:var(--slot);border:2px solid var(--panel-ink);padding:8px;box-shadow:inset 0 3px 0 rgba(0,0,0,.25)}
+.icon-opt[aria-pressed="true"]{border-color:#5cc836;box-shadow:0 0 0 3px rgba(92,200,54,.4);background:var(--done-tint)}
+.emoji-row{display:flex;align-items:center;gap:10px}
+.emoji-row .inp{width:76px;text-align:center;font-size:24px;padding:8px}
+.upload-area{aspect-ratio:16/9;max-width:100%;border-radius:12px;border:3px dashed var(--dim);background:var(--slot);display:grid;place-items:center;overflow:hidden;position:relative;color:var(--muted);font-weight:900}
+.upload-area .up-hint{display:flex;flex-direction:column;align-items:center;gap:6px}
+.upload-area .up-hint i{width:40px;height:34px;display:block}
+.upload-area img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.preview-box{padding:12px 14px;border-radius:12px;background:var(--slot);border:2px solid var(--panel-ink);display:flex;align-items:center;gap:10px;font-weight:900}
+.preview-box i{width:18px;height:23px;display:block}
+.preview-box b{font-family:var(--f-px);font-weight:400;color:var(--gem);font-size:14px}
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:6px;border-radius:14px;background:var(--slot);border:2px solid var(--panel-ink)}
+.tabs .fchip{flex-direction:column;gap:2px;min-height:58px;font-size:14px}
+.tabs .fchip i{width:24px;height:24px}
+.bpanel{display:none;flex-direction:column;gap:12px}
+.bpanel.active{display:flex}
+.day-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:2px dashed var(--slot);font-weight:700}
+.day-row .slot{width:36px;height:36px;padding:5px}
+.day-row .emo{font-size:18px}
+.day-row span.t{flex:1;min-width:0}
+.day-row.miss{opacity:.45}
+
+/* ── toast & particles ── */
+#toasts{position:fixed;top:calc(14px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);z-index:300;display:flex;flex-direction:column;gap:8px;pointer-events:none;width:min(calc(100% - 32px),420px)}
+.toast{display:flex;align-items:center;gap:12px;padding:10px 14px;font-weight:900;font-size:16px;animation:toastIn .2s steps(3,end),toastOut .25s steps(3,end) 2.6s forwards}
+.toast i{width:26px;height:26px;display:block;flex-shrink:0}
+@keyframes toastIn{from{transform:translateY(-14px);opacity:0}}
+@keyframes toastOut{to{transform:translateY(-10px);opacity:0}}
+.burst{position:fixed;width:8px;height:8px;pointer-events:none;z-index:400;border:1px solid rgba(0,0,0,.35);animation:fly .7s steps(7,end) forwards}
+@keyframes fly{to{transform:translate(var(--tx),var(--ty));opacity:0}}
+
+@media (min-width:640px){
+  .task-list,.bonus-list,.ts-list{grid-template-columns:1fr 1fr}
+  .wish-grid{grid-template-columns:repeat(3,1fr)}
+}
+@media (min-width:768px){
+  .sheet{align-items:center;padding:24px}
+  .sheet-body{border-radius:22px;border-bottom:3px solid var(--panel-ink)}
+  .tile{min-height:160px}
+  .tile .t-label{font-size:22px}
+}
+@media (max-width:360px){
+  .btn{font-size:19px}
+  .tile .t-label{font-size:17px}
+  .hero-card .slot{width:46px;height:44px}
+}
+@media (prefers-reduced-motion:reduce){
+  .hero-sprite,.pet-sprite,.pick-label,.btn.glow{animation:none}
+  .burst{display:none}
+  .sheet-body,.toast{animation:none}
+}
+
+/* ══════ V13: SETTINGS ══════ */
+.top-row .rbtn,.hub-top .rbtn{flex-shrink:0}
+.set-group{padding:6px 0}
+.set-head{display:flex;align-items:center;gap:8px;margin:10px 4px 2px;font-weight:900;font-size:16px;letter-spacing:2px}
+.set-head i{width:22px;height:22px;display:block;filter:drop-shadow(0 2px 0 rgba(0,0,0,.4))}
+.set-row{display:flex;align-items:center;gap:12px;padding:10px 14px;min-height:64px;width:100%;text-align:left}
+.set-row + .set-row{border-top:2px dashed var(--slot)}
+.set-row .slot{width:42px;height:42px;padding:7px}
+.set-row .lab{flex:1;min-width:0}
+.set-row .lab b{display:block;font-weight:900;font-size:16px;line-height:1.35}
+.set-row .lab small{display:block;font-size:13px;font-weight:700;color:var(--muted);line-height:1.45}
+.set-row .chev{width:12px;height:18px;color:var(--muted);flex-shrink:0}
+.set-row.off{opacity:.55}
+.set-row.wrap-ctl{flex-wrap:wrap}
+.set-row.wrap-ctl .ctl-line{flex-basis:100%;display:flex;gap:8px;padding-left:54px}
+.soon{flex-shrink:0;font-size:12px;font-weight:900;padding:3px 9px;border-radius:999px;background:var(--slot);border:2px solid var(--panel-ink);color:var(--muted);white-space:nowrap}
+.pill-ok{flex-shrink:0;font-size:12px;font-weight:900;padding:3px 9px;border-radius:999px;background:#3e9a22;border:2px solid var(--ink);color:#fff;white-space:nowrap}
+.tgl{position:relative;width:60px;height:34px;flex:0 0 60px;border-radius:999px;border:3px solid var(--panel-ink);background:var(--slot);box-shadow:inset 0 3px 0 rgba(0,0,0,.3);transition:background .12s}
+.tgl::after{content:'';position:absolute;top:2px;left:2px;width:24px;height:24px;border-radius:50%;background:#dfe4f4;border:2px solid var(--ink);box-shadow:inset 0 -3px 0 #9aa2c8;transition:left .12s steps(3,end)}
+.tgl[aria-checked="true"]{background:#4cb82a;box-shadow:inset 0 3px 0 rgba(0,0,0,.2),0 0 10px rgba(120,220,70,.35)}
+.tgl[aria-checked="true"]::after{left:28px;background:#fff;box-shadow:inset 0 -3px 0 #b6f07a}
+.tgl:disabled{opacity:.45}
+.range{flex:1;min-width:0;height:34px;accent-color:#5cc836;cursor:pointer}
+.vol-line{display:flex;align-items:center;gap:10px;padding:0 14px 12px 68px}
+.vol-line span{font-family:var(--f-px);font-size:10px;color:var(--gem);width:34px;text-align:right;font-variant-numeric:tabular-nums}
+.seg{display:inline-flex;gap:4px;padding:4px;border-radius:12px;background:var(--slot);border:2px solid var(--panel-ink);flex-shrink:0}
+.seg button{min-height:34px;padding:0 10px;border-radius:8px;font-weight:900;font-size:14px;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:#4cb82a;color:#fff;box-shadow:inset 0 2px 0 #b6f07a,inset 0 -3px 0 #2a6e14}
+.store-bar{display:flex;align-items:center;gap:10px;padding:0 14px 12px 68px}
+.store-bar .mini-bar{flex:1}
+.store-bar span{font-size:12px;font-weight:900;color:var(--muted);white-space:nowrap}
+.char-mgr{display:flex;align-items:center;gap:12px;padding:10px 14px}
+.char-mgr + .char-mgr{border-top:2px dashed var(--slot)}
+.char-mgr .slot{width:52px;height:50px;padding:5px}
+.char-mgr .lab{flex:1;min-width:0}
+.char-mgr .lab b{display:block;font-weight:900;font-size:17px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.char-mgr .lab small{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:var(--muted)}
+.char-mgr .lab small i{width:10px;height:13px;display:block}
+.char-mgr .acts{display:flex;gap:8px}
+.rbtn.danger{background:var(--tex) 0 0/24px 24px repeat,linear-gradient(180deg,#f06a6a,#c83434);box-shadow:inset 0 3px 0 #ffb0b0,inset 0 -3px 0 #8a1c1c,0 3px 0 var(--ink)}
+.about{padding:16px;display:flex;align-items:center;gap:14px}
+.about .sp{width:56px;height:84px;flex-shrink:0}
+.about b{display:block;font-weight:900;font-size:18px}
+.about small{display:block;color:var(--muted);font-weight:700;font-size:13px;line-height:1.6}
+
+/* PIN pad */
+.pin-dots{display:flex;justify-content:center;gap:14px;margin:4px 0}
+.pin-dots i{width:22px;height:22px;border-radius:6px;border:3px solid var(--panel-ink);background:var(--slot);box-shadow:inset 0 3px 0 rgba(0,0,0,.3)}
+.pin-dots i.on{background:#ffd23a;box-shadow:inset 0 -3px 0 #c89010,0 0 10px rgba(255,210,58,.5)}
+.pin-dots.shake{animation:shake .32s steps(4,end)}
+@keyframes shake{25%{transform:translateX(-8px)}50%{transform:translateX(8px)}75%{transform:translateX(-4px)}}
+.pin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.pin-pad .btn{min-height:58px;font-family:var(--f-px);font-size:18px;letter-spacing:0}
+.pin-msg{text-align:center;font-weight:900;min-height:24px}
+.pin-msg.err{color:#ff7a7a}
+body[data-mode="day"] .pin-msg.err{color:#c83434}
+
+/* hold-to-confirm */
+.hold{position:relative;overflow:hidden}
+.hold .fill{position:absolute;left:0;top:0;bottom:0;width:0;background:rgba(255,255,255,.28);pointer-events:none}
+.hold span.t{position:relative}
+.warn-card{display:flex;align-items:center;gap:12px;padding:12px;border-radius:12px;background:var(--slot);border:2px solid var(--panel-ink)}
+.warn-card .slot{width:54px;height:52px;padding:5px;background:var(--panel)}
+.warn-card b{display:block;font-weight:900;font-size:18px}
+.warn-card small{display:block;color:var(--muted);font-weight:700;font-size:13px;line-height:1.5}
+.gate-q{text-align:center;font-family:var(--f-px);font-size:20px;color:var(--gold);padding:8px 0}
+
+/* reading tools */
+.read-tools{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.read-tools .btn{min-height:50px;font-size:15px;letter-spacing:1px;gap:8px;padding:0 8px}
+.read-tools .btn .ico{width:22px;height:22px}
+.read-status{font-size:13px;font-weight:900;color:var(--muted);min-height:20px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.read-status a{color:var(--gem)}
+.book-chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch}
+.book-chip{flex-shrink:0;display:flex;align-items:center;gap:6px;max-width:190px;padding:6px 10px;border-radius:10px;background:var(--slot);border:2px solid var(--panel-ink);font-weight:900;font-size:14px}
+.book-chip i{width:18px;height:16px;display:block;flex-shrink:0}
+.book-chip span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.book-chip em{font-style:normal;font-family:var(--f-px);font-size:8px;color:var(--gem)}
+.spin{display:inline-block;width:14px;height:14px;border:3px solid var(--muted);border-top-color:transparent;border-radius:3px;animation:spin .8s steps(4,end) infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+body.big .wrap,body.big .sheet-body{zoom:1.12}
+body.no-motion .hero-sprite,body.no-motion .pet-sprite,body.no-motion .pick-label,body.no-motion .btn.glow{animation:none}
+body.no-motion .sheet-body,body.no-motion .toast{animation:none}
+
+.read-tools{grid-template-columns:repeat(auto-fit,minmax(140px,1fr))}
+</style>
+
+<style>[hidden]{display:none!important}</style>
+</head>
+<body>
+
+<canvas id="bg" aria-hidden="true"></canvas><canvas id="bgfx" aria-hidden="true"></canvas>
+<div id="toasts" aria-live="polite"></div>
+
+<!-- ═════════ TITLE ═════════ -->
+<section id="screen-title" class="screen active">
+  <div class="wrap title-wrap">
+    <div class="top-row"><button class="rbtn" onclick="goSettings('title')" data-ico="gear" aria-label="設定"></button><button class="rbtn theme-btn" onclick="themeToggle()" aria-label="切換日夜"></button></div>
+    <div class="logo-wrap">
+      <h1 class="logo" aria-label="麥塊任務島"><span class="logo-back" aria-hidden="true">麥塊任務島</span><span class="logo-front" aria-hidden="true">麥塊任務島</span></h1>
+      <div class="logo-sub stroke"><span class="dash"></span>讓任務變成冒險<span class="dash"></span></div>
+    </div>
+    <div class="stage">
+      <canvas id="island" aria-hidden="true"></canvas><canvas id="islandfx" aria-hidden="true"></canvas>
+      <div class="hero-sprite" id="title-hero"></div>
+      <div class="pet-sprite" id="title-pet"></div>
+    </div>
+    <div class="title-bottom">
+      <div class="pick-label stroke" id="pick-label">▼ 選擇冒險者 ▼</div>
+      <div class="hero-row" id="hero-row"></div>
+      <button class="btn primary" id="title-go" onclick="titleGo()"><span class="ico" data-ico="play"></span><span id="title-go-txt">開始任務</span></button>
+      <button class="btn stone" id="title-settings" onclick="goTaskSettings('title')"><span class="ico sm" data-ico="gear"></span>任務設定</button>
+    </div>
+    <div class="title-foot stroke">兄弟冒險特訓版</div>
+  </div>
+</section>
+
+<!-- ═════════ CREATE ═════════ -->
+<section id="screen-create" class="screen">
+  <div class="wrap">
+    <header class="bar"><button class="rbtn" onclick="stepBack()" data-ico="back" aria-label="上一步"></button><h2 class="bar-title stroke">建立冒險者</h2><span class="bar-spacer"></span></header>
+    <div class="step-dots" id="step-dots"><i></i><i></i><i></i><i></i></div>
+
+    <div class="create-step active" id="cstep-0">
+      <div class="step-title stroke">你是哪一位冒險者？</div>
+      <button class="panel type-card" onclick="pickType('older')"><span class="slot" data-ico="book"></span><span><b>大兒子</b><small>功課・訂正・自修打卡<br>小考・日記・閱讀加分</small></span></button>
+      <button class="panel type-card" onclick="pickType('younger')"><span class="slot" data-ico="broom"></span><span><b>小兒子</b><small>家務・好習慣・生活任務<br>閱讀・日記加分</small></span></button>
+      <button class="panel type-card" onclick="pickType('custom')"><span class="slot" data-ico="star"></span><span><b>自訂冒險者</b><small>完全屬於你的角色</small></span></button>
+    </div>
+
+    <div class="create-step" id="cstep-1">
+      <div class="step-title stroke">你叫什麼名字？</div>
+      <div class="panel form-card">
+        <label class="field-label" for="input-name">冒險者稱號（最多 10 字）</label>
+        <input id="input-name" class="inp" type="text" maxlength="10" placeholder="輸入你的名字…" autocomplete="off" onkeydown="if(event.key==='Enter')stepNext()">
+      </div>
+      <div class="step-nav"><button class="btn stone sq" onclick="stepBack()" aria-label="上一步"><span class="ico" data-ico="back"></span></button><button class="btn" onclick="stepNext()">下一步</button></div>
+    </div>
+
+    <div class="create-step" id="cstep-2">
+      <div class="step-title stroke">打扮你的角色</div>
+      <div class="panel look-card">
+        <div class="look-preview" id="look-preview"></div>
+        <div class="look-opts">
+          <div class="field-label">帽子</div><div class="swatch-row" id="sw-cap"></div>
+          <div class="field-label">衣服</div><div class="swatch-row" id="sw-jacket"></div>
+          <div class="field-label">頭髮</div><div class="swatch-row" id="sw-hair"></div>
+        </div>
+      </div>
+      <div class="panel form-card photo-row">
+        <button class="slot" id="av-slot" onclick="document.getElementById('av-file').click()" aria-label="上傳頭像照片" data-ico="camera"></button>
+        <div class="grow"><b>用照片當頭像</b><small>選填・會顯示在名片和基地</small></div>
+        <button class="link-btn" id="av-clear" hidden onclick="clearPhoto()">移除</button>
+        <input id="av-file" type="file" accept="image/*" hidden onchange="handleAvatarUpload(this)">
+      </div>
+      <div class="step-nav"><button class="btn stone sq" onclick="stepBack()" aria-label="上一步"><span class="ico" data-ico="back"></span></button><button class="btn" onclick="stepNext()">下一步</button></div>
+    </div>
+
+    <div class="create-step" id="cstep-3">
+      <div class="step-title stroke">確認你的角色</div>
+      <div class="panel confirm-card">
+        <div class="confirm-sprite" id="cf-sprite"></div>
+        <div style="min-width:0">
+          <div class="cf-name" id="cf-name"></div>
+          <div class="cf-type" id="cf-type"></div>
+          <span class="gem-badge" style="display:inline-flex"><i data-ico="gem"></i><b>0</b></span>
+        </div>
+      </div>
+      <div class="section-label stroke">你的每日任務</div>
+      <div class="mini-list" id="cf-tasks"></div>
+      <div class="step-nav"><button class="btn stone sq" onclick="stepBack()" aria-label="上一步"><span class="ico" data-ico="back"></span></button><button class="btn primary" onclick="doCreate()"><span class="ico" data-ico="play"></span>出發冒險！</button></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═════════ HUB ═════════ -->
+<section id="screen-main" class="screen">
+  <div class="wrap">
+    <div class="hub-top">
+      <button class="rbtn" onclick="goTitle()" data-ico="back" aria-label="回標題畫面"></button>
+      <div class="ttl stroke">冒險基地</div>
+      <button class="rbtn" onclick="goSettings('main')" data-ico="gear" aria-label="設定"></button>
+      <button class="rbtn theme-btn" onclick="themeToggle()" aria-label="切換日夜"></button>
+    </div>
+    <div class="panel hdr">
+      <span class="slot" id="hub-av"></span>
+      <div style="min-width:0"><div class="hdr-name" id="hub-name"></div><div class="hdr-streak"><i data-ico="flame"></i>連續 <b id="hub-streak">0</b> 天</div></div>
+      <div class="gem-badge"><i data-ico="gem"></i><b id="hub-gems">0</b></div>
+      <span class="lantern" data-ico="torch"></span>
+    </div>
+    <div class="panel xp">
+      <div class="row-between"><span class="lbl">今日任務</span><span class="num" id="hub-xp-num">0/0</span></div>
+      <div class="seg-bar" id="hub-segs"></div>
+    </div>
+    <button class="panel wish-teaser" id="hub-wish" onclick="goWishlist()" hidden>
+      <span class="slot" data-ico="chest"></span>
+      <span style="min-width:0;display:block">
+        <span class="wish-k" style="display:block">下一個願望</span>
+        <span class="wish-n" id="hub-wish-name" style="display:block"></span>
+        <span class="wish-bar"><span class="mini-bar"><i id="hub-wish-fill" style="width:0%"></i></span><span class="n" id="hub-wish-nums"></span></span>
+      </span>
+    </button>
+    <div class="tiles">
+      <button class="tile" onclick="goTasks()"><span class="t-slot" data-ico="grass"></span><span class="t-label">每日任務</span><span class="t-badge" id="hub-task-badge">0/0</span></button>
+      <button class="tile orange" onclick="goWishlist()"><span class="t-slot" data-ico="chest"></span><span class="t-label">願望清單</span><span class="t-badge" id="hub-wish-badge">0 個</span></button>
+      <button class="tile purple" onclick="goCalendar()"><span class="t-slot" data-ico="cal"></span><span class="t-label">冒險日曆</span><span class="t-badge" id="hub-cal-badge">0 天</span></button>
+      <button class="tile blue" onclick="goBonus()"><span class="t-slot" data-ico="star"></span><span class="t-label">加分日誌</span><span class="t-badge" id="hub-bonus-badge">0 筆</span></button>
+    </div>
+    <button class="btn stone" onclick="goTitle()" style="margin-top:4px"><span class="ico sm" data-ico="swap"></span>切換冒險者</button>
+  </div>
+</section>
+
+<!-- ═════════ TASKS ═════════ -->
+<section id="screen-tasks" class="screen">
+  <div class="wrap wide">
+    <header class="bar"><button class="rbtn" onclick="goMain()" data-ico="back" aria-label="回基地"></button><h2 class="bar-title stroke"><i data-ico="grass"></i>每日任務</h2><span class="date-chip" id="task-date"></span></header>
+    <div class="panel xp summary">
+      <div class="row-between"><span class="lbl">今日進度</span><span class="num" id="task-progress-txt">0/0</span><span class="grow"></span><button class="chip-btn" onclick="goTaskSettings('tasks')"><i data-ico="gear"></i>設定</button></div>
+      <div class="seg-bar" id="task-segs"></div>
+    </div>
+    <div class="task-list" id="task-list"></div>
+    <div class="panel empty" id="task-empty" hidden><span class="slot" data-ico="grass"></span><b>還沒有任務</b><small>點上方「設定」新增今天的任務</small></div>
+  </div>
+</section>
+
+<!-- ═════════ WISHLIST ═════════ -->
+<section id="screen-wishlist" class="screen">
+  <div class="wrap wide">
+    <header class="bar"><button class="rbtn" onclick="goMain()" data-ico="back" aria-label="回基地"></button><h2 class="bar-title stroke"><i data-ico="chest"></i>願望清單</h2><span class="gem-badge"><i data-ico="gem"></i><b id="wish-bal">0</b></span></header>
+    <div class="wish-grid" id="wish-grid"></div>
+    <div class="panel empty" id="wish-empty" hidden><span class="slot" data-ico="chest"></span><b>還沒有願望</b><small>點右下角的 + 來許願！</small></div>
+  </div>
+</section>
+
+<!-- ═════════ CALENDAR ═════════ -->
+<section id="screen-calendar" class="screen">
+  <div class="wrap">
+    <header class="bar"><button class="rbtn" onclick="goMain()" data-ico="back" aria-label="回基地"></button><h2 class="bar-title stroke"><i data-ico="cal"></i>冒險日曆</h2><span class="bar-spacer"></span></header>
+    <div class="panel streak-card"><span class="big-flame" data-ico="flame"></span><div><div class="streak-num"><b id="cal-streak-count">0</b>天連續完成</div><div class="streak-best" id="cal-streak-best"></div></div></div>
+    <div class="stat-row">
+      <div class="panel stat"><b id="cal-stat-days">0</b><span>本月完成天</span></div>
+      <div class="panel stat gold"><b id="cal-stat-bonus">0</b><span>本月加分</span></div>
+      <div class="panel stat"><b id="cal-stat-gems">0</b><span>本月寶石</span></div>
+    </div>
+    <div class="panel cal-card">
+      <div class="cal-nav"><button class="rbtn sm" onclick="calPrev()" data-ico="back" aria-label="上個月"></button><div class="cal-month" id="cal-month-label"></div><button class="rbtn sm flip" onclick="calNext()" data-ico="back" aria-label="下個月"></button></div>
+      <div class="cal-dow"><span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span></div>
+      <div class="cal-grid" id="cal-grid"></div>
+      <div class="legend">
+        <span><i class="cday full"></i>全部完成</span>
+        <span><i class="cday partial"></i>部分完成</span>
+        <span><i class="bstar" data-ico="star"></i>有加分</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═════════ BONUS ═════════ -->
+<section id="screen-bonus" class="screen">
+  <div class="wrap wide">
+    <header class="bar"><button class="rbtn" onclick="goMain()" data-ico="back" aria-label="回基地"></button><h2 class="bar-title stroke"><i data-ico="star"></i>加分日誌</h2><span class="bar-spacer"></span></header>
+    <div class="panel filter-row">
+      <button class="fchip" id="bfilter-all" onclick="setBonusFilter('all')">全部</button>
+      <button class="fchip" id="bfilter-exam" onclick="setBonusFilter('exam')"><i data-ico="paper"></i>考試</button>
+      <button class="fchip" id="bfilter-diary" onclick="setBonusFilter('diary')"><i data-ico="diary"></i>日記</button>
+      <button class="fchip" id="bfilter-reading" onclick="setBonusFilter('reading')"><i data-ico="book"></i>閱讀</button>
+    </div>
+    <div class="bonus-list" id="bonus-list"></div>
+    <div class="panel empty" id="bonus-empty" hidden><span class="slot" data-ico="star"></span><b>還沒有加分紀錄</b><small>點右下角的 + 來登記！</small></div>
+  </div>
+</section>
+
+<!-- ═════════ TASK SETTINGS ═════════ -->
+<section id="screen-task-settings" class="screen">
+  <div class="wrap wide">
+    <header class="bar"><button class="rbtn" onclick="tsBack()" data-ico="back" aria-label="返回"></button><h2 class="bar-title stroke"><i data-ico="gear"></i>任務設定</h2><span class="bar-spacer"></span></header>
+    <div class="panel hint"><i data-ico="box"></i><span id="ts-hint">封存的任務不計入每日進度，但歷史紀錄會保留。</span></div>
+    <div class="section-label stroke" id="ts-active-label"></div>
+    <div class="ts-list" id="ts-active"></div>
+    <div class="section-label stroke" id="ts-arch-label"></div>
+    <div class="ts-list" id="ts-arch"></div>
+    <button class="btn" onclick="openAddTaskModal()" style="margin-top:6px"><span class="ico" data-ico="plus"></span>新增任務</button>
+  </div>
+</section>
+
+
+<!-- ═════════ SETTINGS ═════════ -->
+<section id="screen-settings" class="screen">
+  <div class="wrap">
+    <header class="bar"><button class="rbtn" onclick="settingsBack()" data-ico="back" aria-label="返回"></button><h2 class="bar-title stroke"><i data-ico="gear"></i>設定</h2><span class="bar-spacer"></span></header>
+
+    <div class="set-head stroke"><i data-ico="cloud"></i>帳號與存檔</div>
+    <div class="panel set-group">
+      <div class="set-row">
+        <span class="slot" data-ico="cloud"></span>
+        <span class="lab"><b>雲端存檔</b><small id="cloud-sub">存到你的 Claude 帳號，換手機或平板也能讀回來</small></span>
+        <span id="cloud-state"></span>
+      </div>
+      <div class="set-row wrap-ctl" id="cloud-actions" style="border-top:0;padding-top:0;min-height:0">
+        <div class="ctl-line">
+          <button class="btn sm" id="cloud-up" onclick="cloudUpload()"><span class="ico" data-ico="up"></span>上傳到雲端</button>
+          <button class="btn stone sm" id="cloud-down" onclick="cloudDownload()"><span class="ico" data-ico="cloud"></span>從雲端讀取</button>
+        </div>
+      </div>
+      <div class="set-row off">
+        <span class="slot" data-ico="shield"></span>
+        <span class="lab"><b>綁定家長帳號</b><small>用 Google / Apple 帳號登入、多位家長共用</small></span>
+        <span class="soon">即將推出</span>
+      </div>
+      <button class="set-row" onclick="exportBackup()" id="row-export">
+        <span class="slot" data-ico="export"></span>
+        <span class="lab"><b>匯出備份檔</b><small>下載一個 .json 檔，自己保存最安心</small></span>
+        <span class="chev" data-ico="chev"></span>
+      </button>
+      <button class="set-row" onclick="document.getElementById('import-file').click()">
+        <span class="slot" data-ico="import"></span>
+        <span class="lab"><b>匯入備份檔</b><small>從 .json 備份檔還原所有資料</small></span>
+        <span class="chev" data-ico="chev"></span>
+      </button>
+      <input id="import-file" type="file" accept=".json,application/json" hidden onchange="importBackup(this)">
+      <div class="set-row" style="min-height:0;padding-bottom:4px">
+        <span class="slot" data-ico="box"></span>
+        <span class="lab"><b>這台裝置的儲存空間</b><small id="store-sub">計算中…</small></span>
+      </div>
+      <div class="store-bar"><span class="mini-bar"><i id="store-fill" style="width:0%"></i></span><span id="store-pct">0%</span></div>
+    </div>
+
+    <div class="set-head stroke"><i data-ico="speaker"></i>聲音</div>
+    <div class="panel set-group">
+      <div class="set-row">
+        <span class="slot" data-ico="speaker"></span>
+        <span class="lab"><b>音效</b><small>完成任務、兌換願望的 8-bit 音效</small></span>
+        <button class="tgl" id="tg-sfx" role="switch" aria-label="音效" onclick="toggleSetting('sfx')"></button>
+      </div>
+      <div class="vol-line"><input class="range" id="rg-sfx" type="range" min="0" max="100" step="5" aria-label="音效音量" oninput="setVolume('sfxVol',this.value)"><span id="rv-sfx">70</span></div>
+      <div class="set-row">
+        <span class="slot" data-ico="music"></span>
+        <span class="lab"><b>背景音樂</b><small>輕快的方塊小調，一直循環播放</small></span>
+        <button class="tgl" id="tg-bgm" role="switch" aria-label="背景音樂" onclick="toggleSetting('bgm')"></button>
+      </div>
+      <div class="vol-line"><input class="range" id="rg-bgm" type="range" min="0" max="100" step="5" aria-label="背景音樂音量" oninput="setVolume('bgmVol',this.value)"><span id="rv-bgm">40</span></div>
+      <div class="set-row" id="row-vibrate">
+        <span class="slot" data-ico="bell"></span>
+        <span class="lab"><b>震動回饋</b><small id="vib-sub">完成任務時手機輕震一下（Android）</small></span>
+        <button class="tgl" id="tg-vibrate" role="switch" aria-label="震動回饋" onclick="toggleSetting('vibrate')"></button>
+      </div>
+    </div>
+
+    <div class="set-head stroke"><i data-ico="sparkle"></i>畫面</div>
+    <div class="panel set-group">
+      <div class="set-row">
+        <span class="slot" data-ico="moon"></span>
+        <span class="lab"><b>日夜主題</b><small>自動：早上 6 點到晚上 6 點是白天</small></span>
+        <span class="seg" id="seg-theme"><button onclick="setThemeMode('night')">夜晚</button><button onclick="setThemeMode('day')">白天</button><button onclick="setThemeMode('auto')">自動</button></span>
+      </div>
+      <div class="set-row">
+        <span class="slot" data-ico="sparkle"></span>
+        <span class="lab"><b>動畫效果</b><small>火把閃爍、角色跳動、寶石噴發</small></span>
+        <button class="tgl" id="tg-motion" role="switch" aria-label="動畫效果" onclick="toggleSetting('motion')"></button>
+      </div>
+      <div class="set-row">
+        <span class="slot" data-ico="text"></span>
+        <span class="lab"><b>文字大小</b><small>字大一點，看得更清楚</small></span>
+        <span class="seg" id="seg-text"><button onclick="setBigText(false)">標準</button><button onclick="setBigText(true)">放大</button></span>
+      </div>
+      <div class="set-row off">
+        <span class="slot" data-ico="globe"></span>
+        <span class="lab"><b>語言</b><small>繁體中文</small></span>
+        <span class="soon">更多語言即將推出</span>
+      </div>
+    </div>
+
+    <div class="set-head stroke"><i data-ico="lock"></i>家長控制</div>
+    <div class="panel set-group">
+      <button class="set-row" onclick="managePin()">
+        <span class="slot" data-ico="lock"></span>
+        <span class="lab"><b>家長密碼</b><small id="pin-sub">還沒設定・設定後孩子不能亂刪資料</small></span>
+        <span id="pin-state"></span>
+        <span class="chev" data-ico="chev"></span>
+      </button>
+      <div class="set-row" id="row-lock-ts">
+        <span class="slot" data-ico="gear"></span>
+        <span class="lab"><b>任務設定要密碼</b><small>新增、修改、封存任務前要輸入密碼</small></span>
+        <button class="tgl" id="tg-lock-ts" role="switch" aria-label="任務設定要密碼" onclick="toggleLock('taskSettings')"></button>
+      </div>
+      <div class="set-row" id="row-lock-redeem">
+        <span class="slot" data-ico="chest"></span>
+        <span class="lab"><b>兌換願望要家長確認</b><small>孩子兌換時，由家長輸入密碼</small></span>
+        <button class="tgl" id="tg-lock-redeem" role="switch" aria-label="兌換願望要家長確認" onclick="toggleLock('redeem')"></button>
+      </div>
+      <div class="set-row" id="row-lock-bonus">
+        <span class="slot" data-ico="star"></span>
+        <span class="lab"><b>登記加分要家長確認</b><small>考試、日記、閱讀加分前輸入密碼</small></span>
+        <button class="tgl" id="tg-lock-bonus" role="switch" aria-label="登記加分要家長確認" onclick="toggleLock('bonus')"></button>
+      </div>
+      <div class="set-row off">
+        <span class="slot" data-ico="clock"></span>
+        <span class="lab"><b>每日使用時間</b><small>限制每天可以玩多久</small></span>
+        <span class="soon">即將推出</span>
+      </div>
+    </div>
+
+    <div class="set-head stroke"><i data-ico="shield"></i>冒險者管理</div>
+    <div class="panel set-group" id="char-mgr-list"></div>
+    <div class="panel set-group" id="trash-panel" hidden>
+      <div class="set-row" style="min-height:0"><span class="slot" data-ico="trash"></span><span class="lab"><b>最近刪除</b><small>30 天內可以救回來</small></span></div>
+      <div id="trash-list"></div>
+    </div>
+
+    <div class="set-head stroke"><i data-ico="book"></i>閱讀</div>
+    <div class="panel set-group">
+      <div class="set-row">
+        <span class="slot" data-ico="book"></span>
+        <span class="lab"><b>我的書架</b><small id="shelf-sub">還沒有書</small></span>
+        <button class="btn stone sm" style="width:auto" id="shelf-clear" onclick="clearShelf()">清空</button>
+      </div>
+      <div class="set-row">
+        <span class="slot" data-ico="barcode"></span>
+        <span class="lab"><b>掃描書本條碼</b><small>拍 ISBN 條碼，讀過的書自動帶出書名</small></span>
+        <span class="pill-ok">可以用</span>
+      </div>
+      <div class="set-row">
+        <span class="slot" data-ico="sparkle"></span>
+        <span class="lab"><b>拍書封辨識書名</b><small id="ai-sub">由 Claude 讀出書名和作者，會用到你的 Claude 用量</small></span>
+        <span id="ai-state"><span class="soon">檢查中</span></span>
+      </div>
+      <div class="set-row off">
+        <span class="slot" data-ico="globe"></span>
+        <span class="lab"><b>串接圖書館借閱紀錄</b><small>目前圖書館沒有開放給 App 讀取借閱資料</small></span>
+        <span class="soon">暫不支援</span>
+      </div>
+    </div>
+
+    <div class="set-head stroke"><i data-ico="bell"></i>提醒通知</div>
+    <div class="panel set-group">
+      <div class="set-row off">
+        <span class="slot" data-ico="bell"></span>
+        <span class="lab"><b>每日任務提醒</b><small>傍晚提醒還沒完成的任務</small></span>
+        <span class="soon">即將推出</span>
+      </div>
+      <div class="set-row off">
+        <span class="slot" data-ico="flame"></span>
+        <span class="lab"><b>連續天數快中斷提醒</b><small>睡前還沒打卡時提醒</small></span>
+        <span class="soon">即將推出</span>
+      </div>
+    </div>
+
+    <div class="set-head stroke"><i data-ico="info"></i>關於</div>
+    <div class="panel about">
+      <span class="sp" id="about-sprite"></span>
+      <span><b>麥塊任務島 V13</b><small>兄弟冒險特訓版<br>資料存在這台裝置；可用雲端存檔或備份檔搬家。</small></span>
+    </div>
+    <button class="btn red" onclick="resetAll()" style="margin-top:4px"><span class="ico" data-ico="trash"></span>清除這台裝置的所有資料</button>
+  </div>
+</section>
+
+<!-- ═════════ SHEET: PIN ═════════ -->
+<div class="sheet" id="modal-pin" onclick="if(event.target===this)pinCancel()">
+  <div class="panel sheet-body" role="dialog" aria-labelledby="pin-title" style="max-width:420px">
+    <div class="sheet-head"><h3 id="pin-title"><i data-ico="lock"></i>輸入家長密碼</h3><button class="rbtn sm" onclick="pinCancel()" data-ico="close" aria-label="關閉"></button></div>
+    <div class="note" id="pin-reason" style="text-align:center"></div>
+    <div class="pin-dots" id="pin-dots"><i></i><i></i><i></i><i></i></div>
+    <div class="pin-msg" id="pin-msg"></div>
+    <div class="pin-pad" id="pin-pad"></div>
+    <button class="link-btn" id="pin-forgot" onclick="pinForgot()" style="align-self:center">忘記密碼？</button>
+  </div>
+</div>
+
+<!-- ═════════ SHEET: CONFIRM ═════════ -->
+<div class="sheet" id="modal-confirm" onclick="if(event.target===this)confirmDone(false)">
+  <div class="panel sheet-body" role="dialog" aria-labelledby="cf2-title" style="max-width:460px">
+    <div class="sheet-head"><h3 id="cf2-title"></h3><button class="rbtn sm" onclick="confirmDone(false)" data-ico="close" aria-label="關閉"></button></div>
+    <div id="cf2-body" style="display:flex;flex-direction:column;gap:12px"></div>
+    <div class="sheet-actions"><button class="btn stone" onclick="confirmDone(false)">取消</button><button class="btn" id="cf2-ok"><span class="fill"></span><span class="t" id="cf2-ok-t">確定</span></button></div>
+  </div>
+</div>
+
+<!-- ═════════ SHEET: EDIT ADVENTURER ═════════ -->
+<div class="sheet" id="modal-char" onclick="if(event.target===this)closeSheet(this.id)">
+  <div class="panel sheet-body" role="dialog" aria-labelledby="char-title">
+    <div class="sheet-head"><h3 id="char-title">編輯冒險者</h3><button class="rbtn sm" onclick="closeSheet('modal-char')" data-ico="close" aria-label="關閉"></button></div>
+    <div class="form-card" style="padding:0"><label class="field-label" for="ce-name">冒險者稱號（最多 10 字）</label><input id="ce-name" class="inp" type="text" maxlength="10" autocomplete="off"></div>
+    <div class="look-card" style="padding:0">
+      <div class="look-preview" id="ce-preview"></div>
+      <div class="look-opts">
+        <div class="field-label">帽子</div><div class="swatch-row" id="ce-cap"></div>
+        <div class="field-label">衣服</div><div class="swatch-row" id="ce-jacket"></div>
+        <div class="field-label">頭髮</div><div class="swatch-row" id="ce-hair"></div>
+      </div>
+    </div>
+    <div class="photo-row" style="display:flex;align-items:center;gap:14px">
+      <button class="slot" id="ce-slot" style="width:64px;height:64px;padding:12px" onclick="document.getElementById('ce-file').click()" aria-label="更換頭像照片"></button>
+      <div class="grow" style="flex:1"><b style="font-weight:900">頭像照片</b><small style="display:block;color:var(--muted);font-size:13px">選填</small></div>
+      <button class="link-btn" id="ce-clear" onclick="ceClearPhoto()">移除</button>
+      <input id="ce-file" type="file" accept="image/*" hidden onchange="ceUpload(this)">
+    </div>
+    <div class="sheet-actions"><button class="btn stone" onclick="closeSheet('modal-char')">取消</button><button class="btn" onclick="saveCharEdit()">儲存</button></div>
+  </div>
+</div>
+
+<button class="fab" id="fab-wish" hidden onclick="openWishModal()" data-ico="plus" aria-label="新增願望"></button>
+<button class="fab gold" id="fab-bonus" hidden onclick="openBonusModal()" data-ico="plus" aria-label="登記加分"></button>
+
+<!-- ═════════ SHEET: TASK EDIT ═════════ -->
+<div class="sheet" id="modal-task-edit" onclick="if(event.target===this)closeSheet(this.id)">
+  <div class="panel sheet-body" role="dialog" aria-labelledby="task-edit-title">
+    <div class="sheet-head"><h3 id="task-edit-title">編輯任務</h3><button class="rbtn sm" onclick="closeSheet('modal-task-edit')" data-ico="close" aria-label="關閉"></button></div>
+    <div class="form-card" style="padding:0">
+      <label class="field-label" for="te-name">任務名稱</label>
+      <input id="te-name" class="inp" type="text" maxlength="15" placeholder="例：寫日記" autocomplete="off">
+    </div>
+    <div>
+      <div class="field-label" style="margin-bottom:8px">選一個圖示</div>
+      <div class="icon-grid" id="te-icons"></div>
+      <div class="emoji-row" style="margin-top:10px"><input id="te-emoji" class="inp" type="text" maxlength="2" placeholder="😀" oninput="teEmojiInput()"><span class="note">或輸入一個 Emoji 當圖示</span></div>
+    </div>
+    <div>
+      <label class="field-label" for="te-reward">獎勵綠寶石（1–99）</label>
+      <div class="stepper" style="margin-top:8px">
+        <button class="btn stone" onclick="stepVal('te-reward',-1,1,99)" aria-label="減少">−</button>
+        <span class="gem-i" data-ico="gem"></span>
+        <input id="te-reward" class="inp" type="number" min="1" max="99" value="5" inputmode="numeric">
+        <button class="btn" onclick="stepVal('te-reward',1,1,99)" aria-label="增加">+</button>
+      </div>
+    </div>
+    <div class="sheet-actions"><button class="btn stone" onclick="closeSheet('modal-task-edit')">取消</button><button class="btn" onclick="saveTaskEdit()">儲存</button></div>
+  </div>
+</div>
+
+<!-- ═════════ SHEET: WISH ═════════ -->
+<div class="sheet" id="modal-wish" onclick="if(event.target===this)closeSheet(this.id)">
+  <div class="panel sheet-body" role="dialog" aria-labelledby="wish-title">
+    <div class="sheet-head"><h3 id="wish-title"><i data-ico="chest"></i>新增願望</h3><button class="rbtn sm" onclick="closeSheet('modal-wish')" data-ico="close" aria-label="關閉"></button></div>
+    <div class="form-card" style="padding:0">
+      <label class="field-label" for="wi-name">願望名稱</label>
+      <input id="wi-name" class="inp" type="text" placeholder="我想要…" maxlength="20" autocomplete="off">
+    </div>
+    <div>
+      <div class="field-label" style="margin-bottom:8px">願望圖片（選填）</div>
+      <button class="upload-area" style="width:100%" onclick="document.getElementById('wi-file').click()">
+        <span class="up-hint"><i data-ico="camera"></i>點這裡上傳圖片</span>
+        <img id="wi-img-preview" alt="" hidden>
+      </button>
+      <input id="wi-file" type="file" accept="image/*" hidden onchange="handleImg(this)">
+    </div>
+    <div>
+      <label class="field-label" for="wi-cost">需要多少綠寶石？</label>
+      <div class="stepper" style="margin-top:8px">
+        <button class="btn stone" onclick="stepVal('wi-cost',-10,1,9999);updateCostHint()" aria-label="減少 10">−</button>
+        <span class="gem-i" data-ico="gem"></span>
+        <input id="wi-cost" class="inp" type="number" min="1" max="9999" value="200" inputmode="numeric" oninput="updateCostHint()">
+        <button class="btn" onclick="stepVal('wi-cost',10,1,9999);updateCostHint()" aria-label="增加 10">+</button>
+      </div>
+      <div class="note" id="cost-hint" style="margin-top:8px"></div>
+    </div>
+    <div class="sheet-actions"><button class="btn stone" onclick="closeSheet('modal-wish')">取消</button><button class="btn" onclick="saveWish()">許願！</button></div>
+  </div>
+</div>
+
+<!-- ═════════ SHEET: BONUS ═════════ -->
+<div class="sheet" id="modal-bonus" onclick="if(event.target===this)closeSheet(this.id)">
+  <div class="panel sheet-body" role="dialog" aria-labelledby="bonus-title">
+    <div class="sheet-head"><h3 id="bonus-title"><i data-ico="star"></i>登記加分</h3><button class="rbtn sm" onclick="closeSheet('modal-bonus')" data-ico="close" aria-label="關閉"></button></div>
+    <div class="tabs">
+      <button class="fchip" id="btab-exam" onclick="selectBonusTab('exam')"><i data-ico="paper"></i>考試成績</button>
+      <button class="fchip" id="btab-diary" onclick="selectBonusTab('diary')"><i data-ico="diary"></i>寫日記</button>
+      <button class="fchip" id="btab-reading" onclick="selectBonusTab('reading')"><i data-ico="book"></i>自主閱讀</button>
+    </div>
+    <div class="bpanel" id="bpanel-exam">
+      <div class="form-card" style="padding:0"><label class="field-label" for="ex-subject">考試科目</label><input id="ex-subject" class="inp" type="text" placeholder="例：國語、數學期中考…" maxlength="20" autocomplete="off"></div>
+      <div>
+        <label class="field-label" for="ex-score">分數（0–100）</label>
+        <div class="stepper" style="margin-top:8px">
+          <button class="btn stone" onclick="stepVal('ex-score',-1,0,100);updateScorePreview()" aria-label="減 1 分">−</button>
+          <input id="ex-score" class="inp" type="number" min="0" max="100" value="90" inputmode="numeric" oninput="updateScorePreview()" style="color:var(--gold)">
+          <button class="btn" onclick="stepVal('ex-score',1,0,100);updateScorePreview()" aria-label="加 1 分">+</button>
+        </div>
+      </div>
+      <div class="preview-box"><i data-ico="gem"></i><b id="score-gems">15</b><span id="score-msg">綠寶石（90 分）很棒！</span></div>
+    </div>
+    <div class="bpanel" id="bpanel-diary">
+      <div class="form-card" style="padding:0"><label class="field-label" for="di-title">日記標題（選填）</label><input id="di-title" class="inp" type="text" placeholder="今天發生了…" maxlength="30" autocomplete="off"></div>
+      <div class="form-card" style="padding:0"><label class="field-label" for="di-content">內容（可簡短）</label><textarea id="di-content" class="inp" rows="4" maxlength="300" placeholder="今天我…"></textarea></div>
+      <div class="preview-box"><i data-ico="gem"></i><b>8</b><span>綠寶石（寫一篇日記）</span></div>
+    </div>
+    <div class="bpanel" id="bpanel-reading">
+      <div class="read-tools">
+        <button class="btn stone" onclick="document.getElementById('rd-scan-file').click()"><span class="ico" data-ico="barcode"></span>掃描條碼</button>
+        <button class="btn gold" id="rd-ai-btn" hidden onclick="document.getElementById('rd-cover-file').click()"><span class="ico" data-ico="sparkle"></span>拍書封辨識</button>
+      </div>
+      <input id="rd-scan-file" type="file" accept="image/*" capture="environment" hidden onchange="scanBarcode(this)">
+      <input id="rd-cover-file" type="file" accept="image/*" capture="environment" hidden onchange="aiCover(this)">
+      <div class="read-status" id="rd-status" aria-live="polite"></div>
+      <div id="rd-shelf-wrap" hidden><div class="field-label" style="margin-bottom:6px">我的書架・點一下帶入</div><div class="book-chips" id="rd-shelf"></div></div>
+      <div class="form-card" style="padding:0"><label class="field-label" for="rd-title">書名</label><input id="rd-title" class="inp" type="text" placeholder="書名…" maxlength="30" autocomplete="off"></div>
+      <div class="form-card" style="padding:0"><label class="field-label" for="rd-author">作者（選填）</label><input id="rd-author" class="inp" type="text" placeholder="作者…" maxlength="20" autocomplete="off"></div>
+      <div class="form-card" style="padding:0"><label class="field-label" for="rd-note">讀了哪些部分</label><input id="rd-note" class="inp" type="text" placeholder="例：第 1–3 章、整本…" maxlength="30" autocomplete="off"></div>
+      <div class="form-card" style="padding:0"><label class="field-label" for="rd-isbn">ISBN（選填・掃描會自動填入）</label><input id="rd-isbn" class="inp" type="text" inputmode="numeric" placeholder="978…" maxlength="13" autocomplete="off"></div>
+      <div class="preview-box"><i data-ico="gem"></i><b>6</b><span>綠寶石（每次閱讀紀錄）</span></div>
+    </div>
+    <div class="sheet-actions"><button class="btn stone" onclick="closeSheet('modal-bonus')">取消</button><button class="btn gold" onclick="saveBonus()">登記！</button></div>
+  </div>
+</div>
+
+<!-- ═════════ SHEET: DAY ═════════ -->
+<div class="sheet" id="day-popup" onclick="if(event.target===this)closeSheet(this.id)">
+  <div class="panel sheet-body" role="dialog" aria-labelledby="popup-date">
+    <div class="sheet-head"><h3 id="popup-date"></h3><button class="rbtn sm" onclick="closeSheet('day-popup')" data-ico="close" aria-label="關閉"></button></div>
+    <div id="popup-body"></div>
+    <button class="btn stone" onclick="closeSheet('day-popup')">關閉</button>
+  </div>
+</div>
+<script>
+/* ═══════════════════════════════════
+   PIXEL ART — 全部用程式碼繪製
+════════════════════════════════════ */
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const RM = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+function rng(seed) { let s = seed >>> 0; return () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; }; }
+
+function pix(map, pal) {
+  const h = map.length, w = Math.max(...map.map(r => r.length)); let out = '';
+  map.forEach((row, y) => {
+    let x = 0;
+    while (x < row.length) {
+      const c = row[x]; if (!pal[c]) { x++; continue; }
+      let x2 = x; while (x2 < row.length && row[x2] === c) x2++;
+      out += `<rect x="${x}" y="${y}" width="${x2 - x + .04}" height="1.04" fill="${pal[c]}"/>`; x = x2;
+    }
+  });
+  return `<svg viewBox="0 0 ${w} ${h}" shape-rendering="crispEdges" aria-hidden="true">${out}</svg>`;
+}
+const K = '#1a1024';
+const CUR = 'currentColor';
+
+const BOOK_MAP = ["KKKKKKKKKKK.","KbBBBBBBBBBK","KbBYYYYYYBBK","KbBYWWWWYBBK","KbBYYYYYYBBK","KbBBBBBBBBBK","KbBBBBBBBBBK","KbBBBBBBBBBK","KbKKKKKKKKKK","KbWWWWWWWWWK","KKKKKKKKKKK."];
+const ICONS = {
+  gem:   { m:["..KKK..",".KLGgK.","KLGGGgK","KGGGggK","KGGggDK",".KgDDK.","..KDK..","...K..."], p:{K,L:'#d8ffc0',G:'#5ee85a',g:'#2aa83a',D:'#167a2a'} },
+  flame: { m:["...K...","..KfK..",".KffK..",".KfYfK.","KfYYYfK","KfYWYfK","KfYYYfK",".KfffK.","..KKK.."], p:{K,f:'#f08a24',Y:'#ffd23a',W:'#fff6c0'} },
+  grass: { m:["KKKKKKKKKKKK","KLGLGGLGGLGK","KGGgGGGgGGgK","KgGgGgGGgGgK","KdgDgDDgDgDK","KDDdDtDDdDDK","KDtDDDDdDDtK","KDDDdDDDDtDK","KdDtDDtDdDDK","KDDDDdDDDDdK","KDdDDDDtDDDK","KKKKKKKKKKKK"], p:{K,L:'#9be45c',G:'#5bc236',g:'#3e9a22',D:'#8a5a2a',d:'#6a3f1a',t:'#b07a3e'} },
+  chest: { m:["KKKKKKKKKKKK","KWWWWWWWWWWK","KWwwwwwwwwWK","KWWWWWWWWWWK","KKKKKYYKKKKK","KwwwwYYwwwwK","KWWWWKKWWWWK","KWWWWWWWWWWK","KwwwwwwwwwwK","KWWWWWWWWWWK","KKKKKKKKKKKK"], p:{K,W:'#c27c3c',w:'#8a521e',Y:'#ffd23a'} },
+  cal:   { m:["..K......K..","KKKKKKKKKKKK","KRRRRRRRRRRK","KRRRRRRRRRRK","KKKKKKKKKKKK","KPpPPpPPpPPK","KPPPPPPPPPPK","KPpPPpPPPPGK","KPPPPPPGPGPK","KPpPPpPPGPPK","KPPPPPPPPPPK","KKKKKKKKKKKK"], p:{K,R:'#e04848',P:'#f6f2ff',p:'#b8b0d8',G:'#3fae2a'} },
+  star:  { m:[".....K.....","....KWK....","....KYK....","KKKKYYyKKKK","KWYYYYYYyyK",".KYYYYYYyK.","..KYYYYyK..","..KYYKYyK..",".KYyK.KyyK.",".KyK...KyK.",".KK.....KK."], p:{K,W:'#fff6c0',Y:'#ffd23a',y:'#f0a020'} },
+  gear:  { m:["....KKKK....",".KK.KSSK.KK.",".KSKKSSKKSK.","..KSSSSSSK..","KKSSsKKsSSKK","KSSSK..KSSSK","KSSSK..KSSSK","KKSSsKKsSSKK","..KSSSSSSK..",".KSKKSSKKSK.",".KK.KSSK.KK.","....KKKK...."], p:{K,S:'#e6eaf8',s:'#9aa2c8'} },
+  play:  { m:["KK......","KYKK....","KYYYKK..","KWYYYYKK","KYYYYYyK","KYYYYyyK","KYYYyyKK","KYyyKK..","KyKK....","KK......"], p:{K,Y:'#ffd23a',y:'#f0a020',W:'#fff6c0'} },
+  plus:  { m:["...KKK...","...KWK...","...KWK...","KKKKWKKKK","KWWWWWWWK","KKKKWKKKK","...KWK...","...KWK...","...KKK..."], p:{K,W:'#ffffff'} },
+  check: { m:["......KK",".....KWK","K...KWK.","KWK.KWK.",".KWKWK..","..KWK...","...K...."], p:{K,W:'#ffffff'} },
+  back:  { m:["....KK","...KWK","..KWK.",".KWK..","KWK...",".KWK..","..KWK.","...KWK","....KK"], p:{K,W:CUR} },
+  close: { m:["KK....KK","KWK..KWK",".KWKKWK.","..KWWK..","..KWWK..",".KWKKWK.","KWK..KWK","KK....KK"], p:{K,W:CUR} },
+  moon:  { m:["...KKKK...",".KKMMK....",".KMMK.....","KMMK......","KMMK......","KMMK......","KMMMK....K",".KMMMKKKMK",".KKMMMMMKK","...KKKKK.."], p:{K,M:'#fff2c0'} },
+  sun:   { m:[".....YY.....",".Y...YY...Y.","..Y......Y..","....KKKK....","...KYWYYK...","YY.KYYYyK.YY","YY.KYYyyK.YY","...KYyyyK...","....KKKK....","..Y......Y..",".Y...YY...Y.",".....YY....."], p:{K,Y:'#ffb020',y:'#f08a24',W:'#fff6c0'} },
+  torch: { m:[".KKK.","KYWYK","KfYfK",".KfK.",".KNK.",".KNK.",".KNK.",".KNK.",".KNK.",".KNK.",".KNK.",".KKK."], p:{K,Y:'#ffd23a',W:'#fff6c0',f:'#f08a24',N:'#8a5a2a'} },
+  swap:  { m:["....K....","....KK...","KKKKKWK..","KWWWWWWK.","KKKKKWK..","....KK...","..KK.....",".KWKKKKKK","KWWWWWWWK",".KWKKKKKK","..KK....."], p:{K,W:'#ffffff'} },
+  camera:{ m:["..KKKK......","KKKYYKKKKKKK","KSSSSSSSSSSK","KSSSKKKKSSSK","KSSKLLWLKSSK","KSSKLLLLKSSK","KSSKLLLLKSSK","KSSSKKKKSSSK","KSSSSSSSSSSK","KKKKKKKKKKKK"], p:{K,S:'#6a72a8',L:'#8ad0ff',W:'#ffffff',Y:'#ffd23a'} },
+  box:   { m:["KKKKKKKKKKKK","KwwwwwwwwwwK","KKKKKKKKKKKK",".KWWWWWWWWK.",".KWWKKKKWWK.",".KWWWWWWWWK.",".KWWWWWWWWK.",".KWWWWWWWWK.",".KKKKKKKKKK."], p:{K,W:'#c27c3c',w:'#8a521e'} },
+  up:    { m:["....K....","...KGK...","..KGGGK..",".KGGGGGK.","KKKGGGKKK","..KGGGK..","..KGGGK..","..KGGGK..","..KKKKK.."], p:{K,G:'#5bc236'} },
+  pencil:{ m:["........KKK.",".......KpppK","......KYKppK",".....KYYYKK.","....KYYYYK..","...KYYYYK...","..KYYYYK....",".KwYYYK.....",".KwwYK......","KDwwK.......","KDDK........","KKK........."], p:{K,Y:'#ffd23a',p:'#f08aa0',w:'#f2c08a',D:'#3a3a4a'} },
+  paper: { m:["KKKKKKK...","KWWWWWKK..","KWppWWKWK.","KWWWWWKKKK","KWppppWWWK","KWWWWWWWWK","KWppppppWK","KWWWWWWWWK","KWppWWWWRK","KWWWWRWRWK","KWWWWWRWWK","KKKKKKKKKK"], p:{K,W:'#f6f2ff',p:'#9aa0c8',R:'#e04848'} },
+  book:  { m:BOOK_MAP, p:{K,B:'#3a78d8',b:'#244c9a',Y:'#ffd23a',W:'#f6f2ff'} },
+  diary: { m:BOOK_MAP, p:{K,B:'#e0609a',b:'#a83a70',Y:'#ffd23a',W:'#f6f2ff'} },
+  ruler: { m:["K...........","KK..........","KYK.........","KYYK........","KKYYK.......","KYKYYK......","KYYKYYK.....","KKYYYYYK....","KYYYYYYYK...","KYKYKYKYYK..","KYYYYYYYYYK.","KKKKKKKKKKKK"], p:{K,Y:'#ffd23a'} },
+  globe: { m:["...KKKKKK...","..KBBGGBBK..",".KBGGGGBBBK.","KBBGGGBBBBBK","KBBBGGBBGGBK","KBBBBBBGGGBK","KGBBBBBGGGBK","KGGBBBBBGBBK","KGGGBBBBBBBK",".KGGBBBBBBK.","..KBBBBBBK..","...KKKKKK..."], p:{K,B:'#2f86e0',G:'#5bc236'} },
+  flask: { m:["...KKKKKK...","....KWWK....","....KWWK....","....KWWK....","...KWWWWK...","..KWWWWWWK..",".KGGGGGGGGK.","KGGLGGGGGGGK","KGGGGGLGGGGK","KGLGGGGGGLGK","KGGGGGGGGGGK",".KKKKKKKKKK."], p:{K,W:'#dfe8ff',G:'#5ee85a',L:'#c8ffb0'} },
+  broom: { m:["........KK..",".......KwK..","......KwK...",".....KwK....","....KwK.....","...KRRK.....","..KYYYRK....",".KYYYYYK....","KYYYYYYK....","KYKYKYK.....","KYKYK.......","KKK........."], p:{K,w:'#b07a3e',R:'#e04848',Y:'#e8c060'} },
+  bear:  { m:[".KK......KK.","KbbKKKKKKbbK","KbBBBBBBBBbK",".KBBKBBKBBK.",".KBBBBBBBBK.",".KBBlKKlBBK.","..KBBllBBK..","..KKBBBBKK..",".KBBKllKBBK.",".KBBllllBBK.",".KBBKKKKBBK.","..KK....KK.."], p:{K,B:'#c27c3c',b:'#8a521e',l:'#f2d0a0'} },
+  bulb:  { m:["..KKKKK...",".KYYWYYK..","KYYYYWYYK.","KYYYYYYYK.","KYYYYYYYK.",".KYYYYYK..","..KyyyK...","..KSSSK...","..KsssK...","..KSSSK...","...KKK...."], p:{K,Y:'#ffe45a',W:'#fffbe0',y:'#f0a020',S:'#b8c0d8',s:'#7880a0'} },
+  door:  { m:["KKKKKKKKKK","KwWWWWWWwK","KWwwwwwwWK","KWwWWWWwWK","KWwWWWWwWK","KWwwwwwwWK","KWWWWWWYWK","KWwwwwwwWK","KWwWWWWwWK","KWwwwwwwWK","KWWWWWWWWK","KKKKKKKKKK"], p:{K,W:'#c27c3c',w:'#8a521e',Y:'#ffd23a'} },
+  tooth: { m:[".KKKKKKKK.","KWWWWWWLLK","KWWWWWWWLK","KWWWWWWWLK","KWWWWWWWLK",".KWWWWWLK.",".KWWKWWLK.",".KWWKKWLK.",".KWK..KLK.",".KWK..KLK.","..K....K.."], p:{K,W:'#ffffff',L:'#b8d8f0'} },
+  brush: { m:[".KKKKK......",".KWLWLK.....",".KWLWLK.....","KKKKKKKKKKKK","KCCCCCCCCCcK","KKKKKKKKKKKK"], p:{K,W:'#ffffff',L:'#8ad0ff',C:'#5bc236',c:'#3e9a22'} },
+  heart: { m:[".KKK...KKK.","KRWRK.KRRRK","KWRRRKRRRRK","KRRRRRRRRrK","KRRRRRRRRrK",".KRRRRRRrK.","..KRRRRrK..","...KRRrK...","....KrK....",".....K....."], p:{K,R:'#e04858',r:'#a82838',W:'#ffc0c8'} },
+  ball:  { m:["..KKKKKK..",".KOOKOOLK.","KOOOKOOOLK","KKOOKOOKKK","KOKKKKKKOK","KOOOKOOOOK","KKOOKOOKKK","KOOOKOOOOK",".KOOKOOOK.","..KKKKKK.."], p:{K,O:'#f08a24',L:'#ffc080'} },
+  music: { m:["....KKKKKK","....KNNNNK","....KNKKKK","....KNK...","....KNK...","....KNK...",".KKKKNK...","KNNNNNK...","KNNNNNK...",".KKKKK...."], p:{K,N:'#9c6ce2'} },
+  clock: { m:["..KKKKKK..",".KWWWWWWK.","KWWWKWWWWK","KWWWKWWWWK","KWWWKWWWWK","KWWWKKKWWK","KWWWWWWWWK","KWWWWWWWWK",".KWWWWWWK.","..KKKKKK.."], p:{K,W:'#f6f2ff'} }
+};
+const _icoCache = {};
+function ic(name) {
+  if (_icoCache[name]) return _icoCache[name];
+  const d = ICONS[name]; if (!d) return '';
+  return (_icoCache[name] = pix(d.m, d.p));
+}
+const TASK_ICON_LIST = ['pencil','paper','book','ruler','globe','flask','broom','bear','bulb','door','tooth','brush','star','heart','ball','music','clock','diary'];
+
+/* hero sprite */
+const SPRITE = ["....KKKKKKKK....","...KRRRRRWRRK...","..KRRRRRRRRRRK..","..KrrrrrrrrrrrrK","..KHHSSSSSSHHK..","..KHSSSSSSSSHK..","..KSSKWSSKWSSK..","..KSSKKSSKKSSK..","..KpSSSSSSSSpK..","..KSSSSKKSSSSK..","...KsSSSSSSsK...","....KYYYYYYK....","...KOYYYYYYOK...","..KOOOYOOOOOOK..",".KSOOOYOPOOOOSK.",".KSKOOOOPOOOKMMK","..KKOOOOOOOOKMmK","...KooooooooKMMK","...KBBBBBBBBKKK.","...KBBBbbBBBK...","...KBBBKKBBBK...","...KSSK..KSSK...","..KNNNK..KNNNK..","..KKKKK..KKKKK.."];
+const HEAD = SPRITE.slice(0, 11).map(r => r.slice(1, 16));
+const BASE_PAL = { K, W:'#ffffff', S:'#f2c08a', s:'#d49868', p:'#f59a8a', Y:'#ffd23a', B:'#3a5ab8', b:'#28408a', N:'#6a3a1a', P:'#8a5a2a', M:'#f4e2b0', m:'#b08850' };
+const CAPS = [['紅','#d83a3a','#9a2020'],['藍','#2f86e0','#1a58a8'],['綠','#3fae2a','#26781a'],['紫','#8a4ad0','#5a2a98'],['黃','#f0b020','#b07a10'],['黑','#3a3a4a','#22222e']];
+const JACKETS = [['橘','#f08a24','#b85a10'],['綠','#5bc236','#3a8a1e'],['藍','#3a8ae0','#2460a8'],['紅','#e04848','#a02828'],['紫','#9c6ce2','#6a3ab8'],['粉','#f07aa8','#b84a78']];
+const HAIRS = [['深棕','#3a2418'],['棕','#7a4a22'],['黑','#2a2230'],['金','#d8a838']];
+const DEFAULT_LOOK = { older:{cap:0,jacket:0,hair:0}, younger:{cap:1,jacket:1,hair:1}, custom:{cap:3,jacket:4,hair:0} };
+function lookPal(l) {
+  l = l || DEFAULT_LOOK.custom;
+  const c = CAPS[l.cap] || CAPS[0], j = JACKETS[l.jacket] || JACKETS[0], h = HAIRS[l.hair] || HAIRS[0];
+  return { ...BASE_PAL, R:c[1], r:c[2], O:j[1], o:j[2], H:h[1] };
+}
+const spriteSvg = l => pix(SPRITE, lookPal(l));
+const headSvg = l => pix(HEAD, lookPal(l));
+const PET = { m:["KK.....KK...","KOK...KOK...","KOOKKKOOK...","KOOOOOOOK...","KOKOOOKOK...","KOOOpOOOK...",".KOOOOOK..K.",".KOWWWOK.KOK",".KOWWWOKKOK.",".KOOOOOOOK..",".KoKoooKoK..",".KKKKKKKKK.."], p:{K,O:'#f0962e',o:'#c26a18',W:'#fff4e0',p:'#f07a8a'} };
+
+/* ── scenes ── */
+const SCN = {
+  night:{ sky:['#0b0622','#130a34','#1f0f48','#2e1358','#421862','#5c1f68','#7a2866','#9a365e','#bb4c52','#d66a44','#ea8c3e','#f5ad48'],
+    far:'#2e1a5c',farTop:'#4a3284',mid:'#1a1636',midTop:'#2f5a2a',leaf:'#1d4a22',leaf2:'#2a652a',leafHi:'#3d8534',trunk:'#3a2418',
+    grass:'#3f8f2a',grass2:'#2c6e1e',grassHi:'#64b43e',dirt:'#4e2e18',dirt2:'#3a2010',dirtHi:'#6a4222',stone:'#3c3a5c',stone2:'#2a2846',
+    water:'#3a78d8',water2:'#8cc4ff',water3:'#d8eeff',glow:1 },
+  day:{ sky:['#2f74dc','#3884e2','#4394e8','#50a3ee','#62b2f2','#76c0f5','#8ccdf7','#a2d9f9','#bce4fa'],
+    far:'#86b4de',farTop:'#a8ccec',mid:'#4c9a3c',midTop:'#6cc24c',leaf:'#2f8a2a',leaf2:'#3fa434',leafHi:'#6ccc4c',trunk:'#6a4424',
+    grass:'#5bc236',grass2:'#3e9a22',grassHi:'#8fe05a',dirt:'#8a5a2a',dirt2:'#6a3f1a',dirtHi:'#a8743a',stone:'#8a92a6',stone2:'#6a7288',
+    water:'#3a9ae8',water2:'#9ad8ff',water3:'#ffffff',glow:.35 }
+};
+let mode = 'night';
+let bgMeta = { torches:[], stars:[], W:0, H:0 };
+let islMeta = { torches:[], water:null };
+
+function painter(g) {
+  return { px:(x,y,c)=>{ g.fillStyle=c; g.fillRect(x,y,1,1); }, rect:(x,y,w,h,c)=>{ g.fillStyle=c; g.fillRect(x,y,w,h); } };
+}
+function drawTree(p, P, R, x, base) {
+  p.rect(x, base-6, 2, 6, P.trunk);
+  const cx = x-5, cy = base-15;
+  for (let yy=0; yy<9; yy++) for (let xx=0; xx<12; xx++) { const r=R(); p.px(cx+xx, cy+yy, yy<2&&xx<6&&r<.5 ? P.leafHi : r<.3 ? P.leaf2 : P.leaf); }
+  for (let yy=0; yy<3; yy++) for (let xx=0; xx<8; xx++) p.px(cx+2+xx, cy-3+yy, R()<.35 ? P.leafHi : P.leaf2);
+}
+function drawTorch(p, x, base, list) { p.rect(x, base-5, 1, 5, '#7a4a1e'); p.px(x, base-6, '#ffb02a'); p.px(x, base-7, '#fff3a0'); list.push([x, base]); }
+function blockCol(p, P, R, x, y0, y1) {
+  for (let y=y0; y<y1; y++) {
+    const d=y-y0; let c;
+    if (d===0) c = R()<.35 ? P.grassHi : P.grass;
+    else if (d<3) c = R()<.3 ? P.grass2 : P.grass;
+    else if (d===3) c = R()<.5 ? P.grass2 : P.dirt;
+    else { const r=R(); c = r<.16 ? P.dirt2 : r<.28 ? P.dirtHi : P.dirt; if (y%10===0 && R()<.5) c = P.dirt2; }
+    p.px(x, y, c);
+  }
+}
+function ridge(p, R, W, H, base, amp, step, body, top, drift) {
+  let h = base; const hs = [];
+  for (let x=0; x<W; x+=step) {
+    h += Math.round((R()-.5)*drift); h = Math.max(base-amp, Math.min(base+Math.floor(amp/3), h));
+    p.rect(x, h, step, H-h, body); p.rect(x, h, step, 1, top); hs.push(h);
+  }
+  return hs;
+}
+
+function drawBg() {
+  const cv = $('#bg'), fx = $('#bgfx');
+  const vw = window.innerWidth, vh = window.innerHeight;
+  const sc = Math.max(3, Math.min(6, Math.round(vw/130)));
+  const W = Math.ceil(vw/sc)+1, H = Math.ceil(vh/sc)+1;
+  [cv, fx].forEach(c => { c.width=W; c.height=H; c.style.width=W*sc+'px'; c.style.height=H*sc+'px'; });
+  const g = cv.getContext('2d'), p = painter(g), P = SCN[mode], R = rng(11);
+  bgMeta = { torches:[], stars:[], W, H };
+  const skyEnd = Math.round(H*.8), n = P.sky.length, span = skyEnd/n;
+  for (let i=0; i<n; i++) p.rect(0, Math.floor(i*span), W, Math.ceil(span)+1, P.sky[i]);
+  p.rect(0, skyEnd-1, W, H-skyEnd+1, P.sky[n-1]);
+  for (let i=1; i<n; i++) { const y0=Math.floor(i*span); for (let y=y0-2; y<y0; y++) for (let x=y%2; x<W; x+=2) p.px(x, y, P.sky[i]); }
+  const mx = Math.round(W*.2), my = 12;
+  if (mode === 'night') {
+    const count = Math.round(W*H*.0035);
+    for (let i=0; i<count; i++) { const x=Math.floor(R()*W), y=Math.floor(R()*H*.5); p.px(x, y, R()<.2 ? '#ffe9a8' : '#ffffff'); bgMeta.stars.push([x,y]); }
+    p.rect(mx-3, my-3, 14, 14, 'rgba(255,240,190,.08)'); p.rect(mx-2, my-2, 12, 12, 'rgba(255,240,190,.12)');
+    p.rect(mx, my, 8, 8, '#fff2c0'); [[2,2],[3,2],[5,5],[2,5],[6,1],[3,6]].forEach(([a,b]) => p.px(mx+a, my+b, '#e2d08e'));
+  } else {
+    p.rect(mx-4, my-4, 18, 18, 'rgba(255,250,200,.12)'); p.rect(mx-2, my-2, 14, 14, 'rgba(255,250,200,.25)');
+    p.rect(mx, my, 10, 10, '#ffe45a'); p.rect(mx+2, my+2, 6, 6, '#fff6b0');
+    const cloud = (x,y,w) => { p.rect(x,y,w,4,'#ffffff'); p.rect(x+3,y-3,w-8,3,'#ffffff'); p.rect(x+7,y-5,Math.max(4,w-18),2,'#ffffff'); p.rect(x,y+4,w,2,'#d4eafb'); };
+    const nc = Math.max(3, Math.round(W/35));
+    for (let i=0; i<nc; i++) cloud(Math.floor(R()*W)-8, Math.floor(20 + R()*H*.35), 16 + Math.floor(R()*18));
+  }
+  ridge(p, R, W, H, Math.round(H*.58), 30, 4, P.far, P.farTop, 14);
+  const mid = ridge(p, R, W, H, Math.round(H*.73), 14, 5, P.mid, P.midTop, 8);
+  const hAt = x => mid[Math.max(0, Math.min(mid.length-1, Math.floor(x/5)))];
+  for (let x=4; x<W; x += 14 + Math.floor(R()*18)) if (R() < .75) drawTree(p, P, R, x, hAt(x)+1);
+  const gBase = H - 24, cols = Math.ceil(W/10)+1, steps = [];
+  for (let i=0; i<cols; i++) steps.push(gBase + [0,0,-4,4][Math.floor(R()*4)]);
+  for (let x=0; x<W; x++) blockCol(p, P, R, x, steps[Math.floor(x/10)], H);
+  for (let i=0; i<Math.round(W/14); i++) { const x=Math.floor(R()*W), t=steps[Math.floor(x/10)]; p.px(x, t-1, R()<.5 ? '#ffd23a' : '#e04848'); p.px(x, t, P.grass2); }
+  drawTorch(p, 10, steps[1], bgMeta.torches);
+  drawTorch(p, W-12, steps[Math.floor((W-12)/10)], bgMeta.torches);
+}
+
+function drawIsland() {
+  const cv = $('#island'), fx = $('#islandfx'); const W = 80, H = 56;
+  cv.width = fx.width = W; cv.height = fx.height = H;
+  const g = cv.getContext('2d'), p = painter(g), P = SCN[mode], R = rng(7);
+  g.clearRect(0, 0, W, H);
+  islMeta = { torches:[], water:null };
+  const it = 22, ix0 = 8, ix1 = 72;
+  drawTree(p, P, R, 14, it);
+  for (let x=ix0; x<ix1; x++) blockCol(p, P, R, x, it, it+12);
+  for (let y=it+2; y<it+12; y++) { p.px(ix0, y, P.dirt2); p.px(ix1-1, y, P.dirt2); }
+  let l = ix0, r = ix1, y = it+12;
+  while (r-l > 4 && y < H) {
+    l += 1 + Math.floor(R()*2); r -= 1 + Math.floor(R()*2);
+    for (let x=l; x<r; x++) { const q=R(); p.px(x, y, q<.35 ? P.stone : q<.55 ? P.stone2 : q<.7 ? P.dirt2 : P.dirt); }
+    y++;
+  }
+  [[ix0+4,4],[ix0+11,6],[ix1-14,5]].forEach(([x,len]) => { for (let k=0; k<len; k++) p.px(x, it+13+k, P.leaf2); });
+  drawTorch(p, 66, it, islMeta.torches);
+  p.rect(72, it+5, 3, H-it-5, P.water); p.rect(71, it+4, 4, 1, P.water2);
+  islMeta.water = { x:72, y0:it+5, y1:H };
+}
+
+function glow(g, P, torches) {
+  torches.forEach(([x, b]) => {
+    const cy = b-7, rr = 13 + Math.floor(Math.random()*3);
+    for (let dy=-rr; dy<=rr; dy++) for (let dx=-rr; dx<=rr; dx++) {
+      const d = Math.hypot(dx, dy); if (d > rr) continue;
+      const a = (d < rr*.3 ? .24 : d < rr*.62 ? .13 : .055) * P.glow;
+      g.fillStyle = `rgba(255,160,50,${a})`; g.fillRect(x+dx, cy+dy, 1, 1);
+    }
+    g.fillStyle = Math.random() < .5 ? '#fff3a0' : '#ffd23a'; g.fillRect(x, cy, 1, 1);
+    if (Math.random() < .4) { g.fillStyle = '#ff8a24'; g.fillRect(x, cy-1, 1, 1); }
+  });
+}
+let tickN = 0;
+function tick() {
+  if (document.hidden) return;
+  tickN++;
+  const P = SCN[mode];
+  const g = $('#bgfx').getContext('2d'); g.clearRect(0, 0, bgMeta.W, bgMeta.H);
+  glow(g, P, bgMeta.torches);
+  if (mode === 'night') bgMeta.stars.forEach(([x,y], i) => {
+    if (i % 3 === 0 && Math.sin(tickN*.35 + i*1.7) > .86) { g.fillStyle='rgba(255,255,255,.9)'; g.fillRect(x-1,y,3,1); g.fillRect(x,y-1,1,3); }
+  });
+  if ($('#screen-title').classList.contains('active')) {
+    const gi = $('#islandfx').getContext('2d'); gi.clearRect(0, 0, 80, 56);
+    glow(gi, P, islMeta.torches);
+    const w = islMeta.water;
+    if (w) {
+      for (let y=w.y0; y<w.y1; y++) { const k = ((y - tickN*2) % 7 + 7) % 7; if (k < 2) { gi.fillStyle = P.water2; gi.fillRect(w.x + ((y+tickN)%3), y, 1, 1); } }
+    }
+  }
+}
+</script>
+<script>
+/* ═══════════════════════════════════
+   V13 — 設定、家長密碼、冒險者管理、雲端存檔、閱讀掃描
+════════════════════════════════════ */
+Object.assign(ICONS, {
+  cloud:  { m:["....KKKK....","...KWWWWK...","..KWWWWWWKK.",".KKWWWWWWWWK","KWWWWWWWWWWK","KWWWWWWWWWLK","KWWWWWWWWLLK",".KKKKKKKKKK."], p:{K,W:'#ffffff',L:'#b8d8f0'} },
+  speaker:{ m:["....KK.....","...KWK..b..","KKKWWK...b.","KWWWWK.b.b.","KWWWWK.b.b.","KWWWWK.b.b.","KKKWWK...b.","...KWK..b..","....KK....."], p:{K,W:'#ffffff',b:'#8ad0ff'} },
+  lock:   { m:["...KKKK...","..KSSSSK..",".KSK..KSK.",".KSK..KSK.","KKKKKKKKKK","KYYYYYYYyK","KYYYKKYYyK","KYYYKKYYyK","KYYYYKYYyK","KYYYYYYYyK","KyyyyyyyyK","KKKKKKKKKK"], p:{K,S:'#b8c0d8',Y:'#ffd23a',y:'#d0a020'} },
+  trash:  { m:["...KKKK...","KKKKKKKKKK","KRRRRRRRRK","KKKKKKKKKK",".KSSSSSSK.",".KSsSsSsK.",".KSsSsSsK.",".KSsSsSsK.",".KSsSsSsK.",".KSSSSSSK.",".KKKKKKKK."], p:{K,S:'#b8c0d8',s:'#7880a0',R:'#e04848'} },
+  bell:   { m:["....KK....","...KYYK...","..KYYWYK..",".KYYYYYYK.",".KYYYYYYK.",".KYYYYYYK.","KYYYYYYYYK","KKKKKKKKKK","....KK...."], p:{K,Y:'#ffd23a',W:'#fff6c0'} },
+  info:   { m:["..KKKKKK..",".KBBWWBBK.","KBBBWWBBBK","KBBBBBBBBK","KBBBWWBBBK","KBBBWWBBBK","KBBBWWBBBK","KBBBWWBBBK",".KBBBBBBK.","..KKKKKK.."], p:{K,B:'#2f86e0',W:'#ffffff'} },
+  chev:   { m:["KK....","KWK...",".KWK..","..KWK.","...KWK","..KWK.",".KWK..","KWK...","KK...."], p:{K,W:CUR} },
+  barcode:{ m:["KKKKKKKKKKKK","KWWWWWWWWWWK","KWKWKKWKWKWK","KWKWKKWKWKWK","KRRRRRRRRRRK","KWKWKKWKWKWK","KWKWKKWKWKWK","KWWWWWWWWWWK","KKKKKKKKKKKK"], p:{K,W:'#ffffff',R:'#e04848'} },
+  sparkle:{ m:[".....K.....","....KYK....","....KYK....","..KKYWYKK..","KKYYWWWYYKK","..KKYWYKK..","....KYK....","....KYK....",".....K....."], p:{K,Y:'#ffd23a',W:'#ffffff'} },
+  text:   { m:[".KKKK.......","KWWWWK......","KWKKWK.KKKK.","KWWWWK.KWWWK","KWKKWK.KKKWK","KWKKWK.KWWWK","KWKKWK.KWKWK","KKKKKK.KWWWK",".......KKKKK"], p:{K,W:'#ffffff'} },
+  shield: { m:[".KKKKKKKK.","KBBBBBBBBK","KBBWBBBBBK","KBWWWBBBBK","KBBWBBBBbK","KBBBBBBBbK","KBBBBBBBbK",".KBBBBBbK.",".KBBBBBbK.","..KBBBbK..","...KBbK...","....KK...."], p:{K,B:'#5bc236',b:'#3e9a22',W:'#c8ffb0'} },
+  export: { m:["...KKKK...","...KGGK...","...KGGK...","KKKKGGKKKK",".KGGGGGGK.","..KGGGGK..","...KGGK...","....KK....","KK......KK","KWKKKKKKWK","KKKKKKKKKK"], p:{K,G:'#5bc236',W:'#ffffff'} },
+  import: { m:["....KK....","...KBBK...","..KBBBBK..",".KBBBBBBK.","KKKKBBKKKK","...KBBK...","...KBBK...","...KKKK...","KK......KK","KWKKKKKKWK","KKKKKKKKKK"], p:{K,B:'#3a8ae0',W:'#ffffff'} }
+});
+
+const DEFAULT_SETTINGS = { sfx:true, sfxVol:.7, bgm:false, bgmVol:.4, vibrate:true, themeMode:null, motion:true, bigText:false, pinHash:null, lock:{ taskSettings:true, redeem:false, bonus:false }, cloudSavedAt:null };
+function normalizeState() {
+  if (!S || typeof S !== 'object') S = { characters: [], curId: null };
+  if (!Array.isArray(S.characters)) S.characters = [];
+  S.settings = { ...DEFAULT_SETTINGS, ...(S.settings || {}) };
+  S.settings.lock = { ...DEFAULT_SETTINGS.lock, ...((S.settings && S.settings.lock) || {}) };
+  if (!Array.isArray(S.trash)) S.trash = [];
+  if (!Array.isArray(S.books)) S.books = [];
+  const cutoff = Date.now() - 30 * 864e5;
+  S.trash = S.trash.filter(t => t && t.char && t.deletedAt > cutoff);
+  S.characters.forEach(migrate);
+  S.trash.forEach(t => migrate(t.char));
+}
+const ST = () => S.settings;
+function resolveMode() {
+  const m = ST().themeMode;
+  if (m === 'auto') { const h = new Date().getHours(); return h >= 6 && h < 18 ? 'day' : 'night'; }
+  return m === 'day' ? 'day' : 'night';
+}
+function applySettingsClasses() {
+  document.body.classList.toggle('no-motion', !ST().motion);
+  document.body.classList.toggle('big', !!ST().bigText);
+}
+function buzz(ms) { if (ST().vibrate && navigator.vibrate) { try { navigator.vibrate(ms); } catch (e) {} } }
+const fmtTime = t => t ? new Date(t).toLocaleString('zh-TW', { month:'numeric', day:'numeric', hour:'2-digit', minute:'2-digit' }) : '';
+
+/* ═══ NAV ═══ */
+let settingsReturn = 'title';
+function goSettings(from) { settingsReturn = from || 'title'; renderSettings(); show('settings'); }
+function settingsBack() { settingsReturn === 'main' && cur() ? goMain() : goTitle(); }
+
+/* ═══ RENDER SETTINGS ═══ */
+function setTgl(id, on, disabled) { const el = document.getElementById(id); if (!el) return; el.setAttribute('aria-checked', String(!!on)); el.disabled = !!disabled; }
+function renderSettings() {
+  const s = ST();
+  setTgl('tg-sfx', s.sfx); setTgl('tg-bgm', s.bgm); setTgl('tg-motion', s.motion);
+  const canVib = !!navigator.vibrate;
+  setTgl('tg-vibrate', s.vibrate && canVib, !canVib);
+  $('#row-vibrate').classList.toggle('off', !canVib);
+  $('#vib-sub').textContent = canVib ? '完成任務時手機輕震一下' : '這台裝置不支援震動';
+  $('#rg-sfx').value = Math.round(s.sfxVol * 100); $('#rv-sfx').textContent = Math.round(s.sfxVol * 100);
+  $('#rg-bgm').value = Math.round(s.bgmVol * 100); $('#rv-bgm').textContent = Math.round(s.bgmVol * 100);
+  $('#rg-sfx').disabled = !s.sfx; $('#rg-bgm').disabled = !s.bgm;
+  $$('#seg-theme button').forEach((b, i) => b.setAttribute('aria-pressed', String(['night','day','auto'][i] === (s.themeMode || 'night'))));
+  $$('#seg-text button').forEach((b, i) => b.setAttribute('aria-pressed', String((i === 1) === !!s.bigText)));
+  // pin & locks
+  const hasPin = !!s.pinHash;
+  $('#pin-sub').textContent = hasPin ? '已設定・點這裡修改或移除' : '還沒設定・設定後孩子不能自己刪資料';
+  $('#pin-state').innerHTML = hasPin ? '<span class="pill-ok">已開啟</span>' : '<span class="soon">未設定</span>';
+  [['tg-lock-ts','taskSettings','row-lock-ts'],['tg-lock-redeem','redeem','row-lock-redeem'],['tg-lock-bonus','bonus','row-lock-bonus']].forEach(([id, k, row]) => {
+    setTgl(id, hasPin && s.lock[k]); $('#' + row).classList.toggle('off', !hasPin);
+  });
+  // storage
+  let used = 0; try { used = (localStorage.getItem(LS_KEY) || '').length; } catch (e) {}
+  const pct = Math.min(100, Math.round(used / 2500000 * 100));
+  $('#store-fill').style.width = Math.max(2, pct) + '%';
+  $('#store-pct').textContent = pct + '%';
+  $('#store-sub').textContent = `已使用約 ${used > 1e6 ? (used / 1e6).toFixed(1) + ' MB' : Math.max(1, Math.round(used / 1000)) + ' KB'}・照片越多用越多`;
+  // cloud
+  renderCloudState();
+  // characters
+  const list = S.characters.map(c => `<div class="char-mgr">
+      <span class="slot">${avatarInner(c)}</span>
+      <span class="lab"><b>${esc(c.name)}</b><small><i>${ic('gem')}</i>${c.emeralds || 0}・${esc(TYPE_LABEL[c.type] || '冒險者')}</small></span>
+      <span class="acts"><button class="rbtn sm" onclick="openCharEdit('${c.id}')" aria-label="編輯「${esc(c.name)}」">${ic('pencil')}</button><button class="rbtn sm danger" onclick="deleteChar('${c.id}')" aria-label="刪除「${esc(c.name)}」">${ic('trash')}</button></span>
+    </div>`).join('');
+  $('#char-mgr-list').innerHTML = (list || '<div class="set-row"><span class="lab"><small>還沒有冒險者</small></span></div>') +
+    `<button class="set-row" onclick="goCreate()"><span class="slot">${ic('plus')}</span><span class="lab"><b>新增冒險者</b></span><span class="chev">${ic('chev')}</span></button>`;
+  $('#trash-panel').hidden = !S.trash.length;
+  $('#trash-list').innerHTML = S.trash.map((t, i) => {
+    const left = Math.max(1, 30 - Math.floor((Date.now() - t.deletedAt) / 864e5));
+    return `<div class="char-mgr"><span class="slot">${avatarInner(t.char)}</span><span class="lab"><b>${esc(t.char.name)}</b><small>還剩 ${left} 天會永久刪除</small></span><button class="btn sm" style="width:auto" onclick="restoreChar(${i})"><span class="ico">${ic('up')}</span>救回</button></div>`;
+  }).join('');
+  // reading
+  $('#shelf-sub').textContent = S.books.length ? `記住了 ${S.books.length} 本書・下次登記可以一鍵帶入` : '還沒有書・登記閱讀後會自動記住';
+  $('#shelf-clear').hidden = !S.books.length;
+  $('#ai-state').innerHTML = capState.sample === 'wait' ? '<span class="soon">檢查中</span>' : aiImages ? '<span class="pill-ok">可以用</span>' : '<span class="soon">只在 Claude 裡可用</span>';
+  $('#about-sprite').innerHTML = spriteSvg(cur() ? cur().look : DEFAULT_LOOK.older);
+}
+function toggleSetting(key) {
+  const s = ST(); s[key] = !s[key]; save();
+  if (key === 'bgm') { s.bgm ? bgmStart() : bgmStop(); }
+  if (key === 'motion') { applySettingsClasses(); tick(); }
+  if (key === 'vibrate' && s.vibrate) buzz(40);
+  playSound('click');
+  renderSettings();
+}
+let volSaveT;
+function setVolume(key, v) {
+  ST()[key] = Math.max(0, Math.min(1, v / 100));
+  $(key === 'sfxVol' ? '#rv-sfx' : '#rv-bgm').textContent = Math.round(v);
+  if (key === 'bgmVol' && bgmGain) bgmGain.gain.value = ST().bgmVol * .5;
+  clearTimeout(volSaveT); volSaveT = setTimeout(() => { save(); if (key === 'sfxVol') playSound('click'); }, 250);
+}
+function setThemeMode(m) {
+  ST().themeMode = m; save();
+  try { if (m !== 'auto') localStorage.setItem(THEME_KEY, m === 'day' ? 'light' : 'dark'); } catch (e) {}
+  const next = resolveMode(); if (next !== mode) { mode = next; applyMode(); }
+  playSound('click'); renderSettings();
+}
+function setBigText(b) { ST().bigText = b; save(); applySettingsClasses(); playSound('click'); renderSettings(); }
+
+/* ═══ CONFIRM SHEET (with hold-to-confirm) ═══ */
+let cfResolve = null;
+function confirmSheet({ title, icon, body, ok = '確定', okClass = '', hold = false }) {
+  return new Promise(res => {
+    if (cfResolve) cfResolve(false);
+    cfResolve = res;
+    $('#cf2-title').innerHTML = (icon ? `<i>${ic(icon)}</i>` : '') + esc(title);
+    $('#cf2-body').innerHTML = body;
+    const b = $('#cf2-ok');
+    b.className = 'btn ' + okClass + (hold ? ' hold' : '');
+    $('#cf2-ok-t').textContent = hold ? `按住${ok}` : ok;
+    if (hold) $('#cf2-body').insertAdjacentHTML('beforeend', '<div class="note" style="text-align:center;color:var(--gold)">按住紅色按鈕 2 秒才會執行，避免不小心按到</div>');
+    const fill = b.querySelector('.fill'); fill.style.width = '0';
+    b.onclick = null; b.onpointerdown = null; b.onpointerup = b.onpointerleave = b.onpointercancel = null; b.onkeydown = null;
+    if (!hold) b.onclick = () => confirmDone(true);
+    else {
+      let start = 0, raf = 0;
+      const stop = () => { cancelAnimationFrame(raf); start = 0; fill.style.width = '0'; };
+      const step = () => {
+        const p = Math.min(1, (performance.now() - start) / 2000);
+        fill.style.width = (p * 100) + '%';
+        if (p >= 1) { stop(); buzz(60); confirmDone(true); } else raf = requestAnimationFrame(step);
+      };
+      b.onpointerdown = e => { e.preventDefault(); start = performance.now(); raf = requestAnimationFrame(step); };
+      b.onpointerup = b.onpointerleave = b.onpointercancel = stop;
+      b.onkeydown = e => { if ((e.key === 'Enter' || e.key === ' ') && !start) { start = performance.now(); raf = requestAnimationFrame(step); } };
+      b.onkeyup = stop;
+    }
+    openSheet('modal-confirm');
+  });
+}
+function confirmDone(v) { closeSheet('modal-confirm'); const r = cfResolve; cfResolve = null; if (r) r(v); }
+
+/* ═══ PARENT PIN ═══ */
+let pinState = null, pinUnlockUntil = 0;
+async function hashPin(p) {
+  try {
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode('mcqc-pin:' + p));
+    return 'h:' + [...new Uint8Array(buf)].map(x => x.toString(16).padStart(2, '0')).join('');
+  } catch (e) { return 'p:' + p; }
+}
+function requirePin(reason) {
+  if (!ST().pinHash || Date.now() < pinUnlockUntil) return Promise.resolve(true);
+  return openPin('verify', reason);
+}
+function openPin(pmode, reason) {
+  return new Promise(res => {
+    if (pinState && pinState.resolve) pinState.resolve(false);
+    pinState = { mode: pmode, buf: '', first: null, resolve: res };
+    $('#pin-title').innerHTML = `<i>${ic('lock')}</i>` + (pmode === 'verify' ? '輸入家長密碼' : '設定家長密碼');
+    $('#pin-reason').textContent = reason || (pmode === 'verify' ? '' : '請輸入 4 位數字，孩子不要偷看喔');
+    $('#pin-forgot').hidden = pmode !== 'verify';
+    pinMsg('');
+    $('#pin-pad').innerHTML = ['1','2','3','4','5','6','7','8','9','clr','0','del'].map(k =>
+      k === 'clr' ? `<button class="btn stone" onclick="pinKey('clr')" aria-label="清除" style="font-family:var(--f-cn);font-size:16px">清除</button>`
+      : k === 'del' ? `<button class="btn stone" onclick="pinKey('del')" aria-label="刪除一位"><span class="ico">${ic('back')}</span></button>`
+      : `<button class="btn stone" onclick="pinKey('${k}')">${k}</button>`).join('');
+    renderPinDots(); openSheet('modal-pin');
+  });
+}
+function pinMsg(t, err) { const m = $('#pin-msg'); m.textContent = t; m.classList.toggle('err', !!err); }
+function renderPinDots() { $$('#pin-dots i').forEach((d, i) => d.classList.toggle('on', !!pinState && i < pinState.buf.length)); }
+function pinKey(k) {
+  if (!pinState) return;
+  if (k === 'del') pinState.buf = pinState.buf.slice(0, -1);
+  else if (k === 'clr') pinState.buf = '';
+  else if (pinState.buf.length < 4) { pinState.buf += k; buzz(10); }
+  playSound('click'); renderPinDots();
+  if (pinState.buf.length === 4) setTimeout(pinSubmit, 140);
+}
+document.addEventListener('keydown', e => {
+  if (!$('#modal-pin').classList.contains('open')) return;
+  if (/^[0-9]$/.test(e.key)) pinKey(e.key); else if (e.key === 'Backspace') pinKey('del');
+});
+async function pinSubmit() {
+  const st = pinState; if (!st || st.buf.length !== 4) return;
+  const shake = () => { const d = $('#pin-dots'); d.classList.remove('shake'); void d.offsetWidth; d.classList.add('shake'); buzz(120); };
+  if (st.mode === 'verify') {
+    if (await hashPin(st.buf) === ST().pinHash) { pinUnlockUntil = Date.now() + 5 * 60000; pinFinish(true); }
+    else { st.buf = ''; renderPinDots(); shake(); pinMsg('密碼不對，再試一次', true); }
+  } else if (st.mode === 'set1') {
+    st.first = st.buf; st.buf = ''; st.mode = 'set2'; renderPinDots(); pinMsg('再輸入一次確認');
+  } else {
+    if (st.buf === st.first) {
+      ST().pinHash = await hashPin(st.buf); save(); pinUnlockUntil = Date.now() + 5 * 60000;
+      playSound('complete'); toast('家長密碼設定好了', 'lock'); pinFinish(true);
+    } else { st.buf = ''; st.first = null; st.mode = 'set1'; renderPinDots(); shake(); pinMsg('兩次不一樣，請重新輸入', true); }
+  }
+}
+function pinFinish(v) { closeSheet('modal-pin'); const st = pinState; pinState = null; if (st && st.resolve) st.resolve(v); if ($('#screen-settings').classList.contains('active')) renderSettings(); }
+function pinCancel() { pinFinish(false); }
+async function pinForgot() {
+  pinFinish(false);
+  const a = 12 + Math.floor(Math.random() * 18), b = 13 + Math.floor(Math.random() * 17);
+  const ok = await confirmSheet({ title: '家長驗證', icon: 'shield',
+    body: `<div class="note">答對這題就能清除家長密碼，再重新設定。</div><div class="gate-q">${a} × ${b} = ?</div><input id="gate-ans" class="inp" type="number" inputmode="numeric" placeholder="輸入答案" style="text-align:center">`,
+    ok: '確定' });
+  if (!ok) return;
+  if (parseInt(($('#gate-ans') || {}).value) === a * b) { ST().pinHash = null; save(); toast('密碼已清除，請重新設定', 'lock'); if ($('#screen-settings').classList.contains('active')) renderSettings(); }
+  else toast('答案不對', 'close');
+}
+async function managePin() {
+  if (!ST().pinHash) { await openPin('set1'); return; }
+  if (!(await requirePin('修改家長密碼前，先輸入目前的密碼'))) return;
+  const ok = await confirmSheet({ title: '家長密碼', icon: 'lock',
+    body: `<div class="note">要修改成新密碼，還是移除密碼？移除後所有「要密碼」的保護都會關閉。</div><button class="btn stone" onclick="confirmDone(false);pinRemove()"><span class="ico">${ic('trash')}</span>移除密碼</button>`,
+    ok: '修改密碼' });
+  if (ok) await openPin('set1', '請輸入新的 4 位數密碼');
+}
+async function pinRemove() {
+  const ok = await confirmSheet({ title: '移除家長密碼？', icon: 'lock', body: '<div class="note">移除後，任何人都可以刪除冒險者和修改任務。</div>', ok: '移除', okClass: 'red' });
+  if (!ok) return;
+  ST().pinHash = null; pinUnlockUntil = 0; save(); toast('家長密碼已移除', 'lock'); renderSettings();
+}
+async function toggleLock(k) {
+  if (!ST().pinHash) { toast('請先設定家長密碼', 'lock'); managePin(); return; }
+  if (!(await requirePin('變更家長控制'))) return;
+  ST().lock[k] = !ST().lock[k]; save(); playSound('click'); renderSettings();
+}
+
+/* ═══ ADVENTURER MANAGEMENT ═══ */
+async function deleteChar(id) {
+  const c = S.characters.find(x => x.id === id); if (!c) return;
+  if (!(await requirePin(`刪除「${c.name}」前，請家長輸入密碼`))) return;
+  const days = Object.keys(c.completionHistory || {}).filter(k => (c.completionHistory[k] || []).length).length;
+  const body = `<div class="warn-card"><span class="slot">${avatarInner(c)}</span><span><b>${esc(c.name)}</b><small>${c.emeralds || 0} 綠寶石・${days} 天任務紀錄<br>${(c.wishes || []).length} 個願望・${(c.bonusLogs || []).length} 筆加分</small></span></div>
+    <div class="note">刪除後會先放進「最近刪除」，30 天內可以救回來，之後就會永久消失。</div>
+    ${ST().pinHash ? '' : '<div class="note" style="color:var(--gold)">小提醒：設定「家長密碼」後，孩子就不能自己刪除冒險者。</div>'}`;
+  const ok = await confirmSheet({ title: '刪除冒險者？', icon: 'trash', body, ok: '刪除', okClass: 'red', hold: true });
+  if (!ok) return;
+  S.characters = S.characters.filter(x => x.id !== id);
+  S.trash.unshift({ char: c, deletedAt: Date.now() });
+  if (S.curId === id) S.curId = S.characters[0] ? S.characters[0].id : null;
+  save(); playSound('click'); toast(`「${c.name}」已移到最近刪除`, 'trash'); renderSettings();
+}
+function restoreChar(i) {
+  const t = S.trash[i]; if (!t) return;
+  S.trash.splice(i, 1); S.characters.push(t.char); if (!S.curId) S.curId = t.char.id;
+  save(); playSound('levelup'); toast(`「${t.char.name}」回來了！`, 'star'); renderSettings();
+}
+let CE = null;
+function openCharEdit(id) {
+  const c = S.characters.find(x => x.id === id); if (!c) return;
+  CE = { id, look: { ...(c.look || DEFAULT_LOOK.custom) }, photo: isPhoto(c) ? c.avatar : null };
+  $('#ce-name').value = c.name; $('#ce-file').value = '';
+  renderCharEdit(); openSheet('modal-char');
+}
+function renderCharEdit() {
+  $('#ce-preview').innerHTML = spriteSvg(CE.look);
+  const sw = (list, key) => list.map((c, i) => `<button class="swatch" style="background:${c[1]}" aria-label="${c[0]}" aria-pressed="${CE.look[key] === i}" onclick="CE.look['${key}']=${i};playSound('click');renderCharEdit()"></button>`).join('');
+  $('#ce-cap').innerHTML = sw(CAPS, 'cap'); $('#ce-jacket').innerHTML = sw(JACKETS, 'jacket'); $('#ce-hair').innerHTML = sw(HAIRS, 'hair');
+  const slot = $('#ce-slot'); slot.innerHTML = CE.photo ? `<img src="${CE.photo}" alt="">` : ic('camera'); slot.style.padding = CE.photo ? '3px' : '12px';
+  $('#ce-clear').hidden = !CE.photo;
+}
+function ceUpload(input) { const f = input.files[0]; if (!f) return; resizeImage(f, 240, .8, url => { CE.photo = url; renderCharEdit(); }); }
+function ceClearPhoto() { CE.photo = null; $('#ce-file').value = ''; renderCharEdit(); }
+function saveCharEdit() {
+  const c = S.characters.find(x => x.id === (CE && CE.id)); if (!c) return;
+  const name = $('#ce-name').value.trim(); if (!name) { toast('請輸入名字！', 'close'); return; }
+  c.name = name; c.look = { ...CE.look }; c.avatar = CE.photo || '';
+  save(); closeSheet('modal-char'); playSound('complete'); toast(`「${name}」已更新`, 'pencil'); renderSettings();
+}
+async function resetAll() {
+  if (!(await requirePin('清除所有資料前，請家長輸入密碼'))) return;
+  const ok = await confirmSheet({ title: '清除這台裝置的所有資料？', icon: 'trash',
+    body: `<div class="note">會刪掉 ${S.characters.length} 位冒險者、所有任務紀錄、願望、加分和書架，而且<b>不能救回</b>。建議先「匯出備份檔」或「上傳到雲端」。</div>`,
+    ok: '清除', okClass: 'red', hold: true });
+  if (!ok) return;
+  S = { characters: [], curId: null, settings: S.settings, trash: [], books: [] };
+  normalizeState(); save(); toast('資料已清除', 'trash'); goTitle();
+}
+
+/* ═══ CAPABILITIES: cloud / downloads / Claude ═══ */
+let dbApi = null, dlApi = null, sampleApi = null, aiImages = false;
+const capState = { db: 'wait', downloads: 'wait', sample: 'wait' };
+let cloudBusy = '';
+function initCaps() {
+  const cl = window.claude;
+  if (!cl || typeof cl.use !== 'function') { capState.db = capState.downloads = capState.sample = 'no'; return; }
+  const done = () => { if ($('#screen-settings').classList.contains('active')) renderSettings(); $('#rd-ai-btn').hidden = !aiImages; };
+  cl.use('db').then(d => { dbApi = d; capState.db = d ? 'ok' : 'no'; done(); }).catch(() => { capState.db = 'no'; done(); });
+  cl.use('downloads').then(d => { dlApi = d; capState.downloads = d ? 'ok' : 'no'; done(); }).catch(() => { capState.downloads = 'no'; done(); });
+  cl.use('sample').then(async s => {
+    sampleApi = s;
+    if (s) { const l = await s.limits().catch(() => null); aiImages = !!(l && l.images); }
+    capState.sample = s ? 'ok' : 'no'; done();
+  }).catch(() => { capState.sample = 'no'; done(); });
+}
+function renderCloudState() {
+  const st = capState.db, s = ST();
+  const badge = cloudBusy ? `<span class="soon"><span class="spin" style="width:10px;height:10px;border-width:2px;vertical-align:-1px"></span> ${cloudBusy}</span>`
+    : st === 'wait' ? '<span class="soon">連線中</span>' : st === 'ok' ? '<span class="pill-ok">可以用</span>' : '<span class="soon">這裡無法使用</span>';
+  $('#cloud-state').innerHTML = badge;
+  $('#cloud-sub').textContent = st === 'no' ? '只有在 Claude 裡開啟時才能用・可改用下方的備份檔搬資料'
+    : s.cloudSavedAt ? `上次上傳：${fmtTime(s.cloudSavedAt)}` : '存到你的 Claude 帳號，換手機或平板也能讀回來';
+  $('#cloud-up').disabled = $('#cloud-down').disabled = st !== 'ok' || !!cloudBusy;
+}
+function cloudErrMsg(e) {
+  const code = e && e.code;
+  if (code === 'too_big') return '資料太大了，試著刪掉一些願望照片';
+  if (code === 'quota_exceeded') return '雲端空間滿了';
+  if (code === 'resource_exhausted') return '動作太快了，稍等一下再試';
+  return '雲端存檔失敗，請確認網路後再試';
+}
+function setCloudBusy(t) { cloudBusy = t || ''; if ($('#screen-settings').classList.contains('active')) renderCloudState(); }
+async function cloudUpload() {
+  if (!dbApi) { toast('雲端存檔目前無法使用', 'close'); return; }
+  const ok = await confirmSheet({ title: '上傳到雲端？', icon: 'cloud', ok: '上傳',
+    body: `<div class="note">會把這台裝置上的 ${S.characters.length} 位冒險者（${esc(S.characters.map(c => c.name).join('、') || '無')}）存到雲端，取代雲端上舊的存檔。</div>` });
+  if (!ok) return;
+  setCloudBusy('上傳中');
+  try {
+    const snap = JSON.parse(JSON.stringify(S)); const imgs = [];
+    const take = (obj, field, key) => { const v = obj[field]; if (typeof v === 'string' && v.startsWith('data:')) { imgs.push([key, v]); obj[field] = 'cloudimg:' + key; } };
+    const walk = c => { take(c, 'avatar', 'a-' + c.id); (c.wishes || []).forEach(w => take(w, 'image', 'w-' + c.id + '-' + w.id)); };
+    snap.characters.forEach(walk); (snap.trash || []).forEach(t => walk(t.char));
+    for (const [k, v] of imgs) await dbApi.doc('cloud/img-' + k).set({ data: v });
+    const json = JSON.stringify(snap);
+    if (json.length > 240000) throw { code: 'too_big' };
+    const savedAt = Date.now();
+    await dbApi.doc('cloud/save').set({ json, savedAt, count: S.characters.length, names: S.characters.map(c => c.name).join('、'), imgs: imgs.map(x => x[0]), version: 13 });
+    ST().cloudSavedAt = savedAt; save();
+    playSound('complete'); toast('已經存到雲端了！', 'cloud');
+  } catch (e) { toast(cloudErrMsg(e), 'close'); }
+  finally { setCloudBusy(''); if ($('#screen-settings').classList.contains('active')) renderSettings(); }
+}
+async function cloudDownload() {
+  if (!dbApi) { toast('雲端存檔目前無法使用', 'close'); return; }
+  setCloudBusy('讀取中');
+  let d;
+  try { const snap = await dbApi.doc('cloud/save').get(); d = snap.exists ? snap.data() : null; }
+  catch (e) { setCloudBusy(''); toast(cloudErrMsg(e), 'close'); return; }
+  setCloudBusy('');
+  if (!d || !d.json) { toast('雲端還沒有存檔，先在有資料的裝置上傳一次', 'cloud'); return; }
+  if (!(await requirePin('從雲端讀取會取代這台裝置的資料'))) return;
+  const ok = await confirmSheet({ title: '從雲端讀取？', icon: 'cloud', ok: '讀取', okClass: 'gold',
+    body: `<div class="warn-card"><span class="slot">${ic('cloud')}</span><span><b>${fmtTime(d.savedAt)} 的存檔</b><small>${d.count} 位冒險者：${esc(d.names || '')}</small></span></div><div class="note">讀取後會取代這台裝置目前的資料（會先自動留一份舊資料備份）。</div>` });
+  if (!ok) return;
+  setCloudBusy('讀取中');
+  try {
+    const data = JSON.parse(d.json); const map = {};
+    for (const k of (d.imgs || [])) { const s = await dbApi.doc('cloud/img-' + k).get(); map[k] = s.exists ? (s.data().data || '') : ''; }
+    const put = (obj, field) => { const v = obj[field]; if (typeof v === 'string' && v.startsWith('cloudimg:')) obj[field] = map[v.slice(9)] || (field === 'image' ? null : ''); };
+    const walk = c => { put(c, 'avatar'); (c.wishes || []).forEach(w => put(w, 'image')); };
+    (data.characters || []).forEach(walk); (data.trash || []).forEach(t => t && t.char && walk(t.char));
+    try { localStorage.setItem('mcqc2-before-cloud', JSON.stringify(S)); } catch (e) {}
+    S = data; normalizeState(); ST().cloudSavedAt = d.savedAt; save();
+    applySettingsClasses(); mode = resolveMode(); applyMode();
+    playSound('levelup'); toast('雲端存檔讀取完成！', 'cloud');
+  } catch (e) { toast(cloudErrMsg(e), 'close'); }
+  finally { setCloudBusy(''); renderSettings(); }
+}
+async function exportBackup() {
+  const data = JSON.stringify({ app: 'mcqc', version: 13, exportedAt: new Date().toISOString(), data: S });
+  const filename = `麥塊任務島備份-${todayKey()}.json`;
+  if (!dlApi) {
+    if (window.claude && capState.downloads === 'wait') { toast('還在準備中，稍等一下', 'close'); return; }
+    try {
+      const url = URL.createObjectURL(new Blob([data], { type: 'application/json' }));
+      const a = document.createElement('a'); a.href = url; a.download = `mcqc-backup-${todayKey()}.json`;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 2000);
+      toast('備份檔已下載', 'export');
+    } catch (e) { toast('這裡無法下載檔案', 'close'); }
+    return;
+  }
+  try { await dlApi.save({ filename, data }); toast('備份檔已儲存', 'export'); }
+  catch (e) { if (!e || e.code !== 'declined') toast('無法下載備份檔', 'close'); }
+}
+function importBackup(input) {
+  const f = input.files[0]; input.value = ''; if (!f) return;
+  const r = new FileReader();
+  r.onload = async () => {
+    let data;
+    try { const obj = JSON.parse(r.result); data = obj && obj.app === 'mcqc' && obj.data ? obj.data : obj; if (!data || !Array.isArray(data.characters)) throw 0; }
+    catch (e) { toast('這不是麥塊任務島的備份檔', 'close'); return; }
+    if (!(await requirePin('匯入備份會取代目前的資料'))) return;
+    const ok = await confirmSheet({ title: '匯入備份檔？', icon: 'import', ok: '匯入', okClass: 'gold',
+      body: `<div class="note">備份裡有 ${data.characters.length} 位冒險者（${esc(data.characters.map(c => c.name).join('、'))}）。匯入後會取代這台裝置目前的資料。</div>` });
+    if (!ok) return;
+    try { localStorage.setItem('mcqc2-before-import', JSON.stringify(S)); } catch (e) {}
+    S = data; normalizeState(); save(); applySettingsClasses(); mode = resolveMode(); applyMode();
+    playSound('levelup'); toast('備份匯入完成！', 'import'); renderSettings();
+  };
+  r.readAsText(f);
+}
+
+/* ═══ BACKGROUND MUSIC（8-bit loop） ═══ */
+const BGM_SEQ = [523,0,659,0,784,0,659,0, 587,0,784,0,880,0,784,0, 659,0,784,0,1047,0,880,0, 784,0,659,0,587,0,0,0];
+const BGM_BASS = [131, 98, 110, 98];
+let bgmTimer = null, bgmStep = 0, bgmNext = 0, bgmGain = null;
+function bgmNote(freq, type, dur, gain, t) {
+  const c = actx(); const o = c.createOscillator(), g = c.createGain();
+  o.type = type; o.frequency.setValueAtTime(freq, t);
+  g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(gain, t + .01); g.gain.exponentialRampToValueAtTime(.001, t + dur);
+  o.connect(g); g.connect(bgmGain); o.start(t); o.stop(t + dur + .02);
+}
+function bgmStart() {
+  const c = actx(); if (!c || bgmTimer) return;
+  if (c.state === 'suspended') c.resume();
+  bgmGain = c.createGain(); bgmGain.gain.value = ST().bgmVol * .5; bgmGain.connect(c.destination);
+  bgmNext = c.currentTime + .05; bgmStep = 0;
+  bgmTimer = setInterval(() => {
+    if (!bgmGain) return;
+    while (bgmNext < c.currentTime + .25) {
+      const f = BGM_SEQ[bgmStep % 32];
+      if (f) bgmNote(f, 'square', .16, .07, bgmNext);
+      if (bgmStep % 8 === 0) bgmNote(BGM_BASS[(bgmStep / 8) % 4], 'triangle', .7, .2, bgmNext);
+      bgmNext += .2; bgmStep++;
+    }
+  }, 80);
+}
+function bgmStop() { clearInterval(bgmTimer); bgmTimer = null; if (bgmGain) { try { bgmGain.disconnect(); } catch (e) {} bgmGain = null; } }
+document.addEventListener('visibilitychange', () => { if (document.hidden) bgmStop(); else if (ST().bgm && _ctx) bgmStart(); });
+
+/* ═══ READING: bookshelf, barcode, Claude cover ═══ */
+function rdStatus(html, busy) { $('#rd-status').innerHTML = (busy ? '<span class="spin"></span>' : '') + html; }
+function renderShelfChips() {
+  const books = S.books.slice().sort((a, b) => (b.last || 0) - (a.last || 0)).slice(0, 10);
+  $('#rd-shelf-wrap').hidden = !books.length;
+  $('#rd-shelf').innerHTML = books.map(b => `<button class="book-chip" onclick="fillBook('${b.id}')"><i>${ic('book')}</i><span>${esc(b.title)}</span><em>×${b.times || 1}</em></button>`).join('');
+  $('#rd-ai-btn').hidden = !aiImages;
+}
+function fillBook(id) {
+  const b = S.books.find(x => x.id === id); if (!b) return;
+  $('#rd-title').value = b.title || ''; $('#rd-author').value = b.author || ''; $('#rd-isbn').value = b.isbn || '';
+  playSound('click'); rdStatus(`已帶入《${esc(b.title)}》，填上這次讀到哪裡就好`);
+  $('#rd-note').focus();
+}
+function upsertBook({ title, author, isbn }) {
+  let b = isbn ? S.books.find(x => x.isbn === isbn) : null;
+  if (!b) b = S.books.find(x => x.title === title);
+  if (b) { b.title = title; if (author) b.author = author; if (isbn) b.isbn = isbn; b.times = (b.times || 0) + 1; b.last = Date.now(); }
+  else S.books.push({ id: uid(), title, author: author || '', isbn: isbn || '', times: 1, last: Date.now() });
+}
+function clearShelf() {
+  confirmSheet({ title: '清空書架？', icon: 'book', ok: '清空', okClass: 'red', body: '<div class="note">只會清掉「記住的書名」，已登記的閱讀加分不會受影響。</div>' })
+    .then(ok => { if (ok) { S.books = []; save(); renderSettings(); toast('書架已清空', 'book'); } });
+}
+let zxingLoading = null;
+function loadZXing() {
+  if (window.ZXing) return Promise.resolve();
+  if (zxingLoading) return zxingLoading;
+  zxingLoading = new Promise((res, rej) => {
+    const s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/npm/@zxing/library@0.21.3/umd/index.min.js';
+    s.onload = () => res(); s.onerror = () => { zxingLoading = null; rej(new Error('load')); };
+    document.head.appendChild(s);
+  });
+  return zxingLoading;
+}
+async function fileToCanvas(file, max, rot) {
+  const url = URL.createObjectURL(file);
+  try {
+    const img = await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = url; });
+    const r = Math.min(1, max / Math.max(img.width, img.height));
+    const w = Math.round(img.width * r), h = Math.round(img.height * r);
+    const c = document.createElement('canvas'), g = c.getContext('2d');
+    if (rot) { c.width = h; c.height = w; g.translate(h / 2, w / 2); g.rotate(Math.PI / 2); g.drawImage(img, -w / 2, -h / 2, w, h); }
+    else { c.width = w; c.height = h; g.drawImage(img, 0, 0, w, h); }
+    return c;
+  } finally { URL.revokeObjectURL(url); }
+}
+async function decodeBarcode(file) {
+  if ('BarcodeDetector' in window) {
+    try { const det = new BarcodeDetector({ formats: ['ean_13', 'ean_8', 'upc_a', 'upc_e'] }); const r = await det.detect(await fileToCanvas(file, 1400, 0)); if (r && r[0]) return r[0].rawValue; } catch (e) {}
+  }
+  await loadZXing();
+  const Z = window.ZXing;
+  const hints = new Map();
+  hints.set(Z.DecodeHintType.POSSIBLE_FORMATS, [Z.BarcodeFormat.EAN_13, Z.BarcodeFormat.EAN_8, Z.BarcodeFormat.UPC_A]);
+  hints.set(Z.DecodeHintType.TRY_HARDER, true);
+  for (const rot of [0, 1]) for (const max of [1400, 800]) {
+    try {
+      const c = await fileToCanvas(file, max, rot);
+      const bmp = new Z.BinaryBitmap(new Z.HybridBinarizer(new Z.HTMLCanvasElementLuminanceSource(c)));
+      const reader = new Z.MultiFormatReader(); reader.setHints(hints);
+      const res = reader.decode(bmp); if (res) return res.getText();
+    } catch (e) {}
+  }
+  return null;
+}
+async function scanBarcode(input) {
+  const f = input.files[0]; input.value = ''; if (!f) return;
+  rdStatus('讀取條碼中…', true);
+  try {
+    const code = await decodeBarcode(f);
+    if (!code) { rdStatus('找不到條碼：拍近一點、光線亮一點再試一次'); return; }
+    $('#rd-isbn').value = code;
+    const b = S.books.find(x => x.isbn === code);
+    if (b) { $('#rd-title').value = b.title; $('#rd-author').value = b.author || ''; playSound('complete'); rdStatus(`書架上有這本：《${esc(b.title)}》`); }
+    else {
+      playSound('click');
+      rdStatus(`掃到 ISBN ${esc(code)}・第一次讀這本，請輸入書名（下次掃就會自動帶出）<a href="https://www.google.com/search?tbm=bks&q=isbn:${encodeURIComponent(code)}" target="_blank" rel="noopener">上網查書名</a>`);
+      $('#rd-title').focus();
+    }
+  } catch (e) { rdStatus('條碼工具載入失敗，請確認網路後再試'); }
+}
+async function aiCover(input) {
+  const f = input.files[0]; input.value = ''; if (!f) return;
+  if (!sampleApi || !aiImages) { rdStatus('這裡無法使用拍照辨識，請手動輸入'); return; }
+  rdStatus('Claude 正在看封面…', true);
+  try {
+    const d = await sampleApi.json('這張照片是一本書的封面或封底。請讀出書名、作者和 ISBN（13 位數字，看得到才填）。書名和作者照照片上的文字，中文用繁體。只回覆 JSON：{"title":"","author":"","isbn":""}，看不到的欄位留空字串；如果照片裡不是書，title 留空。', { images: f, modelTier: 'quick' });
+    const title = String((d && d.title) || '').trim();
+    if (!title) { rdStatus('看不出書名：換個角度、拍清楚一點再試'); return; }
+    $('#rd-title').value = title.slice(0, 30);
+    if (d.author) $('#rd-author').value = String(d.author).slice(0, 20);
+    const isbn = String(d.isbn || '').replace(/[^0-9Xx]/g, '');
+    if (isbn.length === 13 || isbn.length === 10) $('#rd-isbn').value = isbn;
+    playSound('complete'); rdStatus(`Claude 讀到《${esc(title)}》・不對的話可以直接改`);
+  } catch (e) {
+    const code = e && e.code;
+    const msg = { not_granted: '沒有允許使用 Claude，請手動輸入', rate_limited: '使用次數太多了，稍後再試', image_rejected: '這張照片不能用，換一張試試', cancelled: '已取消' }[code] || '辨識失敗，請再試一次或手動輸入';
+    rdStatus(msg);
+    if (['not_granted', 'sampling_disabled', 'images_unavailable', 'capability_disabled', 'capability_removed', 'not_declared'].includes(code)) { aiImages = false; $('#rd-ai-btn').hidden = true; }
+  }
+}
+</script>
+<script>
+/* ═══════════════════════════════════
+   DATA & STATE（沿用 V9/V11：localStorage key "mcqc2"）
+════════════════════════════════════ */
+const LS_KEY = 'mcqc2', THEME_KEY = 'mcqc2-theme';
+let S = { characters: [], curId: null };
+let CW = { type: null, name: '', look: null, photo: null, step: 0 };
+let wishImg = null, calYear, calMonth;
+let bonusFilterActive = 'all', bonusTabActive = 'exam';
+let editingTaskId = null, teIcon = 'star', tsReturn = 'tasks';
+let redeemArm = null, redeemTimer = null;
+
+const TASK_TPLS = {
+  older: [
+    { id:'correct',  name:'訂正作業', emoji:'📝', icon:'paper',  reward:8 },
+    { id:'homework', name:'寫功課',   emoji:'✏️', icon:'pencil', reward:10 },
+    { id:'ch',  name:'國語自修', emoji:'📖', icon:'book',  reward:5, sub:'國語' },
+    { id:'mt',  name:'數學自修', emoji:'📐', icon:'ruler', reward:5, sub:'數學' },
+    { id:'ss',  name:'社會自修', emoji:'🌍', icon:'globe', reward:5, sub:'社會' },
+    { id:'sci', name:'自然自修', emoji:'🔬', icon:'flask', reward:5, sub:'自然' },
+  ],
+  younger: [
+    { id:'vacuum', name:'吸地板',     emoji:'🌀', icon:'broom', reward:8 },
+    { id:'toys',   name:'收臥榻玩具', emoji:'🧸', icon:'bear',  reward:6 },
+    { id:'lights', name:'隨手關燈',   emoji:'💡', icon:'bulb',  reward:3 },
+    { id:'door',   name:'隨手關門',   emoji:'🚪', icon:'door',  reward:3 },
+    { id:'floss',  name:'用牙線',     emoji:'🦷', icon:'tooth', reward:6 },
+    { id:'brush',  name:'認真刷牙',   emoji:'🪥', icon:'brush', reward:6 },
+  ],
+  custom: [
+    { id:'t1', name:'每日任務一', emoji:'⭐', icon:'star', reward:5 },
+    { id:'t2', name:'每日任務二', emoji:'⭐', icon:'star', reward:5 },
+  ]
+};
+const ICON_BY_ID = { correct:'paper', homework:'pencil', ch:'book', mt:'ruler', ss:'globe', sci:'flask', vacuum:'broom', toys:'bear', lights:'bulb', door:'door', floss:'tooth', brush:'brush', t1:'star', t2:'star' };
+const ICON_BY_EMOJI = { '📝':'paper','✏️':'pencil','✏':'pencil','📖':'book','📚':'book','📐':'ruler','📏':'ruler','🌍':'globe','🌏':'globe','🔬':'flask','🧪':'flask','🧹':'broom','🌀':'broom','🧸':'bear','💡':'bulb','🚪':'door','🦷':'tooth','🪥':'brush','⭐':'star','🌟':'star','❤️':'heart','💖':'heart','⚽':'ball','🏀':'ball','🎵':'music','🎹':'music','🎶':'music','⏰':'clock','📔':'diary','📓':'diary' };
+const TYPE_LABEL = { older:'大兒子・學習達人', younger:'小兒子・生活小英雄', custom:'自訂冒險者' };
+const BONUS_ICON = { exam:'paper', diary:'diary', reading:'book' };
+const BONUS_LABEL = { exam:'考試', diary:'日記', reading:'閱讀' };
+
+/* ═══ PERSISTENCE ═══ */
+function load() {
+  try { const d = localStorage.getItem(LS_KEY); if (d) S = JSON.parse(d); } catch (e) {}
+  normalizeState();
+}
+function migrate(c) {
+  if (!c.completionHistory) c.completionHistory = {};
+  if (!c.bonusLogs) c.bonusLogs = [];
+  if (!c.wishes) c.wishes = [];
+  if (!c.tasks) c.tasks = [];
+  if (!c.completedToday) c.completedToday = [];
+  if (c.emeralds === undefined) c.emeralds = 0;
+  if (c.streak === undefined) c.streak = 0;
+  if (c.bestStreak === undefined) c.bestStreak = 0;
+  if (!c.look) c.look = { ...(DEFAULT_LOOK[c.type] || DEFAULT_LOOK.custom) };
+  c.tasks.forEach(t => { if (t.icon === undefined) t.icon = ICON_BY_ID[t.id] || ICON_BY_EMOJI[t.emoji] || null; });
+}
+function save() {
+  try { localStorage.setItem(LS_KEY, JSON.stringify(S)); }
+  catch (e) { toast('儲存失敗（可能圖片太大）', 'close'); }
+}
+
+/* ═══ HELPERS ═══ */
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, ch => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[ch]));
+const uid = () => Math.random().toString(36).slice(2, 9);
+const dateToKey = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+const todayKey = () => dateToKey(new Date());
+const todayLabel = () => new Date().toLocaleDateString('zh-TW', { month:'numeric', day:'numeric', weekday:'short' });
+const cur = () => (S.characters || []).find(c => c.id === S.curId);
+const activeTasks = c => (c.tasks || []).filter(t => !t.archived);
+function progress(c) {
+  const act = activeTasks(c), done = c.completedToday || [];
+  return { done: act.filter(t => done.includes(t.id)).length, total: act.length };
+}
+const dailyMax = c => activeTasks(c).reduce((s, t) => s + (t.reward || 0), 0);
+function dailyReset(c) { const k = todayKey(); if (c.lastReset !== k) { c.completedToday = []; c.lastReset = k; } }
+const isPhoto = c => !!(c && c.avatar && String(c.avatar).startsWith('data:'));
+const avatarInner = c => isPhoto(c) ? `<img src="${esc(c.avatar)}" alt="">` : headSvg(c && c.look);
+const taskIcon = t => (t.icon && ICONS[t.icon]) ? ic(t.icon) : `<span class="emo">${esc(t.emoji || '⭐')}</span>`;
+function calcStreak(c) {
+  const H = c.completionHistory || {}; const d = new Date();
+  if (!((H[dateToKey(d)] || []).length)) d.setDate(d.getDate() - 1); // 今天還沒做不算中斷
+  let s = 0;
+  while ((H[dateToKey(d)] || []).length) { s++; d.setDate(d.getDate() - 1); }
+  return s;
+}
+function updateStreak(c) { const s = calcStreak(c); c.streak = s; if (s > (c.bestStreak || 0)) c.bestStreak = s; }
+function examEmeralds(score) {
+  if (score >= 100) return 25; if (score >= 95) return 20; if (score >= 90) return 15; if (score >= 85) return 12;
+  if (score >= 80) return 10; if (score >= 75) return 8; if (score >= 70) return 6; if (score >= 60) return 4; return 2;
+}
+function segs(sel, n, total) {
+  const el = $(sel); if (!el) return;
+  if (!total) { el.innerHTML = '<i></i>'; return; }
+  const slots = Math.min(total, 12), on = total > 12 ? Math.round(n / total * 12) : n;
+  el.innerHTML = Array.from({ length: slots }, (_, i) => `<i class="${i < on ? 'on' : ''}"></i>`).join('');
+}
+function stepVal(id, delta, min, max) {
+  const el = document.getElementById(id);
+  el.value = Math.max(min, Math.min(max, (parseInt(el.value) || 0) + delta));
+  playSound('click');
+}
+function resizeImage(file, max, quality, done) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = new Image();
+    img.onload = () => {
+      const ratio = Math.min(max / img.width, max / img.height, 1);
+      const cvs = document.createElement('canvas');
+      cvs.width = Math.round(img.width * ratio); cvs.height = Math.round(img.height * ratio);
+      cvs.getContext('2d').drawImage(img, 0, 0, cvs.width, cvs.height);
+      done(cvs.toDataURL('image/jpeg', quality));
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+/* ═══ THEME ═══ */
+function applyMode() {
+  document.body.dataset.mode = mode;
+  $$('.theme-btn').forEach(b => { b.innerHTML = ic(mode === 'night' ? 'moon' : 'sun'); b.setAttribute('aria-label', mode === 'night' ? '切換成白天' : '切換成夜晚'); });
+  drawBg(); drawIsland(); tick();
+}
+function themeToggle() {
+  mode = mode === 'night' ? 'day' : 'night';
+  ST().themeMode = mode; save();
+  try { localStorage.setItem(THEME_KEY, mode === 'night' ? 'dark' : 'light'); } catch (e) {}
+  playSound('click'); applyMode();
+}
+function loadTheme() {
+  if (!ST().themeMode) { let m = 'night'; try { m = localStorage.getItem(THEME_KEY) === 'light' ? 'day' : 'night'; } catch (e) {} ST().themeMode = m; }
+  mode = resolveMode();
+}
+
+/* ═══ NAV ═══ */
+function show(id) {
+  $$('.screen').forEach(s => s.classList.remove('active'));
+  const el = document.getElementById('screen-' + id);
+  if (el) { el.classList.add('active'); el.scrollTop = 0; }
+  $('#fab-wish').hidden = id !== 'wishlist';
+  $('#fab-bonus').hidden = id !== 'bonus';
+  tick();
+}
+function goTitle()    { renderTitle(); show('title'); }
+function goMain()     { if (!cur()) return goTitle(); renderHub(); show('main'); }
+function goTasks()    { if (!cur()) return goTitle(); renderTasks(); show('tasks'); }
+function goWishlist() { if (!cur()) return goTitle(); renderWishlist(); show('wishlist'); }
+function goCreate()   { startCreate(); show('create'); }
+function goBonus()    { if (!cur()) return goTitle(); setBonusFilter(bonusFilterActive); show('bonus'); }
+function goCalendar() { if (!cur()) return goTitle(); const n = new Date(); calYear = n.getFullYear(); calMonth = n.getMonth(); renderCalendar(); show('calendar'); }
+async function goTaskSettings(from) {
+  if (!cur()) return goTitle();
+  if (ST().lock.taskSettings && !(await requirePin('進入任務設定'))) return;
+  tsReturn = from || 'tasks'; renderTaskSettings(); show('task-settings');
+}
+function tsBack() { tsReturn === 'title' ? goTitle() : goTasks(); }
+
+/* ═══ TITLE ═══ */
+function renderTitle() {
+  const chars = S.characters || [];
+  chars.forEach(dailyReset);
+  if (!cur() && chars.length) S.curId = chars[0].id;
+  save();
+  const sel = cur(), has = chars.length > 0;
+  $('#pick-label').hidden = !has;
+  $('#hero-row').hidden = !has;
+  $('#title-settings').hidden = !has;
+  $('#title-go-txt').textContent = has ? '開始任務' : '建立冒險者';
+  const items = chars.map(c => {
+    const { done, total } = progress(c);
+    const pct = total ? Math.round(done / total * 100) : 0;
+    return `<button class="hero-card panel" aria-pressed="${c.id === S.curId}" onclick="pickChar('${c.id}')">
+      <span class="tick">${ic('check')}</span>
+      <span class="slot">${avatarInner(c)}</span>
+      <span class="hc-name">${esc(c.name)}</span>
+      <span class="hc-gem"><i>${ic('gem')}</i>${c.emeralds || 0}</span>
+      <span class="mini-bar"><i style="width:${pct}%"></i></span>
+    </button>`;
+  });
+  items.push(`<button class="hero-card panel add" onclick="goCreate()"><span class="slot"><span>${ic('plus')}</span></span><span class="hc-name">新增</span><span class="hc-sub">自訂冒險者</span></button>`);
+  const row = $('#hero-row');
+  row.style.gridTemplateColumns = `repeat(${Math.min(items.length, 3)},1fr)`;
+  row.innerHTML = items.join('');
+  $('#title-hero').innerHTML = spriteSvg(sel ? sel.look : DEFAULT_LOOK.older);
+}
+function pickChar(id) {
+  if (S.curId === id) { playSound('click'); goMain(); return; }
+  S.curId = id; save(); playSound('click'); renderTitle();
+}
+function titleGo() {
+  if (!cur()) { playSound('click'); goCreate(); return; }
+  playSound('complete'); const r = $('#title-go').getBoundingClientRect(); burst(r.left + r.width/2, r.top + r.height/2, 14);
+  goMain();
+}
+
+/* ═══ CREATE ═══ */
+function startCreate() {
+  CW = { type: null, name: '', look: { ...DEFAULT_LOOK.custom }, photo: null, step: 0 };
+  $('#av-file').value = '';
+  renderCreateStep(0);
+}
+function pickType(type) {
+  CW.type = type;
+  CW.name = type === 'older' ? '大勇士' : type === 'younger' ? '小冒險家' : '';
+  CW.look = { ...DEFAULT_LOOK[type] };
+  stepNext();
+}
+function renderCreateStep(step) {
+  CW.step = step;
+  $$('.create-step').forEach((el, i) => el.classList.toggle('active', i === step));
+  $$('#step-dots i').forEach((d, i) => { d.classList.toggle('active', i === step); d.classList.toggle('done', i < step); });
+  $('#screen-create').scrollTop = 0;
+  if (step === 1) { $('#input-name').value = CW.name; setTimeout(() => $('#input-name').focus(), 120); }
+  if (step === 2) renderLook();
+  if (step === 3) renderConfirm();
+}
+function renderLook() {
+  $('#look-preview').innerHTML = spriteSvg(CW.look);
+  const sw = (list, key) => list.map((c, i) => `<button class="swatch" style="background:${c[1]}" aria-label="${c[0]}" aria-pressed="${CW.look[key] === i}" onclick="setLook('${key}',${i})"></button>`).join('');
+  $('#sw-cap').innerHTML = sw(CAPS, 'cap');
+  $('#sw-jacket').innerHTML = sw(JACKETS, 'jacket');
+  $('#sw-hair').innerHTML = sw(HAIRS, 'hair');
+  const slot = $('#av-slot');
+  slot.innerHTML = CW.photo ? `<img src="${CW.photo}" alt="">` : ic('camera');
+  slot.classList.toggle('has', !!CW.photo);
+  $('#av-clear').hidden = !CW.photo;
+}
+function setLook(key, i) { CW.look[key] = i; playSound('click'); renderLook(); }
+function handleAvatarUpload(input) {
+  const f = input.files[0]; if (!f) return;
+  resizeImage(f, 240, .8, url => { CW.photo = url; renderLook(); });
+}
+function clearPhoto() { CW.photo = null; $('#av-file').value = ''; renderLook(); }
+function renderConfirm() {
+  $('#cf-sprite').innerHTML = spriteSvg(CW.look);
+  $('#cf-name').textContent = CW.name || '無名英雄';
+  $('#cf-type').textContent = TYPE_LABEL[CW.type] || '冒險者';
+  const tasks = TASK_TPLS[CW.type] || TASK_TPLS.custom;
+  $('#cf-tasks').innerHTML = tasks.map(t => `<div class="panel mini-row"><span class="slot">${taskIcon(t)}</span><span class="t">${esc(t.name)}</span><span class="reward-chip"><i>${ic('gem')}</i>+${t.reward}</span></div>`).join('');
+}
+function stepNext() {
+  if (CW.step === 0 && !CW.type) { toast('請先選擇角色類型！', 'close'); return; }
+  if (CW.step === 1) {
+    const v = $('#input-name').value.trim();
+    if (!v) { toast('請輸入名字！', 'close'); return; }
+    CW.name = v;
+  }
+  if (CW.step < 3) { playSound('click'); renderCreateStep(CW.step + 1); }
+}
+function stepBack() { if (CW.step > 0) { playSound('click'); renderCreateStep(CW.step - 1); } else goTitle(); }
+function doCreate() {
+  const c = {
+    id: uid(), name: CW.name || '無名英雄', avatar: CW.photo || '', look: { ...CW.look }, type: CW.type || 'custom',
+    emeralds: 0, tasks: (TASK_TPLS[CW.type] || TASK_TPLS.custom).map(t => ({ ...t })), wishes: [],
+    completedToday: [], lastReset: todayKey(), completionHistory: {}, bonusLogs: [], streak: 0, bestStreak: 0
+  };
+  S.characters.push(c); S.curId = c.id; save();
+  playSound('levelup'); burst(innerWidth / 2, innerHeight * .4, 22);
+  goMain();
+  toast(`歡迎！${c.name} 的冒險開始了！`, 'star');
+}
+
+/* ═══ HUB ═══ */
+function renderHub() {
+  const c = cur(); if (!c) return;
+  dailyReset(c); updateStreak(c); save();
+  const av = $('#hub-av'); av.innerHTML = avatarInner(c); av.classList.toggle('photo', isPhoto(c));
+  $('#hub-name').textContent = c.name;
+  $('#hub-gems').textContent = c.emeralds || 0;
+  $('#hub-streak').textContent = c.streak;
+  const { done, total } = progress(c);
+  $('#hub-xp-num').textContent = `${done}/${total}`;
+  segs('#hub-segs', done, total);
+  const open = (c.wishes || []).filter(w => !w.redeemed);
+  $('#hub-task-badge').textContent = `${done}/${total}`;
+  $('#hub-wish-badge').textContent = `${open.length} 個`;
+  $('#hub-cal-badge').textContent = `${c.streak} 天`;
+  $('#hub-bonus-badge').textContent = `${(c.bonusLogs || []).length} 筆`;
+  const teaser = $('#hub-wish');
+  if (open.length) {
+    const next = open.reduce((a, b) => a.cost <= b.cost ? a : b);
+    teaser.hidden = false;
+    $('#hub-wish-name').textContent = next.name;
+    $('#hub-wish-fill').style.width = Math.min(100, Math.round((c.emeralds || 0) / next.cost * 100)) + '%';
+    $('#hub-wish-nums').textContent = `${c.emeralds || 0}/${next.cost}`;
+  } else teaser.hidden = true;
+}
+
+/* ═══ TASKS ═══ */
+function renderTasks() {
+  const c = cur(); if (!c) return;
+  dailyReset(c);
+  $('#task-date').textContent = todayLabel();
+  const act = activeTasks(c), done = c.completedToday || [];
+  const { done: n, total } = progress(c);
+  $('#task-progress-txt').textContent = `${n}/${total}`;
+  segs('#task-segs', n, total);
+  $('#task-list').innerHTML = act.map(t => {
+    const d = done.includes(t.id);
+    return `<button class="panel task${d ? ' done' : ''}" id="ti-${t.id}" aria-pressed="${d}" onclick="toggleTask('${t.id}')">
+      <span class="slot">${taskIcon(t)}</span>
+      <span class="t-info"><span class="t-name">${esc(t.name)}</span>${t.sub ? `<span class="t-sub">${esc(t.sub)} 自修</span>` : ''}</span>
+      <span class="reward-chip"><i>${ic('gem')}</i>+${t.reward}</span>
+      <span class="check">${d ? ic('check') : ''}</span>
+    </button>`;
+  }).join('');
+  $('#task-empty').hidden = act.length > 0;
+}
+function toggleTask(id) {
+  const c = cur(); if (!c) return;
+  const task = c.tasks.find(t => t.id === id); if (!task) return;
+  const done = c.completedToday || [], tk = todayKey();
+  if (!c.completionHistory[tk]) c.completionHistory[tk] = [];
+  if (!done.includes(id)) {
+    c.completedToday = [...done, id];
+    c.emeralds = (c.emeralds || 0) + task.reward;
+    if (!c.completionHistory[tk].includes(id)) c.completionHistory[tk].push(id);
+    updateStreak(c); save(); renderTasks();
+    const el = document.getElementById('ti-' + id);
+    if (el) { el.classList.add('flash'); const r = el.getBoundingClientRect(); burst(r.right - 30, r.top + r.height / 2, 9); }
+    const { done: n, total } = progress(c);
+    buzz(30);
+    if (n === total && total > 0) { buzz([40, 60, 40]); playSound('levelup'); burst(innerWidth / 2, innerHeight * .3, 26); toast('今日任務全部完成！太強了！', 'star'); }
+    else { playSound('complete'); toast(`+${task.reward} 綠寶石！`, 'gem'); }
+  } else {
+    c.completedToday = done.filter(x => x !== id);
+    c.emeralds = Math.max(0, (c.emeralds || 0) - task.reward);
+    c.completionHistory[tk] = c.completionHistory[tk].filter(x => x !== id);
+    updateStreak(c); save(); playSound('click'); renderTasks();
+  }
+}
+
+/* ═══ WISHLIST ═══ */
+function renderWishlist() {
+  const c = cur(); if (!c) return;
+  $('#wish-bal').textContent = c.emeralds || 0;
+  const dmax = dailyMax(c), wishes = c.wishes || [];
+  $('#wish-empty').hidden = wishes.length > 0;
+  const ordered = [...wishes.filter(w => !w.redeemed), ...wishes.filter(w => w.redeemed)];
+  $('#wish-grid').innerHTML = ordered.map(w => {
+    const gems = c.emeralds || 0;
+    const pct = Math.min(100, Math.round(gems / w.cost * 100));
+    const can = !w.redeemed && gems >= w.cost, lack = Math.max(0, w.cost - gems);
+    const days = dmax > 0 ? Math.ceil(Math.max(0, lack) / dmax) : '?';
+    let btn;
+    if (w.redeemed) btn = `<button class="btn stone sm" disabled><span class="ico">${ic('check')}</span>已兌換</button>`;
+    else if (can) btn = redeemArm === w.id
+      ? `<button class="btn gold sm glow" onclick="redeemWish('${w.id}')">再按一次確認</button>`
+      : `<button class="btn sm glow" onclick="redeemWish('${w.id}')">兌換！</button>`;
+    else btn = `<button class="btn stone sm" disabled>還差 ${lack}</button>`;
+    return `<div class="panel wcard${w.redeemed ? ' redeemed' : ''}">
+      <div class="w-img${w.redeemed ? ' stamp' : ''}">${w.image ? `<img src="${esc(w.image)}" alt="${esc(w.name)}">` : `<span class="ph">${ic('chest')}</span>`}</div>
+      <div class="w-info">
+        <div class="w-name">${esc(w.name)}</div>
+        <div class="w-meta"><span class="reward-chip"><i>${ic('gem')}</i>${w.cost}</span>${!w.redeemed ? `<span class="w-days">${can ? '可以兌換了！' : `約 ${days} 天`}</span>` : ''}</div>
+        ${!w.redeemed ? `<span class="mini-bar"><i style="width:${pct}%"></i></span>` : ''}
+        ${btn}
+      </div>
+    </div>`;
+  }).join('');
+}
+async function redeemWish(id) {
+  const c = cur(); if (!c) return;
+  const w = (c.wishes || []).find(x => x.id === id);
+  if (!w || w.redeemed || (c.emeralds || 0) < w.cost) return;
+  if (redeemArm !== id) {
+    redeemArm = id; clearTimeout(redeemTimer);
+    redeemTimer = setTimeout(() => { redeemArm = null; if ($('#screen-wishlist').classList.contains('active')) renderWishlist(); }, 3000);
+    playSound('click'); renderWishlist(); return;
+  }
+  redeemArm = null; clearTimeout(redeemTimer);
+  if (ST().lock.redeem && !(await requirePin(`兌換「${w.name}」，請家長確認`))) { renderWishlist(); return; }
+  if (w.redeemed || (c.emeralds || 0) < w.cost) return;
+  c.emeralds -= w.cost; w.redeemed = true; save(); buzz(80);
+  playSound('redeem'); burst(innerWidth / 2, innerHeight / 2, 30);
+  toast(`「${w.name}」兌換成功！去找媽媽領獎品吧！`, 'chest');
+  renderWishlist();
+}
+function openWishModal() {
+  wishImg = null;
+  $('#wi-name').value = ''; $('#wi-cost').value = '200'; $('#wi-file').value = '';
+  const prev = $('#wi-img-preview'); prev.hidden = true; prev.removeAttribute('src');
+  updateCostHint(); openSheet('modal-wish');
+}
+function updateCostHint() {
+  const c = cur(); if (!c) return;
+  const cost = parseInt($('#wi-cost').value) || 0, dmax = dailyMax(c);
+  if (dmax <= 0 || cost <= 0) { $('#cost-hint').textContent = ''; return; }
+  const days = Math.ceil(cost / dmax), weeks = Math.round(days / 7 * 10) / 10;
+  let hint = `每天全部完成：約 ${days} 天`;
+  if (days >= 7) hint += `（約 ${weeks} 週）`;
+  if (days >= 28) hint += '・建議當作一個月的大目標';
+  $('#cost-hint').textContent = hint;
+}
+function handleImg(input) {
+  const f = input.files[0]; if (!f) return;
+  resizeImage(f, 480, .72, url => { wishImg = url; const p = $('#wi-img-preview'); p.src = url; p.hidden = false; });
+}
+function saveWish() {
+  const name = $('#wi-name').value.trim();
+  if (!name) { toast('請輸入願望名稱！', 'close'); return; }
+  const cost = Math.max(1, Math.min(9999, parseInt($('#wi-cost').value) || 200));
+  const c = cur(); if (!c) return;
+  c.wishes.push({ id: uid(), name, image: wishImg, cost, redeemed: false });
+  save(); closeSheet('modal-wish'); playSound('complete');
+  toast(`願望「${name}」加入清單！`, 'chest');
+  renderWishlist();
+}
+
+/* ═══ CALENDAR ═══ */
+function renderCalendar() {
+  const c = cur(); if (!c) return;
+  updateStreak(c); save();
+  $('#cal-streak-count').textContent = c.streak;
+  $('#cal-streak-best').textContent = `最佳紀錄 ${c.bestStreak} 天`;
+  const mm = String(calMonth + 1).padStart(2, '0'), monthKey = `${calYear}-${mm}`;
+  const hist = c.completionHistory || {}, logs = c.bonusLogs || [];
+  const daysIn = new Date(calYear, calMonth + 1, 0).getDate();
+  const total = activeTasks(c).length, today = todayKey();
+  let completeDays = 0, gems = 0, html = '';
+  const first = new Date(calYear, calMonth, 1).getDay();
+  for (let i = 0; i < first; i++) html += '<div class="cday pad"></div>';
+  for (let d = 1; d <= daysIn; d++) {
+    const key = `${monthKey}-${String(d).padStart(2, '0')}`, h = hist[key] || [];
+    if (h.length) completeDays++;
+    gems += h.reduce((s, id) => { const t = c.tasks.find(x => x.id === id); return s + (t ? t.reward : 0); }, 0);
+    const bonus = logs.some(b => b.date === key);
+    let cls = 'cday';
+    if (key > today) cls += ' future';
+    else if (h.length) cls += (total > 0 && h.length >= total) ? ' full' : ' partial';
+    if (key === today) cls += ' today';
+    const label = `${calMonth + 1}月${d}日${h.length ? `，完成 ${h.length} 項` : ''}${bonus ? '，有加分' : ''}`;
+    html += `<button class="${cls}" onclick="openDayPopup('${key}')" aria-label="${label}">${d}${bonus ? `<i class="bstar">${ic('star')}</i>` : ''}</button>`;
+  }
+  const monthLogs = logs.filter(b => b.date && b.date.startsWith(monthKey));
+  gems += monthLogs.reduce((s, b) => s + (b.emeralds || 0), 0);
+  $('#cal-grid').innerHTML = html;
+  $('#cal-stat-days').textContent = completeDays;
+  $('#cal-stat-bonus').textContent = monthLogs.length;
+  $('#cal-stat-gems').textContent = gems;
+  $('#cal-month-label').textContent = `${calYear} 年 ${calMonth + 1} 月`;
+}
+function calPrev() { calMonth--; if (calMonth < 0) { calMonth = 11; calYear--; } playSound('click'); renderCalendar(); }
+function calNext() { calMonth++; if (calMonth > 11) { calMonth = 0; calYear++; } playSound('click'); renderCalendar(); }
+function openDayPopup(key) {
+  const c = cur(); if (!c) return;
+  $('#popup-date').textContent = new Date(key + 'T00:00:00').toLocaleDateString('zh-TW', { month:'long', day:'numeric', weekday:'short' });
+  const h = (c.completionHistory || {})[key] || [];
+  const tasks = c.tasks.filter(t => h.includes(t.id) || !t.archived);
+  let html = '';
+  if (tasks.length) {
+    html += `<div class="field-label" style="margin:4px 0 2px">每日任務</div>`;
+    html += tasks.map(t => { const d = h.includes(t.id);
+      return `<div class="day-row${d ? '' : ' miss'}"><span class="slot">${taskIcon(t)}</span><span class="t">${esc(t.name)}</span>${d ? `<span class="reward-chip"><i>${ic('gem')}</i>+${t.reward}</span>` : '<span class="note">未完成</span>'}</div>`; }).join('');
+  }
+  const bs = (c.bonusLogs || []).filter(b => b.date === key);
+  if (bs.length) {
+    html += `<div class="field-label" style="margin:14px 0 2px">加分紀錄</div>`;
+    html += bs.map(b => `<div class="day-row"><span class="slot">${ic(BONUS_ICON[b.type] || 'star')}</span><span class="t">${esc(b.title || BONUS_LABEL[b.type])}${b.score !== undefined ? `（${b.score} 分）` : ''}</span><span class="reward-chip gold"><i>${ic('gem')}</i>+${b.emeralds}</span></div>`).join('');
+  }
+  if (!html) html = '<div class="note" style="padding:10px 0">這天沒有紀錄。</div>';
+  $('#popup-body').innerHTML = html;
+  playSound('click'); openSheet('day-popup');
+}
+
+/* ═══ BONUS ═══ */
+function renderBonus() {
+  const c = cur(); if (!c) return;
+  const all = (c.bonusLogs || []).slice().reverse();
+  const list = bonusFilterActive === 'all' ? all : all.filter(b => b.type === bonusFilterActive);
+  $('#bonus-empty').hidden = list.length > 0;
+  $('#bonus-list').innerHTML = list.map(b => {
+    let meta = b.date ? new Date(b.date + 'T00:00:00').toLocaleDateString('zh-TW', { month:'numeric', day:'numeric', weekday:'short' }) : '';
+    if (b.type === 'exam' && b.score !== undefined) meta += ` · ${b.score} 分`;
+    if (b.type === 'reading' && b.author) meta += ` · ${b.author}`;
+    if (b.note) meta += ` · ${b.note}`;
+    return `<div class="panel bitem"><span class="slot">${ic(BONUS_ICON[b.type] || 'star')}</span><div class="b-info"><div class="b-title">${esc(b.title || BONUS_LABEL[b.type])}</div><div class="b-meta">${esc(meta)}</div></div><span class="reward-chip gold"><i>${ic('gem')}</i>+${b.emeralds}</span></div>`;
+  }).join('');
+}
+function setBonusFilter(f) {
+  bonusFilterActive = f;
+  ['all', 'exam', 'diary', 'reading'].forEach(k => $('#bfilter-' + k).setAttribute('aria-pressed', String(k === f)));
+  renderBonus();
+}
+async function openBonusModal() {
+  if (ST().lock.bonus && !(await requirePin('登記加分，請家長確認'))) return;
+  rdStatus(''); renderShelfChips();
+  ['ex-subject', 'di-title', 'di-content', 'rd-title', 'rd-author', 'rd-note', 'rd-isbn'].forEach(id => { document.getElementById(id).value = ''; });
+  $('#ex-score').value = '90';
+  selectBonusTab(bonusFilterActive !== 'all' ? bonusFilterActive : bonusTabActive);
+  updateScorePreview(); openSheet('modal-bonus');
+}
+function selectBonusTab(tab) {
+  bonusTabActive = tab;
+  ['exam', 'diary', 'reading'].forEach(k => {
+    $('#btab-' + k).setAttribute('aria-pressed', String(k === tab));
+    $('#bpanel-' + k).classList.toggle('active', k === tab);
+  });
+}
+function updateScorePreview() {
+  const score = Math.max(0, Math.min(100, parseInt($('#ex-score').value) || 0));
+  $('#score-gems').textContent = examEmeralds(score);
+  let msg = `綠寶石（${score} 分）`;
+  if (score >= 100) msg += ' 滿分！'; else if (score >= 95) msg += ' 超厲害！'; else if (score >= 90) msg += ' 很棒！';
+  $('#score-msg').textContent = msg;
+}
+function saveBonus() {
+  const c = cur(); if (!c) return;
+  const entry = { id: uid(), type: bonusTabActive, date: todayKey() };
+  if (bonusTabActive === 'exam') {
+    const subject = $('#ex-subject').value.trim();
+    if (!subject) { toast('請輸入科目！', 'close'); return; }
+    const score = Math.max(0, Math.min(100, parseInt($('#ex-score').value) || 0));
+    Object.assign(entry, { title: subject, score, emeralds: examEmeralds(score) });
+  } else if (bonusTabActive === 'diary') {
+    const content = $('#di-content').value.trim();
+    if (!content) { toast('請寫一點日記內容！', 'close'); return; }
+    Object.assign(entry, { title: $('#di-title').value.trim() || '日記', note: content.slice(0, 60), emeralds: 8 });
+  } else {
+    const title = $('#rd-title').value.trim();
+    if (!title) { toast('請輸入書名！', 'close'); return; }
+    const isbn = $('#rd-isbn').value.replace(/[^0-9Xx]/g, '');
+    Object.assign(entry, { title, author: $('#rd-author').value.trim(), note: $('#rd-note').value.trim(), emeralds: 6 });
+    if (isbn) entry.isbn = isbn;
+    upsertBook({ title, author: entry.author, isbn });
+  }
+  c.bonusLogs.push(entry);
+  c.emeralds = (c.emeralds || 0) + entry.emeralds;
+  save(); closeSheet('modal-bonus');
+  playSound('complete'); burst(innerWidth / 2, innerHeight * .5, 16);
+  toast(`+${entry.emeralds} 綠寶石！`, 'star');
+  renderBonus();
+}
+
+/* ═══ TASK SETTINGS ═══ */
+function renderTaskSettings() {
+  const c = cur(); if (!c) return;
+  const act = c.tasks.filter(t => !t.archived), arch = c.tasks.filter(t => t.archived);
+  $('#ts-active-label').textContent = act.length ? `目前任務（${act.length}）` : '目前沒有任務';
+  $('#ts-arch-label').textContent = arch.length ? `封存任務（${arch.length}）` : '';
+  $('#ts-arch-label').hidden = !arch.length;
+  $('#ts-active').innerHTML = act.map(tsRow).join('');
+  $('#ts-arch').innerHTML = arch.map(tsRow).join('');
+}
+function tsRow(t) {
+  const a = !!t.archived;
+  return `<div class="panel tsrow${a ? ' arch' : ''}">
+    <span class="slot">${taskIcon(t)}</span>
+    <div class="ts-info"><div class="ts-name">${esc(t.name)}</div><div class="ts-reward"><i>${ic('gem')}</i>${t.reward} 綠寶石${a ? ' · 已封存' : ''}</div></div>
+    <div class="ts-actions">
+      ${!a ? `<button class="rbtn sm" onclick="openEditTaskModal('${t.id}')" aria-label="編輯「${esc(t.name)}」">${ic('pencil')}</button>` : ''}
+      <button class="rbtn sm" onclick="toggleArchiveTask('${t.id}')" aria-label="${a ? '恢復' : '封存'}「${esc(t.name)}」">${ic(a ? 'up' : 'box')}</button>
+    </div>
+  </div>`;
+}
+function renderIconGrid() {
+  $('#te-icons').innerHTML = TASK_ICON_LIST.map(n => `<button class="icon-opt" aria-pressed="${teIcon === n}" onclick="pickTeIcon('${n}')">${ic(n)}</button>`).join('');
+}
+function pickTeIcon(n) { teIcon = n; $('#te-emoji').value = ''; playSound('click'); renderIconGrid(); }
+function teEmojiInput() { if ($('#te-emoji').value.trim()) { teIcon = null; renderIconGrid(); } }
+function openEditTaskModal(id) {
+  const c = cur(); if (!c) return;
+  const t = c.tasks.find(x => x.id === id); if (!t) return;
+  editingTaskId = id;
+  $('#task-edit-title').textContent = '編輯任務';
+  $('#te-name').value = t.name;
+  $('#te-reward').value = t.reward;
+  teIcon = t.icon && ICONS[t.icon] ? t.icon : null;
+  $('#te-emoji').value = teIcon ? '' : (t.emoji || '');
+  renderIconGrid(); openSheet('modal-task-edit');
+}
+function openAddTaskModal() {
+  editingTaskId = null;
+  $('#task-edit-title').textContent = '新增任務';
+  $('#te-name').value = ''; $('#te-reward').value = '5'; $('#te-emoji').value = '';
+  teIcon = 'star'; renderIconGrid(); openSheet('modal-task-edit');
+  setTimeout(() => $('#te-name').focus(), 150);
+}
+function saveTaskEdit() {
+  const c = cur(); if (!c) return;
+  const name = $('#te-name').value.trim();
+  if (!name) { toast('請輸入任務名稱！', 'close'); return; }
+  const emoji = $('#te-emoji').value.trim();
+  if (!teIcon && !emoji) teIcon = 'star';
+  const reward = Math.max(1, Math.min(99, parseInt($('#te-reward').value) || 5));
+  if (editingTaskId) {
+    const t = c.tasks.find(x => x.id === editingTaskId);
+    if (t) { t.name = name; t.reward = reward; t.icon = teIcon; if (emoji) t.emoji = emoji; }
+    toast(`「${name}」已更新`, 'pencil');
+  } else {
+    c.tasks.push({ id: uid(), name, emoji: emoji || '⭐', icon: teIcon, reward });
+    toast(`新增任務「${name}」`, 'plus'); playSound('complete');
+  }
+  save(); closeSheet('modal-task-edit'); renderTaskSettings();
+}
+function toggleArchiveTask(id) {
+  const c = cur(); if (!c) return;
+  const t = c.tasks.find(x => x.id === id); if (!t) return;
+  t.archived = !t.archived; save(); playSound('click');
+  toast(t.archived ? `「${t.name}」已封存` : `「${t.name}」已恢復`, t.archived ? 'box' : 'up');
+  renderTaskSettings();
+}
+
+/* ═══ SHEETS ═══ */
+function openSheet(id) { document.getElementById(id).classList.add('open'); }
+function closeSheet(id) { document.getElementById(id).classList.remove('open'); }
+document.addEventListener('keydown', e => { if (e.key === 'Escape') $$('.sheet.open').forEach(s => s.classList.remove('open')); });
+
+/* ═══ SOUND（8-bit） ═══ */
+let _ctx = null;
+function actx() { if (!_ctx) try { _ctx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {} return _ctx; }
+function tone(freq, type, dur, gain = .2, t0 = 0) {
+  const c = actx(); if (!c) return;
+  const o = c.createOscillator(), g = c.createGain();
+  o.connect(g); g.connect(c.destination); o.type = type;
+  const s = c.currentTime + t0;
+  o.frequency.setValueAtTime(freq, s);
+  gain = gain * (S.settings ? ST().sfxVol : .7) * 1.3;
+  g.gain.setValueAtTime(0, s); g.gain.linearRampToValueAtTime(gain, s + .01); g.gain.exponentialRampToValueAtTime(.001, s + dur);
+  o.start(s); o.stop(s + dur + .02);
+}
+function playSound(type) {
+  if (!S.settings || !ST().sfx || ST().sfxVol <= 0) return;
+  try {
+    if (type === 'click') tone(420, 'square', .07, .1);
+    else if (type === 'complete') [523, 659, 784].forEach((f, i) => tone(f, 'square', .12, .16, i * .09));
+    else if (type === 'levelup') [523, 587, 659, 784, 880, 1047].forEach((f, i) => tone(f, 'square', .14, .18, i * .1));
+    else if (type === 'redeem') [784, 988, 1175, 1568].forEach((f, i) => tone(f, 'square', .16, .2, i * .08));
+  } catch (e) {}
+}
+
+/* ═══ PARTICLES & TOAST ═══ */
+function burst(x, y, n) {
+  if (RM || !ST().motion) return;
+  const cols = ['#7cf05a', '#ffd23a', '#ffffff', '#f08a24', '#8ad0ff', '#c8a8ff'];
+  for (let i = 0; i < n; i++) {
+    const b = document.createElement('i'); b.className = 'burst';
+    const a = (Math.PI * 2 * i / n) + (Math.random() - .5) * .8, d = 40 + Math.random() * 70;
+    const sz = 6 + Math.floor(Math.random() * 3) * 2;
+    b.style.cssText = `left:${x}px;top:${y}px;width:${sz}px;height:${sz}px;background:${cols[i % cols.length]};--tx:${Math.cos(a) * d}px;--ty:${Math.sin(a) * d - 30}px;animation-delay:${Math.random() * .1}s`;
+    document.body.appendChild(b); setTimeout(() => b.remove(), 900);
+  }
+}
+function toast(msg, icon = 'star') {
+  const el = document.createElement('div');
+  el.className = 'panel toast';
+  el.innerHTML = `<i>${ic(icon) || ic('star')}</i><span>${esc(msg)}</span>`;
+  const box = $('#toasts'); box.appendChild(el);
+  while (box.children.length > 2) box.firstChild.remove();
+  setTimeout(() => el.remove(), 2900);
+}
+
+/* ═══ INIT ═══ */
+(function init() {
+  // button texture
+  try {
+    const c = document.createElement('canvas'); c.width = c.height = 16; const g = c.getContext('2d'); const R = rng(5);
+    for (let y = 0; y < 16; y += 2) for (let x = 0; x < 16; x += 2) { const r = R(); if (r < .16) { g.fillStyle = 'rgba(255,255,255,.12)'; g.fillRect(x, y, 2, 2); } else if (r < .34) { g.fillStyle = 'rgba(0,0,0,.12)'; g.fillRect(x, y, 2, 2); } }
+    document.documentElement.style.setProperty('--tex', `url(${c.toDataURL()})`);
+  } catch (e) {}
+  $$('[data-ico]').forEach(el => { el.innerHTML = ic(el.dataset.ico); });
+  $('#title-pet').innerHTML = pix(PET.m, PET.p);
+  load(); loadTheme(); applySettingsClasses();
+  applyMode();
+  renderTitle();
+  if (!RM) setInterval(() => { if (ST().motion) tick(); }, 140);
+  setInterval(() => { if (ST().themeMode === 'auto') { const m = resolveMode(); if (m !== mode) { mode = m; applyMode(); } } }, 60000);
+  document.addEventListener('pointerdown', () => { if (ST().bgm) bgmStart(); }, { once: true });
+  initCaps();
+  let rt; window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { drawBg(); tick(); }, 150); });
+})();
+</script>
+
+</body>
+</html>
