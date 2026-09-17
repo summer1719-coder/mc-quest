@@ -542,6 +542,35 @@ body.no-motion.pen-flash::after{display:none}
 }
 .wrap{min-width:0}
 .t-name,.ts-name,.pen-row .lab b{overflow-wrap:anywhere}
+
+/* ══════ V15: 願望存錢筒 ══════ */
+.wallet-panel{display:grid;grid-template-columns:1fr 1fr;gap:8px 12px;padding:12px 14px}
+.wallet-cell{display:flex;align-items:center;gap:10px;min-width:0}
+.wallet-cell .slot{width:42px;height:42px;padding:8px}
+.wallet-cell small{display:block;font-size:12px;font-weight:700;color:var(--muted);line-height:1.2}
+.wallet-cell b{display:block;font-family:var(--f-px);font-weight:400;font-size:16px;color:var(--gem);line-height:1.6;font-variant-numeric:tabular-nums}
+.wallet-note{grid-column:1/-1;font-size:12px}
+.w-img{position:relative}
+.w-pct{position:absolute;right:6px;bottom:6px;font-family:var(--f-px);font-size:10px;color:#fff;background:rgba(10,6,30,.78);border:2px solid var(--ink);border-radius:6px;padding:3px 6px}
+.w-acts{display:flex;gap:6px;margin-top:auto;align-items:center}
+.w-acts .btn{flex:1;min-width:0}
+.w-acts .rbtn{flex:0 0 40px}
+.wcard .w-days{font-size:12px;font-weight:700;color:var(--muted);line-height:1.35}
+.dp-wallet{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:6px;font-weight:900;font-size:14px;color:var(--muted)}
+.dp-wallet i{width:14px;height:18px;display:block}
+.dp-wallet b{font-family:var(--f-px);font-weight:400;font-size:13px;color:var(--gem)}
+.dp-quick{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.dp-quick .btn{min-height:44px;font-size:15px;padding:0 4px;letter-spacing:0}
+.wm-danger{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.warn-card .slot img{width:100%;height:100%;object-fit:cover}
+
+.w-mode{position:absolute;left:6px;top:6px;font-size:11px;font-weight:900;color:#fff;border:2px solid var(--ink);border-radius:6px;padding:1px 6px;line-height:1.5}
+.w-mode.bank{background:#e0701a}
+.w-mode.shared{background:#3e9a22}
+.mode-pick{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:6px;border-radius:14px;background:var(--slot);border:2px solid var(--panel-ink)}
+.mode-pick button{display:flex;align-items:center;justify-content:center;gap:8px;min-height:48px;border-radius:10px;font-weight:900;font-size:15px;color:var(--muted);border:2px solid transparent}
+.mode-pick button i{width:22px;height:22px;display:block}
+.mode-pick button[aria-pressed="true"]{background:var(--panel2);color:var(--text);border-color:#5cc836;box-shadow:0 0 0 2px rgba(92,200,54,.3)}
 </style>
 
 <style>[hidden]{display:none!important}</style>
@@ -687,6 +716,11 @@ body.no-motion.pen-flash::after{display:none}
 <section id="screen-wishlist" class="screen">
   <div class="wrap wide">
     <header class="bar"><button class="rbtn" onclick="goMain()" data-ico="back" aria-label="回基地"></button><h2 class="bar-title stroke"><i data-ico="chest"></i>願望清單</h2><span class="gem-badge"><i data-ico="gem"></i><b id="wish-bal">0</b></span></header>
+    <div class="panel wallet-panel" id="wallet-panel" hidden>
+      <div class="wallet-cell"><span class="slot" data-ico="gem"></span><span><small>錢包裡</small><b id="wallet-now">0</b></span></div>
+      <div class="wallet-cell"><span class="slot" data-ico="chest"></span><span><small>存在願望裡</small><b id="wallet-banked">0</b></span></div>
+      <div class="note wallet-note">「存錢筒」願望要按存入才算・「共用」願望直接用錢包裡的寶石</div>
+    </div>
     <div class="wish-grid" id="wish-grid"></div>
     <div class="panel empty" id="wish-empty" hidden><span class="slot" data-ico="chest"></span><b>還沒有願望</b><small>點右下角的 + 來許願！</small></div>
   </div>
@@ -924,7 +958,7 @@ body.no-motion.pen-flash::after{display:none}
     <div class="set-head stroke"><i data-ico="info"></i>關於</div>
     <div class="panel about">
       <span class="sp" id="about-sprite"></span>
-      <span><b>麥塊任務島 V14</b><small>兄弟冒險特訓版<br>資料存在這台裝置；可用雲端存檔或備份檔搬家。</small></span>
+      <span><b>麥塊任務島 V15</b><small>兄弟冒險特訓版<br>資料存在這台裝置；可用雲端存檔或備份檔搬家。</small></span>
     </div>
     <button class="btn red" onclick="resetAll()" style="margin-top:4px"><span class="ico" data-ico="trash"></span>清除這台裝置的所有資料</button>
   </div>
@@ -1029,6 +1063,57 @@ body.no-motion.pen-flash::after{display:none}
   </div>
 </div>
 
+
+<!-- ═════════ SHEET: DEPOSIT ═════════ -->
+<div class="sheet" id="modal-deposit" onclick="if(event.target===this)closeSheet(this.id)">
+  <div class="panel sheet-body" role="dialog" aria-labelledby="dp-title">
+    <div class="sheet-head"><h3 id="dp-title"><i data-ico="chest"></i>存進願望存錢筒</h3><button class="rbtn sm" onclick="closeSheet('modal-deposit')" data-ico="close" aria-label="關閉"></button></div>
+    <div class="warn-card" id="dp-wish"></div>
+    <span class="mini-bar" style="height:14px"><i id="dp-fill" style="width:0%"></i></span>
+    <div class="dp-wallet"><span>錢包裡有</span><i data-ico="gem"></i><b id="dp-wallet">0</b><span>顆・最多可以存</span><b id="dp-max">0</b><span>顆</span></div>
+    <div class="dp-quick" id="dp-quick"></div>
+    <div class="stepper">
+      <button class="btn stone" onclick="dpStep(-1)" aria-label="少存 1 顆">−</button>
+      <span class="gem-i" data-ico="gem"></span>
+      <input id="dp-amt" class="inp" type="number" min="1" value="1" inputmode="numeric" oninput="dpPreview()" aria-label="存入數量">
+      <button class="btn" onclick="dpStep(1)" aria-label="多存 1 顆">+</button>
+    </div>
+    <div class="note" id="dp-after" style="text-align:center"></div>
+    <div class="sheet-actions"><button class="btn stone" onclick="closeSheet('modal-deposit')">取消</button><button class="btn" id="dp-go" onclick="doDeposit()"><span id="dp-go-t">存入</span></button></div>
+  </div>
+</div>
+
+<!-- ═════════ SHEET: WISH MANAGE ═════════ -->
+<div class="sheet" id="modal-wish-manage" onclick="if(event.target===this)closeSheet(this.id)">
+  <div class="panel sheet-body" role="dialog" aria-labelledby="wm-title">
+    <div class="sheet-head"><h3 id="wm-title"><i data-ico="gear"></i>管理願望</h3><button class="rbtn sm" onclick="closeSheet('modal-wish-manage')" data-ico="close" aria-label="關閉"></button></div>
+    <div class="warn-card" id="wm-info"></div>
+    <div id="wm-edit">
+      <div class="form-card" style="padding:0"><label class="field-label" for="wm-name">願望名稱</label><input id="wm-name" class="inp" type="text" maxlength="20" autocomplete="off"></div>
+      <div style="margin-top:12px">
+        <div class="field-label" style="margin-bottom:8px">存法</div>
+        <div class="mode-pick" id="wm-mode"><button data-m="bank" onclick="setWmMode('bank')"><i data-ico="chest"></i>專屬存錢筒</button><button data-m="shared" onclick="setWmMode('shared')"><i data-ico="gem"></i>共用錢包</button></div>
+        <div class="note" id="wm-mode-note" style="margin-top:8px"></div>
+      </div>
+      <div style="margin-top:12px">
+        <label class="field-label" for="wm-cost">需要多少綠寶石？</label>
+        <div class="stepper" style="margin-top:8px">
+          <button class="btn stone" onclick="stepVal('wm-cost',-10,1,9999)" aria-label="減少 10">−</button>
+          <span class="gem-i" data-ico="gem"></span>
+          <input id="wm-cost" class="inp" type="number" min="1" max="9999" inputmode="numeric">
+          <button class="btn" onclick="stepVal('wm-cost',10,1,9999)" aria-label="增加 10">+</button>
+        </div>
+      </div>
+    </div>
+    <div class="wm-danger">
+      <button class="btn stone sm" id="wm-withdraw" onclick="withdrawWish()"><span class="ico" data-ico="up"></span>取出寶石</button>
+      <button class="btn red sm" onclick="deleteWish()"><span class="ico" data-ico="trash"></span>刪除願望</button>
+    </div>
+    <div class="note" id="wm-note"></div>
+    <div class="sheet-actions" id="wm-actions"><button class="btn stone" onclick="closeSheet('modal-wish-manage')">取消</button><button class="btn" onclick="saveWishManage()">儲存</button></div>
+  </div>
+</div>
+
 <button class="fab" id="fab-wish" hidden onclick="openWishModal()" data-ico="plus" aria-label="新增願望"></button>
 <button class="fab gold" id="fab-bonus" hidden onclick="openBonusModal()" data-ico="plus" aria-label="登記加分"></button>
 
@@ -1083,6 +1168,11 @@ body.no-motion.pen-flash::after{display:none}
         <button class="btn" onclick="stepVal('wi-cost',10,1,9999);updateCostHint()" aria-label="增加 10">+</button>
       </div>
       <div class="note" id="cost-hint" style="margin-top:8px"></div>
+    </div>
+    <div>
+      <div class="field-label" style="margin-bottom:8px">這個願望怎麼存？</div>
+      <div class="mode-pick" id="wi-mode"><button data-m="bank" onclick="setNewWishMode('bank')"><i data-ico="chest"></i>專屬存錢筒</button><button data-m="shared" onclick="setNewWishMode('shared')"><i data-ico="gem"></i>共用錢包</button></div>
+      <div class="note" id="wi-mode-note" style="margin-top:8px"></div>
     </div>
     <div class="sheet-actions"><button class="btn stone" onclick="closeSheet('modal-wish')">取消</button><button class="btn" onclick="saveWish()">許願！</button></div>
   </div>
@@ -1709,7 +1799,7 @@ async function cloudUpload() {
     const json = JSON.stringify(snap);
     if (json.length > 240000) throw { code: 'too_big' };
     const savedAt = Date.now();
-    await dbApi.doc('cloud/save').set({ json, savedAt, count: S.characters.length, names: S.characters.map(c => c.name).join('、'), imgs: imgs.map(x => x[0]), version: 14 });
+    await dbApi.doc('cloud/save').set({ json, savedAt, count: S.characters.length, names: S.characters.map(c => c.name).join('、'), imgs: imgs.map(x => x[0]), version: 15 });
     ST().cloudSavedAt = savedAt; save();
     playSound('complete'); toast('已經存到雲端了！', 'cloud');
   } catch (e) { toast(cloudErrMsg(e), 'close'); }
@@ -1742,7 +1832,7 @@ async function cloudDownload() {
   finally { setCloudBusy(''); renderSettings(); }
 }
 async function exportBackup() {
-  const data = JSON.stringify({ app: 'mcqc', version: 14, exportedAt: new Date().toISOString(), data: S });
+  const data = JSON.stringify({ app: 'mcqc', version: 15, exportedAt: new Date().toISOString(), data: S });
   const filename = `麥塊任務島備份-${todayKey()}.json`;
   if (!dlApi) {
     if (window.claude && capState.downloads === 'wait') { toast('還在準備中，稍等一下', 'close'); return; }
@@ -2066,6 +2156,123 @@ async function toggleNegative() {
 </script>
 <script>
 /* ═══════════════════════════════════
+   V15 — 願望存錢筒：每個願望各自存寶石
+════════════════════════════════════ */
+let DP = null, WM = null;
+const wishThumb = w => w.image ? `<img src="${esc(w.image)}" alt="">` : ic('chest');
+function findWish(id) { const c = cur(); return c ? { c, w: (c.wishes || []).find(x => x.id === id) } : {}; }
+
+function openDeposit(id) {
+  const { c, w } = findWish(id); if (!w || w.redeemed || wishMode(w) !== 'bank') return;
+  const wallet = c.emeralds || 0, lack = Math.max(0, w.cost - wishSaved(w));
+  if (lack <= 0) { toast('這個願望已經存滿了，可以兌換囉！', 'chest'); return; }
+  if (wallet <= 0) { toast('錢包裡沒有寶石，先去完成任務吧！', 'gem'); return; }
+  DP = { id, max: Math.min(wallet, lack) };
+  $('#dp-wish').innerHTML = `<span class="slot">${wishThumb(w)}</span><span><b>${esc(w.name)}</b><small>已存 ${wishSaved(w)} / ${w.cost} 顆・還差 ${lack} 顆</small></span>`;
+  $('#dp-wallet').textContent = wallet; $('#dp-max').textContent = DP.max;
+  const quick = [1, 5, 10].filter(n => n < DP.max).map(n => [n, `+${n}`]);
+  quick.push([DP.max, DP.max === lack ? '存滿' : '全部']);
+  $('#dp-quick').style.gridTemplateColumns = `repeat(${quick.length},minmax(0,1fr))`;
+  $('#dp-quick').innerHTML = quick.map(([n, t]) => `<button class="btn stone" onclick="dpSet(${n})">${t}</button>`).join('');
+  $('#dp-amt').max = DP.max;
+  dpSet(Math.min(DP.max, 5), true);
+  openSheet('modal-deposit'); playSound('click');
+}
+function dpSet(n, silent) { if (!DP) return; $('#dp-amt').value = Math.max(1, Math.min(DP.max, n)); if (!silent) playSound('click'); dpPreview(); }
+function dpStep(d) { dpSet((parseInt($('#dp-amt').value) || 0) + d); }
+function dpPreview() {
+  const { c, w } = findWish(DP && DP.id); if (!w) return;
+  const n = Math.max(1, Math.min(DP.max, parseInt($('#dp-amt').value) || 0));
+  const after = wishSaved(w) + n;
+  $('#dp-fill').style.width = Math.min(100, Math.round(after / w.cost * 100)) + '%';
+  $('#dp-after').textContent = after >= w.cost ? `存入後就存滿了！錢包剩 ${(c.emeralds || 0) - n} 顆` : `存入後：${after} / ${w.cost}・錢包剩 ${(c.emeralds || 0) - n} 顆`;
+  $('#dp-go-t').textContent = `存入 ${n} 顆`;
+}
+function doDeposit() {
+  const { c, w } = findWish(DP && DP.id); if (!w || w.redeemed) return;
+  const max = Math.min(c.emeralds || 0, Math.max(0, w.cost - wishSaved(w)));
+  const n = Math.max(0, Math.min(max, parseInt($('#dp-amt').value) || 0));
+  if (n <= 0) { toast('沒有可以存的寶石', 'close'); return; }
+  c.emeralds = (c.emeralds || 0) - n;
+  w.saved = wishSaved(w) + n; w.lastDepositAt = Date.now();
+  save(); closeSheet('modal-deposit');
+  const r = $('#dp-go').getBoundingClientRect(); burst(innerWidth / 2, Math.min(innerHeight * .5, r.top || innerHeight * .5), 14);
+  if (w.saved >= w.cost) { playSound('levelup'); buzz([40, 60, 40]); toast(`「${w.name}」存滿了！可以兌換囉！`, 'chest'); }
+  else { playSound('complete'); buzz(30); toast(`存入 ${n} 顆，「${w.name}」還差 ${w.cost - w.saved} 顆`, 'gem'); }
+  renderWishlist();
+}
+
+function openWishManage(id) {
+  const { w } = findWish(id); if (!w) return;
+  WM = { id };
+  const bank = wishMode(w) === 'bank';
+  WM.mode = wishMode(w);
+  $('#wm-info').innerHTML = `<span class="slot">${wishThumb(w)}</span><span><b>${esc(w.name)}</b><small>${w.redeemed ? '已兌換' : bank ? `專屬存錢筒・裡面有 ${wishSaved(w)} 顆` : '共用錢包・用錢包裡的寶石算'}</small></span>`;
+  renderWmMode();
+  $('#wm-name').value = w.name; $('#wm-cost').value = w.cost;
+  $('#wm-edit').hidden = !!w.redeemed; $('#wm-actions').hidden = !!w.redeemed;
+  $('#wm-withdraw').hidden = !!w.redeemed || !bank || wishSaved(w) <= 0;
+  $('#wm-note').textContent = w.redeemed ? '已兌換的願望只能刪除（不會退回寶石）。'
+    : ST().pinHash ? '修改、取出寶石、刪除都需要家長密碼。' : '小提醒：設定「家長密碼」後，孩子就不能自己把寶石拿出來。';
+  openSheet('modal-wish-manage'); playSound('click');
+}
+async function saveWishManage() {
+  const { c, w } = findWish(WM && WM.id); if (!w || w.redeemed) return;
+  const name = $('#wm-name').value.trim();
+  if (!name) { toast('請輸入願望名稱！', 'close'); return; }
+  const cost = Math.max(1, Math.min(9999, parseInt($('#wm-cost').value) || w.cost));
+  const modeChanged = WM.mode !== wishMode(w);
+  if (cost !== w.cost || name !== w.name || modeChanged) {
+    closeSheet('modal-wish-manage');
+    if (!(await requirePin(`修改「${w.name}」`))) return;
+  }
+  w.name = name; w.cost = cost;
+  let back = 0;
+  if (modeChanged && WM.mode === 'shared') { back = wishSaved(w); w.saved = 0; c.emeralds = (c.emeralds || 0) + back; }
+  w.mode = WM.mode;
+  if (w.mode === 'bank' && wishSaved(w) > cost) { back = wishSaved(w) - cost; w.saved = cost; c.emeralds = (c.emeralds || 0) + back; }
+  save(); closeSheet('modal-wish-manage'); playSound('complete');
+  toast(back ? `已更新，${back} 顆退回錢包` : `「${name}」已更新`, 'pencil');
+  renderWishlist();
+}
+async function withdrawWish() {
+  const { c, w } = findWish(WM && WM.id); if (!w || w.redeemed || wishSaved(w) <= 0) return;
+  closeSheet('modal-wish-manage');
+  if (!(await requirePin(`從「${w.name}」拿出寶石，需要家長同意`))) return;
+  const saved = wishSaved(w);
+  const ok = await confirmSheet({ title: '從存錢筒拿出寶石？', icon: 'up', ok: '拿出來', okClass: 'gold',
+    body: `<div class="warn-card"><span class="slot">${wishThumb(w)}</span><span><b>${esc(w.name)}</b><small>存錢筒裡有 ${saved} 顆</small></span></div>
+      <div><label class="field-label" for="wd-amt">要拿出幾顆？（最多 ${saved}）</label><input id="wd-amt" class="inp" type="number" min="1" max="${saved}" value="${saved}" inputmode="numeric" style="margin-top:8px;text-align:center;font-family:var(--f-px);color:var(--gem)"></div>
+      <div class="note">拿出來的寶石會回到錢包。</div>` });
+  if (!ok) return;
+  const n = Math.max(1, Math.min(saved, parseInt(($('#wd-amt') || {}).value) || saved));
+  w.saved = saved - n; c.emeralds = (c.emeralds || 0) + n;
+  save(); playSound('click'); toast(`拿出 ${n} 顆，回到錢包`, 'gem'); renderWishlist();
+}
+async function deleteWish() {
+  const { c, w } = findWish(WM && WM.id); if (!w) return;
+  closeSheet('modal-wish-manage');
+  if (!(await requirePin(`刪除「${w.name}」`))) return;
+  const saved = w.redeemed || wishMode(w) !== 'bank' ? 0 : wishSaved(w);
+  const ok = await confirmSheet({ title: '刪除這個願望？', icon: 'trash', ok: '刪除', okClass: 'red',
+    body: `<div class="warn-card"><span class="slot">${wishThumb(w)}</span><span><b>${esc(w.name)}</b><small>${w.redeemed ? '已兌換' : wishMode(w) === 'bank' ? `存錢筒裡有 ${saved} 顆` : '共用錢包'}</small></span></div>
+      <div class="note">${saved ? `存在裡面的 ${saved} 顆會全部退回錢包。` : '刪除後無法復原。'}</div>` });
+  if (!ok) return;
+  c.wishes = c.wishes.filter(x => x.id !== w.id);
+  if (saved) c.emeralds = (c.emeralds || 0) + saved;
+  save(); playSound('click'); toast(saved ? `已刪除，${saved} 顆退回錢包` : '願望已刪除', 'trash'); renderWishlist();
+}
+function setWmMode(m) { if (!WM) return; WM.mode = m; playSound('click'); renderWmMode(); }
+function renderWmMode() {
+  const { w } = findWish(WM && WM.id); if (!w) return;
+  $$('#wm-mode button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.m === WM.mode)));
+  const cur0 = wishMode(w);
+  $('#wm-mode-note').textContent = WM.mode === cur0 ? WISH_MODE_NOTE[WM.mode]
+    : WM.mode === 'shared' ? `改成共用錢包後，存錢筒裡的 ${wishSaved(w)} 顆會退回錢包。` : '改成專屬存錢筒後，要重新把寶石存入這個願望。';
+}
+</script>
+<script>
+/* ═══════════════════════════════════
    DATA & STATE（沿用 V9/V11：localStorage key "mcqc2"）
 ════════════════════════════════════ */
 const LS_KEY = 'mcqc2', THEME_KEY = 'mcqc2-theme';
@@ -2119,6 +2326,7 @@ function migrate(c) {
   if (c.streak === undefined) c.streak = 0;
   if (c.bestStreak === undefined) c.bestStreak = 0;
   if (!Array.isArray(c.penaltyLogs)) c.penaltyLogs = [];
+  c.wishes.forEach(w => { if (w.saved === undefined) w.saved = w.redeemed ? (w.cost || 0) : 0; if (!w.mode) w.mode = 'shared'; });
   if (!c.look) c.look = { ...(DEFAULT_LOOK[c.type] || DEFAULT_LOOK.custom) };
   c.tasks.forEach(t => { if (t.icon === undefined) t.icon = ICON_BY_ID[t.id] || ICON_BY_EMOJI[t.emoji] || null; });
 }
@@ -2348,11 +2556,12 @@ function renderHub() {
   $('#hub-bonus-badge').textContent = `${(c.bonusLogs || []).length} 筆`;
   const teaser = $('#hub-wish');
   if (open.length) {
-    const next = open.reduce((a, b) => a.cost <= b.cost ? a : b);
+    const ratio = w => wishHave(c, w) / (w.cost || 1);
+    const next = open.reduce((a, b) => ratio(a) > ratio(b) || (ratio(a) === ratio(b) && a.cost <= b.cost) ? a : b);
     teaser.hidden = false;
     $('#hub-wish-name').textContent = next.name;
-    $('#hub-wish-fill').style.width = Math.max(0, Math.min(100, Math.round((c.emeralds || 0) / next.cost * 100))) + '%';
-    $('#hub-wish-nums').textContent = `${c.emeralds || 0}/${next.cost}`;
+    $('#hub-wish-fill').style.width = Math.max(0, Math.min(100, Math.round(wishHave(c, next) / next.cost * 100))) + '%';
+    $('#hub-wish-nums').textContent = `${Math.min(wishHave(c, next), next.cost)}/${next.cost}`;
   } else teaser.hidden = true;
 }
 
@@ -2401,30 +2610,48 @@ function toggleTask(id) {
 }
 
 /* ═══ WISHLIST ═══ */
+function wishSaved(w) { return Math.max(0, w.saved || 0); }
+const wishMode = w => w.mode === 'bank' ? 'bank' : 'shared';
+const wishHave = (c, w) => wishMode(w) === 'bank' ? wishSaved(w) : Math.max(0, c.emeralds || 0);
+let newWishMode = 'bank';
+function setNewWishMode(m) { newWishMode = m; $$('#wi-mode button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.m === m))); $('#wi-mode-note').textContent = WISH_MODE_NOTE[m]; playSound('click'); }
+const WISH_MODE_NOTE = {
+  bank: '專屬存錢筒：要把寶石「存入」這個願望才算數，存進去要家長同意才能拿出來。適合大禮物。',
+  shared: '共用錢包：直接用錢包裡的寶石算進度，跟其他共用願望一起算。適合小獎勵。'
+};
 function renderWishlist() {
   const c = cur(); if (!c) return;
-  $('#wish-bal').textContent = c.emeralds || 0;
+  const wallet = c.emeralds || 0;
+  $('#wish-bal').textContent = wallet;
+  $('#wish-bal').classList.toggle('neg', wallet < 0);
   const dmax = dailyMax(c), wishes = c.wishes || [];
+  const inBanks = wishes.filter(w => !w.redeemed && wishMode(w) === 'bank').reduce((s, w) => s + wishSaved(w), 0);
+  $('#wallet-now').textContent = wallet; $('#wallet-now').classList.toggle('neg', wallet < 0);
+  $('#wallet-banked').textContent = inBanks;
+  $('#wallet-panel').hidden = !wishes.length;
   $('#wish-empty').hidden = wishes.length > 0;
   const ordered = [...wishes.filter(w => !w.redeemed), ...wishes.filter(w => w.redeemed)];
   $('#wish-grid').innerHTML = ordered.map(w => {
-    const gems = c.emeralds || 0;
-    const pct = Math.max(0, Math.min(100, Math.round(gems / w.cost * 100)));
-    const can = !w.redeemed && gems >= w.cost, lack = Math.max(0, w.cost - gems);
-    const days = dmax > 0 ? Math.ceil(Math.max(0, lack) / dmax) : '?';
-    let btn;
-    if (w.redeemed) btn = `<button class="btn stone sm" disabled><span class="ico">${ic('check')}</span>已兌換</button>`;
-    else if (can) btn = redeemArm === w.id
-      ? `<button class="btn gold sm glow" onclick="redeemWish('${w.id}')">再按一次確認</button>`
-      : `<button class="btn sm glow" onclick="redeemWish('${w.id}')">兌換！</button>`;
-    else btn = `<button class="btn stone sm" disabled>還差 ${lack}</button>`;
+    const bank = wishMode(w) === 'bank';
+    const saved = wishHave(c, w);
+    const pct = Math.max(0, Math.min(100, Math.round(saved / w.cost * 100)));
+    const full = !w.redeemed && saved >= w.cost, lack = Math.max(0, w.cost - saved);
+    const days = dmax > 0 ? Math.ceil(lack / dmax) : '?';
+    const manage = `<button class="rbtn sm" onclick="openWishManage('${w.id}')" aria-label="管理「${esc(w.name)}」">${ic('gear')}</button>`;
+    let acts;
+    if (w.redeemed) acts = `<div class="w-acts"><button class="btn stone sm" disabled><span class="ico">${ic('check')}</span>已兌換</button>${manage}</div>`;
+    else if (full) acts = `<div class="w-acts">${redeemArm === w.id
+      ? `<button class="btn gold sm glow" onclick="redeemWish('${w.id}')">再按一次</button>`
+      : `<button class="btn sm glow" onclick="redeemWish('${w.id}')">兌換！</button>`}${manage}</div>`;
+    else if (bank) acts = `<div class="w-acts"><button class="btn sm" onclick="openDeposit('${w.id}')"><span class="ico">${ic('plus')}</span>存入</button>${manage}</div>`;
+    else acts = `<div class="w-acts"><button class="btn stone sm" disabled>還差 ${lack}</button>${manage}</div>`;
     return `<div class="panel wcard${w.redeemed ? ' redeemed' : ''}">
-      <div class="w-img${w.redeemed ? ' stamp' : ''}">${w.image ? `<img src="${esc(w.image)}" alt="${esc(w.name)}">` : `<span class="ph">${ic('chest')}</span>`}</div>
+      <div class="w-img${w.redeemed ? ' stamp' : ''}">${w.image ? `<img src="${esc(w.image)}" alt="${esc(w.name)}">` : `<span class="ph">${ic('chest')}</span>`}${!w.redeemed ? `<span class="w-pct">${pct}%</span>` : ''}<span class="w-mode ${bank ? 'bank' : 'shared'}">${bank ? '存錢筒' : '共用'}</span></div>
       <div class="w-info">
         <div class="w-name">${esc(w.name)}</div>
-        <div class="w-meta"><span class="reward-chip"><i>${ic('gem')}</i>${w.cost}</span>${!w.redeemed ? `<span class="w-days">${can ? '可以兌換了！' : `約 ${days} 天`}</span>` : ''}</div>
-        ${!w.redeemed ? `<span class="mini-bar"><i style="width:${pct}%"></i></span>` : ''}
-        ${btn}
+        <div class="w-meta"><span class="reward-chip"><i>${ic('gem')}</i>${w.redeemed ? w.cost : `${Math.min(saved, w.cost)}/${w.cost}`}</span></div>
+        ${!w.redeemed ? `<span class="mini-bar"><i style="width:${pct}%"></i></span><span class="w-days">${full ? '存滿了，可以兌換！' : `還差 ${lack}・約 ${days} 天`}</span>` : ''}
+        ${acts}
       </div>
     </div>`;
   }).join('');
@@ -2432,7 +2659,7 @@ function renderWishlist() {
 async function redeemWish(id) {
   const c = cur(); if (!c) return;
   const w = (c.wishes || []).find(x => x.id === id);
-  if (!w || w.redeemed || (c.emeralds || 0) < w.cost) return;
+  if (!w || w.redeemed || wishHave(c, w) < w.cost) return;
   if (redeemArm !== id) {
     redeemArm = id; clearTimeout(redeemTimer);
     redeemTimer = setTimeout(() => { redeemArm = null; if ($('#screen-wishlist').classList.contains('active')) renderWishlist(); }, 3000);
@@ -2440,8 +2667,12 @@ async function redeemWish(id) {
   }
   redeemArm = null; clearTimeout(redeemTimer);
   if (ST().lock.redeem && !(await requirePin(`兌換「${w.name}」，請家長確認`))) { renderWishlist(); return; }
-  if (w.redeemed || (c.emeralds || 0) < w.cost) return;
-  c.emeralds -= w.cost; w.redeemed = true; save(); buzz(80);
+  if (w.redeemed || wishHave(c, w) < w.cost) return;
+  if (wishMode(w) === 'bank') {
+    const extra = wishSaved(w) - w.cost;
+    if (extra > 0) c.emeralds = (c.emeralds || 0) + extra;
+  } else c.emeralds = (c.emeralds || 0) - w.cost;
+  w.saved = w.cost; w.redeemed = true; w.redeemedAt = Date.now(); save(); buzz(80);
   playSound('redeem'); burst(innerWidth / 2, innerHeight / 2, 30);
   toast(`「${w.name}」兌換成功！去找媽媽領獎品吧！`, 'chest');
   renderWishlist();
@@ -2450,6 +2681,7 @@ function openWishModal() {
   wishImg = null;
   $('#wi-name').value = ''; $('#wi-cost').value = '200'; $('#wi-file').value = '';
   const prev = $('#wi-img-preview'); prev.hidden = true; prev.removeAttribute('src');
+  newWishMode = 'bank'; setNewWishMode('bank');
   updateCostHint(); openSheet('modal-wish');
 }
 function updateCostHint() {
@@ -2471,10 +2703,12 @@ function saveWish() {
   if (!name) { toast('請輸入願望名稱！', 'close'); return; }
   const cost = Math.max(1, Math.min(9999, parseInt($('#wi-cost').value) || 200));
   const c = cur(); if (!c) return;
-  c.wishes.push({ id: uid(), name, image: wishImg, cost, redeemed: false });
+  const nw = { id: uid(), name, image: wishImg, cost, mode: newWishMode, saved: 0, redeemed: false, createdAt: Date.now() };
+  c.wishes.push(nw);
   save(); closeSheet('modal-wish'); playSound('complete');
   toast(`願望「${name}」加入清單！`, 'chest');
   renderWishlist();
+  if (nw.mode === 'bank' && (c.emeralds || 0) > 0) setTimeout(() => openDeposit(nw.id), 350);
 }
 
 /* ═══ CALENDAR ═══ */
