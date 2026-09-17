@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#0b0622">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="麥塊任務島">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⛏️</text></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>
 <title>麥塊任務島</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -496,6 +496,41 @@ body.no-motion .hero-sprite,body.no-motion .pet-sprite,body.no-motion .pick-labe
 body.no-motion .sheet-body,body.no-motion .toast{animation:none}
 
 .read-tools{grid-template-columns:repeat(auto-fit,minmax(140px,1fr))}
+
+/* ══════ V14: PENALTY ══════ */
+.tile.red{--c1:#f06a6a;--c2:#c83434;--hl:#ffb0b0;--lip:#8a1c1c;--st:#4a0c0c}
+.tile.wide{grid-column:1/-1;flex-direction:row;justify-content:flex-start;min-height:80px;padding:10px 16px;gap:14px}
+.tile.wide .t-label{flex:1;text-align:left}
+.tile.wide .t-slot{width:52px;height:50px}
+.pen-list{display:grid;grid-template-columns:1fr;gap:10px}
+.pen-row{display:flex;align-items:center;gap:12px;padding:10px 12px;width:100%;min-height:74px;transition:transform .08s}
+button.pen-row:active{transform:translateY(3px)}
+.pen-row .slot{width:50px;height:50px;padding:8px}
+.pen-row .lab,.pen-log .lab{flex:1;min-width:0}
+.pen-row .lab b{display:block;font-weight:900;font-size:17px;line-height:1.3}
+.pen-row .lab small,.pen-log .lab small{display:block;font-size:13px;font-weight:700;color:var(--muted)}
+.minus-chip{display:inline-flex;align-items:center;gap:5px;padding:5px 8px;border-radius:8px;background:#3a0f18;border:2px solid var(--panel-ink);font-family:var(--f-px);font-size:10px;color:#ff8a8a;white-space:nowrap;flex-shrink:0}
+.minus-chip i{width:10px;height:13px;display:block}
+body[data-mode="day"] .minus-chip{background:#ffe4e4;color:#c83434}
+.pen-go{flex-shrink:0;width:44px;height:44px;border-radius:12px;border:3px solid var(--ink);display:grid;place-items:center;font-weight:900;font-size:18px;color:#fff;
+  background:linear-gradient(180deg,#f06a6a,#c83434);box-shadow:inset 0 2px 0 #ffb0b0,inset 0 -4px 0 #8a1c1c,0 3px 0 var(--ink);text-shadow:1px 1px 0 #4a0c0c,-1px 1px 0 #4a0c0c,1px -1px 0 #4a0c0c,-1px -1px 0 #4a0c0c}
+.pen-log{display:flex;align-items:center;gap:10px;padding:10px 14px}
+.pen-log + .pen-log{border-top:2px dashed var(--slot)}
+.pen-log .slot{width:42px;height:40px;padding:4px}
+.pen-log .lab b{display:block;font-weight:900;font-size:15px;line-height:1.35;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#pen-manage-btn[aria-pressed="true"]{background:var(--tex) 0 0/24px 24px repeat,linear-gradient(180deg,#72d43e,#3f9a22);box-shadow:inset 0 3px 0 #b6f07a,inset 0 -4px 0 #2a6e14,0 4px 0 var(--ink)}
+.who-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:10px}
+.who[aria-pressed="true"]{border-color:#f06a6a;box-shadow:inset 0 2px 0 var(--panel-hi),inset 0 -4px 0 var(--panel-lip),0 4px 0 #8a1c1c,0 0 0 4px rgba(240,106,106,.35),0 0 18px rgba(240,106,106,.4)}
+.who[aria-pressed="true"] .tick{display:block;background:#e04848}
+.who.all .slot{background:transparent;border-style:dashed;box-shadow:none;padding:12px}
+.neg{color:#ff7a7a!important}
+.gem-badge b.neg{text-shadow:none}
+.pdot{position:absolute;bottom:-4px;left:-4px;width:14px;height:17px;display:block}
+.legend .pdot{position:static;width:12px;height:15px;display:inline-block}
+body.pen-flash::after{content:'';position:fixed;inset:0;z-index:250;pointer-events:none;background:rgba(224,72,72,.35);animation:penflash .5s steps(4,end) forwards}
+@keyframes penflash{to{opacity:0}}
+body.no-motion.pen-flash::after{display:none}
+@media (min-width:640px){.pen-list{grid-template-columns:1fr 1fr}}
 </style>
 
 <style>[hidden]{display:none!important}</style>
@@ -618,6 +653,7 @@ body.no-motion .sheet-body,body.no-motion .toast{animation:none}
       <button class="tile orange" onclick="goWishlist()"><span class="t-slot" data-ico="chest"></span><span class="t-label">願望清單</span><span class="t-badge" id="hub-wish-badge">0 個</span></button>
       <button class="tile purple" onclick="goCalendar()"><span class="t-slot" data-ico="cal"></span><span class="t-label">冒險日曆</span><span class="t-badge" id="hub-cal-badge">0 天</span></button>
       <button class="tile blue" onclick="goBonus()"><span class="t-slot" data-ico="star"></span><span class="t-label">加分日誌</span><span class="t-badge" id="hub-bonus-badge">0 筆</span></button>
+      <button class="tile red wide" onclick="goPenalty('main')"><span class="t-slot" data-ico="lightning"></span><span class="t-label">扣寶石</span><span class="t-badge" id="hub-pen-badge">今天 −0</span></button>
     </div>
     <button class="btn stone" onclick="goTitle()" style="margin-top:4px"><span class="ico sm" data-ico="swap"></span>切換冒險者</button>
   </div>
@@ -663,6 +699,7 @@ body.no-motion .sheet-body,body.no-motion .toast{animation:none}
         <span><i class="cday full"></i>全部完成</span>
         <span><i class="cday partial"></i>部分完成</span>
         <span><i class="bstar" data-ico="star"></i>有加分</span>
+        <span><i class="pdot" data-ico="lightning"></i>被扣寶石</span>
       </div>
     </div>
   </div>
@@ -801,6 +838,21 @@ body.no-motion .sheet-body,body.no-motion .toast{animation:none}
         <span class="lab"><b>兌換願望要家長確認</b><small>孩子兌換時，由家長輸入密碼</small></span>
         <button class="tgl" id="tg-lock-redeem" role="switch" aria-label="兌換願望要家長確認" onclick="toggleLock('redeem')"></button>
       </div>
+      <div class="set-row" id="row-lock-penalty">
+        <span class="slot" data-ico="lightning"></span>
+        <span class="lab"><b>扣寶石要家長密碼</b><small>扣寶石、撤銷、管理罰則前輸入密碼</small></span>
+        <button class="tgl" id="tg-lock-penalty" role="switch" aria-label="扣寶石要家長密碼" onclick="toggleLock('penalty')"></button>
+      </div>
+      <div class="set-row">
+        <span class="slot" data-ico="gem"></span>
+        <span class="lab"><b>寶石可以扣到負數</b><small id="neg-sub">關閉時最多扣到 0；打開後會「欠寶石」</small></span>
+        <button class="tgl" id="tg-neg" role="switch" aria-label="寶石可以扣到負數" onclick="toggleNegative()"></button>
+      </div>
+      <button class="set-row" onclick="goPenalty('settings', true)">
+        <span class="slot" data-ico="angry"></span>
+        <span class="lab"><b>罰則管理</b><small id="pen-set-sub">新增、修改、刪除兩兄弟共用的家規</small></span>
+        <span class="chev" data-ico="chev"></span>
+      </button>
       <div class="set-row" id="row-lock-bonus">
         <span class="slot" data-ico="star"></span>
         <span class="lab"><b>登記加分要家長確認</b><small>考試、日記、閱讀加分前輸入密碼</small></span>
@@ -861,7 +913,7 @@ body.no-motion .sheet-body,body.no-motion .toast{animation:none}
     <div class="set-head stroke"><i data-ico="info"></i>關於</div>
     <div class="panel about">
       <span class="sp" id="about-sprite"></span>
-      <span><b>麥塊任務島 V13</b><small>兄弟冒險特訓版<br>資料存在這台裝置；可用雲端存檔或備份檔搬家。</small></span>
+      <span><b>麥塊任務島 V14</b><small>兄弟冒險特訓版<br>資料存在這台裝置；可用雲端存檔或備份檔搬家。</small></span>
     </div>
     <button class="btn red" onclick="resetAll()" style="margin-top:4px"><span class="ico" data-ico="trash"></span>清除這台裝置的所有資料</button>
   </div>
@@ -908,6 +960,61 @@ body.no-motion .sheet-body,body.no-motion .toast{animation:none}
       <input id="ce-file" type="file" accept="image/*" hidden onchange="ceUpload(this)">
     </div>
     <div class="sheet-actions"><button class="btn stone" onclick="closeSheet('modal-char')">取消</button><button class="btn" onclick="saveCharEdit()">儲存</button></div>
+  </div>
+</div>
+
+
+<!-- ═════════ PENALTY ═════════ -->
+<section id="screen-penalty" class="screen">
+  <div class="wrap wide">
+    <header class="bar"><button class="rbtn" onclick="penaltyBack()" data-ico="back" aria-label="返回"></button><h2 class="bar-title stroke"><i data-ico="lightning"></i>扣寶石</h2><button class="rbtn" id="pen-manage-btn" onclick="togglePenManage()" aria-label="管理罰則"></button></header>
+    <div class="panel hint"><i data-ico="angry"></i><span id="pen-hint"></span></div>
+    <div class="pen-list" id="pen-list"></div>
+    <div class="panel empty" id="pen-empty" hidden><span class="slot" data-ico="lightning"></span><b>還沒有罰則</b><small>按右上角的鉛筆，再按「新增罰則」</small></div>
+    <button class="btn red" id="pen-add" hidden onclick="openRuleEdit()"><span class="ico" data-ico="plus"></span>新增罰則</button>
+    <div class="section-label stroke">扣寶石紀錄</div>
+    <div class="panel filter-row" id="pen-filter"></div>
+    <div class="panel set-group" id="pen-logs"></div>
+    <div class="panel empty" id="pen-logs-empty" hidden><span class="slot" data-ico="shield"></span><b>還沒有被扣過</b><small>繼續保持！</small></div>
+  </div>
+</section>
+
+<!-- ═════════ SHEET: DEDUCT ═════════ -->
+<div class="sheet" id="modal-deduct" onclick="if(event.target===this)closeSheet(this.id)">
+  <div class="panel sheet-body" role="dialog" aria-labelledby="dd-title">
+    <div class="sheet-head"><h3 id="dd-title"><i data-ico="lightning"></i>扣寶石</h3><button class="rbtn sm" onclick="closeSheet('modal-deduct')" data-ico="close" aria-label="關閉"></button></div>
+    <div class="warn-card" id="dd-rule"></div>
+    <div><div class="field-label" style="margin-bottom:8px">要扣誰？（可以選好幾個）</div><div class="who-grid" id="dd-who"></div></div>
+    <div>
+      <label class="field-label" for="dd-cost">這次每人扣幾顆</label>
+      <div class="stepper" style="margin-top:8px">
+        <button class="btn stone" onclick="stepVal('dd-cost',-1,1,99)" aria-label="減少">−</button>
+        <span class="gem-i" data-ico="gem"></span>
+        <input id="dd-cost" class="inp" type="number" min="1" max="99" value="1" inputmode="numeric" style="color:#ff7a7a">
+        <button class="btn" onclick="stepVal('dd-cost',1,1,99)" aria-label="增加">+</button>
+      </div>
+    </div>
+    <div class="form-card" style="padding:0"><label class="field-label" for="dd-note">發生什麼事（選填）</label><input id="dd-note" class="inp" type="text" maxlength="30" placeholder="例：搶遙控器" autocomplete="off"></div>
+    <div class="sheet-actions"><button class="btn stone" onclick="closeSheet('modal-deduct')">取消</button><button class="btn red" id="dd-go" onclick="doDeduct()"><span class="ico" data-ico="lightning"></span><span id="dd-go-t">扣寶石</span></button></div>
+  </div>
+</div>
+
+<!-- ═════════ SHEET: RULE EDIT ═════════ -->
+<div class="sheet" id="modal-rule" onclick="if(event.target===this)closeSheet(this.id)">
+  <div class="panel sheet-body" role="dialog" aria-labelledby="rule-title">
+    <div class="sheet-head"><h3 id="rule-title">新增罰則</h3><button class="rbtn sm" onclick="closeSheet('modal-rule')" data-ico="close" aria-label="關閉"></button></div>
+    <div class="form-card" style="padding:0"><label class="field-label" for="ru-name">罰則名稱</label><input id="ru-name" class="inp" type="text" maxlength="15" placeholder="例：吵架、沒收玩具" autocomplete="off"></div>
+    <div><div class="field-label" style="margin-bottom:8px">選一個圖示</div><div class="icon-grid" id="ru-icons"></div></div>
+    <div>
+      <label class="field-label" for="ru-cost">每次扣幾顆綠寶石（1–99）</label>
+      <div class="stepper" style="margin-top:8px">
+        <button class="btn stone" onclick="stepVal('ru-cost',-1,1,99)" aria-label="減少">−</button>
+        <span class="gem-i" data-ico="gem"></span>
+        <input id="ru-cost" class="inp" type="number" min="1" max="99" value="1" inputmode="numeric" style="color:#ff7a7a">
+        <button class="btn" onclick="stepVal('ru-cost',1,1,99)" aria-label="增加">+</button>
+      </div>
+    </div>
+    <div class="sheet-actions"><button class="btn stone" onclick="closeSheet('modal-rule')">取消</button><button class="btn red" onclick="saveRule()">儲存</button></div>
   </div>
 </div>
 
@@ -1266,7 +1373,7 @@ Object.assign(ICONS, {
   import: { m:["....KK....","...KBBK...","..KBBBBK..",".KBBBBBBK.","KKKKBBKKKK","...KBBK...","...KBBK...","...KKKK...","KK......KK","KWKKKKKKWK","KKKKKKKKKK"], p:{K,B:'#3a8ae0',W:'#ffffff'} }
 });
 
-const DEFAULT_SETTINGS = { sfx:true, sfxVol:.7, bgm:false, bgmVol:.4, vibrate:true, themeMode:null, motion:true, bigText:false, pinHash:null, lock:{ taskSettings:true, redeem:false, bonus:false }, cloudSavedAt:null };
+const DEFAULT_SETTINGS = { sfx:true, sfxVol:.7, bgm:false, bgmVol:.4, vibrate:true, themeMode:null, motion:true, bigText:false, pinHash:null, lock:{ taskSettings:true, redeem:false, bonus:false, penalty:true }, allowNegative:false, cloudSavedAt:null };
 function normalizeState() {
   if (!S || typeof S !== 'object') S = { characters: [], curId: null };
   if (!Array.isArray(S.characters)) S.characters = [];
@@ -1274,6 +1381,7 @@ function normalizeState() {
   S.settings.lock = { ...DEFAULT_SETTINGS.lock, ...((S.settings && S.settings.lock) || {}) };
   if (!Array.isArray(S.trash)) S.trash = [];
   if (!Array.isArray(S.books)) S.books = [];
+  if (!Array.isArray(S.penalties)) S.penalties = DEFAULT_PENALTIES.map(x => ({ ...x }));
   const cutoff = Date.now() - 30 * 864e5;
   S.trash = S.trash.filter(t => t && t.char && t.deletedAt > cutoff);
   S.characters.forEach(migrate);
@@ -1315,9 +1423,11 @@ function renderSettings() {
   const hasPin = !!s.pinHash;
   $('#pin-sub').textContent = hasPin ? '已設定・點這裡修改或移除' : '還沒設定・設定後孩子不能自己刪資料';
   $('#pin-state').innerHTML = hasPin ? '<span class="pill-ok">已開啟</span>' : '<span class="soon">未設定</span>';
-  [['tg-lock-ts','taskSettings','row-lock-ts'],['tg-lock-redeem','redeem','row-lock-redeem'],['tg-lock-bonus','bonus','row-lock-bonus']].forEach(([id, k, row]) => {
+  [['tg-lock-ts','taskSettings','row-lock-ts'],['tg-lock-redeem','redeem','row-lock-redeem'],['tg-lock-bonus','bonus','row-lock-bonus'],['tg-lock-penalty','penalty','row-lock-penalty']].forEach(([id, k, row]) => {
     setTgl(id, hasPin && s.lock[k]); $('#' + row).classList.toggle('off', !hasPin);
   });
+  setTgl('tg-neg', s.allowNegative);
+  $('#pen-set-sub').textContent = `目前 ${S.penalties.length} 條家規・新增、修改、刪除`;
   // storage
   let used = 0; try { used = (localStorage.getItem(LS_KEY) || '').length; } catch (e) {}
   const pct = Math.min(100, Math.round(used / 2500000 * 100));
@@ -1588,7 +1698,7 @@ async function cloudUpload() {
     const json = JSON.stringify(snap);
     if (json.length > 240000) throw { code: 'too_big' };
     const savedAt = Date.now();
-    await dbApi.doc('cloud/save').set({ json, savedAt, count: S.characters.length, names: S.characters.map(c => c.name).join('、'), imgs: imgs.map(x => x[0]), version: 13 });
+    await dbApi.doc('cloud/save').set({ json, savedAt, count: S.characters.length, names: S.characters.map(c => c.name).join('、'), imgs: imgs.map(x => x[0]), version: 14 });
     ST().cloudSavedAt = savedAt; save();
     playSound('complete'); toast('已經存到雲端了！', 'cloud');
   } catch (e) { toast(cloudErrMsg(e), 'close'); }
@@ -1621,7 +1731,7 @@ async function cloudDownload() {
   finally { setCloudBusy(''); renderSettings(); }
 }
 async function exportBackup() {
-  const data = JSON.stringify({ app: 'mcqc', version: 13, exportedAt: new Date().toISOString(), data: S });
+  const data = JSON.stringify({ app: 'mcqc', version: 14, exportedAt: new Date().toISOString(), data: S });
   const filename = `麥塊任務島備份-${todayKey()}.json`;
   if (!dlApi) {
     if (window.claude && capState.downloads === 'wait') { toast('還在準備中，稍等一下', 'close'); return; }
@@ -1789,6 +1899,162 @@ async function aiCover(input) {
 </script>
 <script>
 /* ═══════════════════════════════════
+   V14 — 家規罰則：扣寶石（兩兄弟共用）
+════════════════════════════════════ */
+Object.assign(ICONS, {
+  phone:    { m:["KKKKKKKK","KSSSSSSK","KSBBBBSK","KSBBBBSK","KSBBBBSK","KSBBBBSK","KSBBBBSK","KSBBBBSK","KSSSSSSK","KSSKKSSK","KSSSSSSK","KKKKKKKK"], p:{K,S:'#6a72a8',B:'#8ad0ff'} },
+  angry:    { m:["...KKKKKK...","..KRRRRRRK..",".KRRRRRRRRK.","KRKKRRRRKKRK","KRRKKRRKKRRK","KRRRRRRRRRRK","KRRKRRRRKRRK","KRRRRRRRRRRK","KRRRKKKKRRRK","KRRKRRRRKRRK",".KRRRRRRRRK.","..KKKKKKKK.."], p:{K,R:'#e86050'} },
+  lightning:{ m:["....KKKK.","...KYYYK.","...KYYK..","..KYYK...",".KYYYKKK.","KYYYYYYK.","KKKKYYK..","...KYYK..","..KYYK...","..KYK....",".KYK.....",".KK......"], p:{K,Y:'#ffd23a'} }
+});
+const PENALTY_ICON_LIST = ['angry','phone','bulb','moon','clock','lightning','tooth','broom','bear','door','ball','music','book','pencil','heart','star','trash','paper'];
+const DEFAULT_PENALTIES = [
+  { id:'p-fight',  name:'吵架',               icon:'angry', cost:1 },
+  { id:'p-phone',  name:'玩手機超過 10 分鐘', icon:'phone', cost:1 },
+  { id:'p-lights', name:'沒有準時 10 點關燈', icon:'bulb',  cost:1 }
+];
+const penIcon = r => (r && r.icon && ICONS[r.icon]) ? ic(r.icon) : ic('lightning');
+
+let penReturn = 'main', penManage = false, penFilter = 'all';
+function goPenalty(from, manage) { penReturn = from || 'main'; penManage = !!manage; penFilter = 'all'; renderPenalty(); show('penalty'); }
+function penaltyBack() {
+  if (penReturn === 'settings') goSettings(settingsReturn);
+  else if (penReturn === 'main' && cur()) goMain();
+  else goTitle();
+}
+async function togglePenManage() {
+  if (!penManage && ST().lock.penalty && !(await requirePin('管理罰則，請家長確認'))) return;
+  penManage = !penManage; playSound('click'); renderPenalty();
+}
+const penTodayCount = c => (c.penaltyLogs || []).filter(l => l.date === todayKey()).reduce((s, l) => s + (l.cost || 0), 0);
+
+function renderPenalty() {
+  const rules = S.penalties;
+  $('#pen-manage-btn').setAttribute('aria-pressed', String(penManage));
+  $('#pen-manage-btn').innerHTML = ic(penManage ? 'check' : 'pencil');
+  $('#pen-manage-btn').setAttribute('aria-label', penManage ? '完成管理' : '管理罰則');
+  $('#pen-hint').textContent = penManage ? '管理模式：可以修改、刪除或新增罰則，完成後按右上角打勾' : '兩兄弟共用的家規・點一條就能扣寶石';
+  $('#pen-add').hidden = !penManage;
+  $('#pen-empty').hidden = rules.length > 0;
+  $('#pen-list').innerHTML = rules.map(r => penManage
+    ? `<div class="panel pen-row"><span class="slot">${penIcon(r)}</span><span class="lab"><b>${esc(r.name)}</b><small>每次扣 ${r.cost} 顆</small></span>
+        <span class="ts-actions"><button class="rbtn sm" onclick="openRuleEdit('${r.id}')" aria-label="修改「${esc(r.name)}」">${ic('pencil')}</button><button class="rbtn sm danger" onclick="deleteRule('${r.id}')" aria-label="刪除「${esc(r.name)}」">${ic('trash')}</button></span></div>`
+    : `<button class="panel pen-row" onclick="openDeduct('${r.id}')"><span class="slot">${penIcon(r)}</span><span class="lab"><b>${esc(r.name)}</b><small>兩兄弟共用</small></span>
+        <span class="minus-chip"><i>${ic('gem')}</i>−${r.cost}</span><span class="pen-go">扣</span></button>`
+  ).join('');
+  // filter chips
+  const chips = [['all', '全部']].concat(S.characters.map(c => [c.id, c.name]));
+  $('#pen-filter').innerHTML = chips.map(([id, name]) => `<button class="fchip" aria-pressed="${penFilter === id}" onclick="penFilter='${id}';renderPenalty()">${esc(name)}</button>`).join('');
+  $('#pen-filter').style.gridTemplateColumns = `repeat(${Math.min(chips.length, 4)},1fr)`;
+  // logs
+  const all = [];
+  S.characters.forEach(c => (c.penaltyLogs || []).forEach(l => all.push({ c, l })));
+  const shown = all.filter(x => penFilter === 'all' || x.c.id === penFilter).sort((a, b) => (b.l.at || 0) - (a.l.at || 0)).slice(0, 40);
+  $('#pen-logs').hidden = !shown.length;
+  $('#pen-logs-empty').hidden = !!shown.length;
+  $('#pen-logs').innerHTML = shown.map(({ c, l }) => {
+    const t = new Date(l.at || (l.date + 'T12:00:00'));
+    const when = t.toLocaleDateString('zh-TW', { month:'numeric', day:'numeric' }) + ' ' + t.toLocaleTimeString('zh-TW', { hour:'2-digit', minute:'2-digit', hour12:false });
+    return `<div class="pen-log"><span class="slot">${avatarInner(c)}</span>
+      <span class="lab"><b>${esc(c.name)}・${esc(l.name)}</b><small>${when}${l.note ? '・' + esc(l.note) : ''}${l.cost < (l.want || l.cost) ? `・寶石不夠，只扣 ${l.cost}` : ''}</small></span>
+      <span class="minus-chip"><i>${ic('gem')}</i>−${l.cost}</span>
+      <button class="btn stone sm" style="width:auto;min-height:38px;font-size:13px" onclick="undoPenalty('${c.id}','${l.id}')">撤銷</button></div>`;
+  }).join('');
+}
+
+/* ── deduct ── */
+let DD = null;
+function openDeduct(ruleId) {
+  const r = S.penalties.find(x => x.id === ruleId); if (!r) return;
+  if (!S.characters.length) { toast('還沒有冒險者', 'close'); return; }
+  DD = { ruleId, who: new Set(cur() ? [cur().id] : [S.characters[0].id]) };
+  $('#dd-rule').innerHTML = `<span class="slot">${penIcon(r)}</span><span><b>${esc(r.name)}</b><small>每人扣 ${r.cost} 顆綠寶石・可以調整這次的數量</small></span>`;
+  $('#dd-cost').value = r.cost; $('#dd-note').value = '';
+  renderDeductWho(); openSheet('modal-deduct'); playSound('click');
+}
+function renderDeductWho() {
+  $('#dd-who').innerHTML = S.characters.map(c => `<button class="hero-card panel who" aria-pressed="${DD.who.has(c.id)}" onclick="toggleWho('${c.id}')">
+      <span class="tick">${ic('check')}</span><span class="slot">${avatarInner(c)}</span><span class="hc-name">${esc(c.name)}</span>
+      <span class="hc-gem${(c.emeralds || 0) < 0 ? ' neg' : ''}"><i>${ic('gem')}</i>${c.emeralds || 0}</span></button>`).join('')
+    + (S.characters.length > 1 ? `<button class="hero-card panel who all" onclick="toggleWhoAll()"><span class="slot">${ic('swap')}</span><span class="hc-name">${DD.who.size === S.characters.length ? '取消全選' : '全部都扣'}</span></button>` : '');
+  const n = DD.who.size;
+  $('#dd-go-t').textContent = n ? `扣 ${n} 人` : '請選人';
+  $('#dd-go').disabled = !n;
+}
+function toggleWho(id) { DD.who.has(id) ? DD.who.delete(id) : DD.who.add(id); playSound('click'); renderDeductWho(); }
+function toggleWhoAll() { DD.who = DD.who.size === S.characters.length ? new Set() : new Set(S.characters.map(c => c.id)); playSound('click'); renderDeductWho(); }
+async function doDeduct() {
+  if (!DD || !DD.who.size) return;
+  const r = S.penalties.find(x => x.id === DD.ruleId); if (!r) return;
+  const n = Math.max(1, Math.min(99, parseInt($('#dd-cost').value) || r.cost));
+  const note = $('#dd-note').value.trim().slice(0, 30);
+  closeSheet('modal-deduct');
+  if (ST().lock.penalty && !(await requirePin(`「${r.name}」扣寶石，請家長確認`))) return;
+  const names = [], short = [];
+  DD.who.forEach(id => {
+    const c = S.characters.find(x => x.id === id); if (!c) return;
+    const before = c.emeralds || 0;
+    const after = ST().allowNegative ? before - n : Math.max(Math.min(before, 0), before - n);
+    const actual = before - after;
+    c.emeralds = after;
+    c.penaltyLogs.push({ id: uid(), ruleId: r.id, name: r.name, icon: r.icon, cost: actual, want: n, note, date: todayKey(), at: Date.now() });
+    names.push(c.name); if (actual < n) short.push(c.name);
+  });
+  save();
+  playSound('penalty'); buzz([90, 50, 90]);
+  document.body.classList.remove('pen-flash'); void document.body.offsetWidth; document.body.classList.add('pen-flash');
+  toast(`${names.join('、')} ${names.length > 1 ? '各' : ''}扣 ${n} 顆寶石${short.length ? `（${short.join('、')} 寶石不夠，扣到 0）` : ''}`, 'lightning');
+  if ($('#screen-penalty').classList.contains('active')) renderPenalty();
+  if ($('#screen-main').classList.contains('active')) renderHub();
+}
+async function undoPenalty(charId, logId) {
+  const c = S.characters.find(x => x.id === charId); if (!c) return;
+  const l = (c.penaltyLogs || []).find(x => x.id === logId); if (!l) return;
+  if (ST().lock.penalty && !(await requirePin('撤銷扣寶石，請家長確認'))) return;
+  const ok = await confirmSheet({ title: '撤銷這筆扣寶石？', icon: 'lightning', ok: '撤銷', okClass: 'gold',
+    body: `<div class="warn-card"><span class="slot">${avatarInner(c)}</span><span><b>${esc(c.name)}・${esc(l.name)}</b><small>會退回 ${l.cost} 顆綠寶石</small></span></div>` });
+  if (!ok) return;
+  c.emeralds = (c.emeralds || 0) + (l.cost || 0);
+  c.penaltyLogs = c.penaltyLogs.filter(x => x.id !== logId);
+  save(); playSound('complete'); toast(`已撤銷，${c.name} 拿回 ${l.cost} 顆寶石`, 'gem'); renderPenalty();
+}
+
+/* ── rules CRUD ── */
+let RU = null;
+function openRuleEdit(id) {
+  const r = id ? S.penalties.find(x => x.id === id) : null;
+  RU = { id: r ? r.id : null, icon: r ? (r.icon || 'lightning') : 'angry' };
+  $('#rule-title').innerHTML = `<i>${ic('lightning')}</i>${r ? '修改罰則' : '新增罰則'}`;
+  $('#ru-name').value = r ? r.name : '';
+  $('#ru-cost').value = r ? r.cost : 1;
+  renderRuleIcons(); openSheet('modal-rule');
+  if (!r) setTimeout(() => $('#ru-name').focus(), 150);
+}
+function renderRuleIcons() {
+  $('#ru-icons').innerHTML = PENALTY_ICON_LIST.map(n => `<button class="icon-opt" aria-pressed="${RU.icon === n}" onclick="RU.icon='${n}';playSound('click');renderRuleIcons()">${ic(n)}</button>`).join('');
+}
+function saveRule() {
+  const name = $('#ru-name').value.trim();
+  if (!name) { toast('請輸入罰則名稱！', 'close'); return; }
+  const cost = Math.max(1, Math.min(99, parseInt($('#ru-cost').value) || 1));
+  if (RU.id) { const r = S.penalties.find(x => x.id === RU.id); if (r) Object.assign(r, { name, cost, icon: RU.icon }); toast(`「${name}」已更新`, 'pencil'); }
+  else { S.penalties.push({ id: 'p-' + uid(), name, cost, icon: RU.icon }); toast(`新增罰則「${name}」`, 'plus'); playSound('complete'); }
+  save(); closeSheet('modal-rule'); renderPenalty();
+}
+async function deleteRule(id) {
+  const r = S.penalties.find(x => x.id === id); if (!r) return;
+  const ok = await confirmSheet({ title: '刪除這條罰則？', icon: 'trash', ok: '刪除', okClass: 'red',
+    body: `<div class="warn-card"><span class="slot">${penIcon(r)}</span><span><b>${esc(r.name)}</b><small>每次扣 ${r.cost} 顆</small></span></div><div class="note">已經扣過的紀錄會保留，不會退回寶石。</div>` });
+  if (!ok) return;
+  S.penalties = S.penalties.filter(x => x.id !== id);
+  save(); playSound('click'); toast(`「${r.name}」已刪除`, 'trash'); renderPenalty();
+}
+async function toggleNegative() {
+  if (ST().pinHash && !(await requirePin('變更家長控制'))) return;
+  ST().allowNegative = !ST().allowNegative; save(); playSound('click'); renderSettings();
+}
+</script>
+<script>
+/* ═══════════════════════════════════
    DATA & STATE（沿用 V9/V11：localStorage key "mcqc2"）
 ════════════════════════════════════ */
 const LS_KEY = 'mcqc2', THEME_KEY = 'mcqc2-theme';
@@ -1841,6 +2107,7 @@ function migrate(c) {
   if (c.emeralds === undefined) c.emeralds = 0;
   if (c.streak === undefined) c.streak = 0;
   if (c.bestStreak === undefined) c.bestStreak = 0;
+  if (!Array.isArray(c.penaltyLogs)) c.penaltyLogs = [];
   if (!c.look) c.look = { ...(DEFAULT_LOOK[c.type] || DEFAULT_LOOK.custom) };
   c.tasks.forEach(t => { if (t.icon === undefined) t.icon = ICON_BY_ID[t.id] || ICON_BY_EMOJI[t.emoji] || null; });
 }
@@ -2057,6 +2324,8 @@ function renderHub() {
   const av = $('#hub-av'); av.innerHTML = avatarInner(c); av.classList.toggle('photo', isPhoto(c));
   $('#hub-name').textContent = c.name;
   $('#hub-gems').textContent = c.emeralds || 0;
+  $('#hub-gems').classList.toggle('neg', (c.emeralds || 0) < 0);
+  $('#hub-pen-badge').textContent = `今天 −${penTodayCount(c)}`;
   $('#hub-streak').textContent = c.streak;
   const { done, total } = progress(c);
   $('#hub-xp-num').textContent = `${done}/${total}`;
@@ -2071,7 +2340,7 @@ function renderHub() {
     const next = open.reduce((a, b) => a.cost <= b.cost ? a : b);
     teaser.hidden = false;
     $('#hub-wish-name').textContent = next.name;
-    $('#hub-wish-fill').style.width = Math.min(100, Math.round((c.emeralds || 0) / next.cost * 100)) + '%';
+    $('#hub-wish-fill').style.width = Math.max(0, Math.min(100, Math.round((c.emeralds || 0) / next.cost * 100))) + '%';
     $('#hub-wish-nums').textContent = `${c.emeralds || 0}/${next.cost}`;
   } else teaser.hidden = true;
 }
@@ -2114,7 +2383,7 @@ function toggleTask(id) {
     else { playSound('complete'); toast(`+${task.reward} 綠寶石！`, 'gem'); }
   } else {
     c.completedToday = done.filter(x => x !== id);
-    c.emeralds = Math.max(0, (c.emeralds || 0) - task.reward);
+    { const e = c.emeralds || 0; c.emeralds = ST().allowNegative ? e - task.reward : Math.max(Math.min(e, 0), e - task.reward); }
     c.completionHistory[tk] = c.completionHistory[tk].filter(x => x !== id);
     updateStreak(c); save(); playSound('click'); renderTasks();
   }
@@ -2129,7 +2398,7 @@ function renderWishlist() {
   const ordered = [...wishes.filter(w => !w.redeemed), ...wishes.filter(w => w.redeemed)];
   $('#wish-grid').innerHTML = ordered.map(w => {
     const gems = c.emeralds || 0;
-    const pct = Math.min(100, Math.round(gems / w.cost * 100));
+    const pct = Math.max(0, Math.min(100, Math.round(gems / w.cost * 100)));
     const can = !w.redeemed && gems >= w.cost, lack = Math.max(0, w.cost - gems);
     const days = dmax > 0 ? Math.ceil(Math.max(0, lack) / dmax) : '?';
     let btn;
@@ -2215,12 +2484,14 @@ function renderCalendar() {
     if (h.length) completeDays++;
     gems += h.reduce((s, id) => { const t = c.tasks.find(x => x.id === id); return s + (t ? t.reward : 0); }, 0);
     const bonus = logs.some(b => b.date === key);
+    const pen = (c.penaltyLogs || []).filter(l => l.date === key);
+    gems -= pen.reduce((s, l) => s + (l.cost || 0), 0);
     let cls = 'cday';
     if (key > today) cls += ' future';
     else if (h.length) cls += (total > 0 && h.length >= total) ? ' full' : ' partial';
     if (key === today) cls += ' today';
-    const label = `${calMonth + 1}月${d}日${h.length ? `，完成 ${h.length} 項` : ''}${bonus ? '，有加分' : ''}`;
-    html += `<button class="${cls}" onclick="openDayPopup('${key}')" aria-label="${label}">${d}${bonus ? `<i class="bstar">${ic('star')}</i>` : ''}</button>`;
+    const label = `${calMonth + 1}月${d}日${h.length ? `，完成 ${h.length} 項` : ''}${bonus ? '，有加分' : ''}${pen.length ? `，被扣 ${pen.length} 次` : ''}`;
+    html += `<button class="${cls}" onclick="openDayPopup('${key}')" aria-label="${label}">${d}${bonus ? `<i class="bstar">${ic('star')}</i>` : ''}${pen.length ? `<i class="pdot">${ic('lightning')}</i>` : ''}</button>`;
   }
   const monthLogs = logs.filter(b => b.date && b.date.startsWith(monthKey));
   gems += monthLogs.reduce((s, b) => s + (b.emeralds || 0), 0);
@@ -2247,6 +2518,11 @@ function openDayPopup(key) {
   if (bs.length) {
     html += `<div class="field-label" style="margin:14px 0 2px">加分紀錄</div>`;
     html += bs.map(b => `<div class="day-row"><span class="slot">${ic(BONUS_ICON[b.type] || 'star')}</span><span class="t">${esc(b.title || BONUS_LABEL[b.type])}${b.score !== undefined ? `（${b.score} 分）` : ''}</span><span class="reward-chip gold"><i>${ic('gem')}</i>+${b.emeralds}</span></div>`).join('');
+  }
+  const ps = (c.penaltyLogs || []).filter(l => l.date === key);
+  if (ps.length) {
+    html += `<div class="field-label" style="margin:14px 0 2px">扣寶石</div>`;
+    html += ps.map(l => `<div class="day-row"><span class="slot">${penIcon(l)}</span><span class="t">${esc(l.name)}${l.note ? `（${esc(l.note)}）` : ''}</span><span class="minus-chip"><i>${ic('gem')}</i>−${l.cost}</span></div>`).join('');
   }
   if (!html) html = '<div class="note" style="padding:10px 0">這天沒有紀錄。</div>';
   $('#popup-body').innerHTML = html;
@@ -2415,6 +2691,7 @@ function playSound(type) {
     if (type === 'click') tone(420, 'square', .07, .1);
     else if (type === 'complete') [523, 659, 784].forEach((f, i) => tone(f, 'square', .12, .16, i * .09));
     else if (type === 'levelup') [523, 587, 659, 784, 880, 1047].forEach((f, i) => tone(f, 'square', .14, .18, i * .1));
+    else if (type === 'penalty') [392, 311, 233].forEach((f, i) => tone(f, 'square', .16, .2, i * .12));
     else if (type === 'redeem') [784, 988, 1175, 1568].forEach((f, i) => tone(f, 'square', .16, .2, i * .08));
   } catch (e) {}
 }
