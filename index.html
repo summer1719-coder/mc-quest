@@ -600,6 +600,79 @@ body.no-motion.pen-flash::after{display:none}
 .mini-step .rbtn{font-weight:900;font-size:20px;padding:0;color:inherit}
 body[data-mode="night"] .mini-step .rbtn{color:#fff}
 </style>
+<style>
+/* ═══ V17：背景／特效／改色／髮型／兌換券 ═══ */
+.hero-bg{position:absolute;top:-24px;left:36px;width:120px;height:168px;z-index:0;border-radius:10px;overflow:hidden;box-shadow:0 0 0 2px var(--ink)}
+.hero-bg:empty{display:none}
+.hero-bg svg{width:100%;height:100%;display:block}
+.hero-fx{position:absolute;top:-24px;left:36px;width:120px;height:168px;z-index:2;pointer-events:none}
+.shop-bg{position:absolute;inset:0;z-index:0}
+.shop-bg svg{width:100%;height:100%;display:block}
+.shop-fx{position:absolute;left:8px;bottom:18px;width:100px;height:140px;z-index:2;pointer-events:none}
+.shop-stage:has(#shop-bg svg)::after{display:none}
+.shop-stage:has(#shop-bg svg) .shop-hero,.shop-stage:has(#shop-bg svg) .shop-fx{inset:0;left:0;bottom:0;width:auto;height:auto}
+.shop-stage:has(#shop-bg svg) .shop-pet{bottom:26px;right:6px}
+#shop-tabs{gap:4px;padding:5px}
+#shop-tabs .fchip{flex-direction:column;gap:2px;font-size:11.5px;min-height:46px;padding:2px}
+#shop-tabs .fchip i{width:16px;height:16px}
+.sh-thumb.bg{padding:3px;overflow:hidden}
+.sh-thumb.bg svg{width:100%;height:100%;border-radius:6px}
+.sh-thumb.weapon{padding:2px}
+.sh-thumb.cp{padding:12px}
+.bg-none{font-size:12px;color:var(--muted)}
+.shop-grid.coupons{grid-template-columns:repeat(2,minmax(0,1fr))}
+.sh-item.cp.poor{opacity:.55}
+/* 改色 */
+.sc-box{padding:10px 12px 12px;display:grid;gap:8px}
+.sc-box[hidden],.cp-list[hidden],.hs-row[hidden],.lash-row[hidden]{display:none}
+.sc-head{display:flex;align-items:center;gap:7px;font-size:14px;font-weight:900}
+.sc-head i{width:18px;height:18px;display:block}
+.sc-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.sc-lab{font-size:13px;color:var(--muted);min-width:44px}
+.sc-sw{display:flex;flex-wrap:wrap;gap:5px}
+.csw{width:26px;height:26px;border-radius:7px;border:2px solid var(--panel-ink);box-shadow:inset 0 2px 0 rgba(255,255,255,.3),inset 0 -3px 0 rgba(0,0,0,.25)}
+.csw.on{outline:3px solid #9be45c;outline-offset:2px}
+/* 髮型 */
+.hs-row{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:6px}
+.hs-chip{display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 5px 5px;border-radius:10px;background:var(--slot);border:2px solid var(--panel-ink);box-shadow:inset 0 3px 0 rgba(0,0,0,.25)}
+.hs-chip[aria-pressed="true"]{border-color:#5cc836;box-shadow:0 0 0 3px rgba(92,200,54,.4)}
+.hs-pic{width:40px;height:32px;display:block}
+.hs-pic svg{width:100%;height:100%;display:block}
+.hs-n{font-size:11px;font-weight:900;color:var(--muted)}
+.hs-chip[aria-pressed="true"] .hs-n{color:var(--text)}
+.lash-row{display:flex;align-items:center;gap:10px;font-size:13.5px;font-weight:900;color:var(--muted);margin-bottom:2px}
+/* 兌換券 */
+.tile.gold{--c1:#ffd23a;--c2:#d89a10;--hl:#fff3a0;--lip:#96690a;--st:#553a04}
+.cp-list{display:grid;grid-template-columns:minmax(0,1fr);gap:10px}
+.cp-card{display:flex;align-items:center;gap:12px;padding:10px 12px;min-width:0}
+.cp-card .slot{width:54px;height:54px;padding:9px}
+.cp-card .slot svg{width:100%;height:100%}
+.cp-card .lab{flex:1;min-width:0}
+.cp-card .lab b{display:block;font-size:15px;font-weight:900}
+.cp-card .lab small{display:block;font-size:12px;color:var(--muted)}
+.cp-card .btn.sm{min-height:40px;padding:0 12px;flex-shrink:0}
+/* 呼吸法特效 */
+.fx{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.fx i{position:absolute;display:block;width:9%;height:6.4%;background:var(--c);animation-duration:1.5s;animation-iteration-count:infinite;animation-timing-function:linear;animation-delay:calc(var(--i) * -.22s)}
+.fx-water i{left:calc(52% + var(--i) * 4%);top:calc(74% - var(--i) * 6%);border-radius:60% 0 60% 0;animation-name:aWater}
+@keyframes aWater{0%{transform:translate(6px,14px) scale(.4) rotate(0deg);opacity:0}25%{opacity:1}100%{transform:translate(-22px,-34px) scale(1.25) rotate(-70deg);opacity:0}}
+.fx-flame i{left:72%;top:calc(76% - var(--i) * 8%);animation-name:aFlame;animation-duration:1.1s}
+.fx-flame i:nth-child(3n+1){left:66%}.fx-flame i:nth-child(3n+2){left:80%}
+@keyframes aFlame{0%{transform:translate(0,10px) scale(.35);opacity:0}30%{opacity:1;transform:translate(3px,0) scale(1)}70%{transform:translate(-4px,-14px) scale(.8);opacity:.9}100%{transform:translate(2px,-26px) scale(.2);opacity:0}}
+.fx-thunder i{left:calc(64% + var(--i) * 4%);top:calc(64% - var(--i) * 10%);width:4.5%;height:8%;transform:skewX(-30deg);animation-name:aBolt;animation-duration:.85s;animation-timing-function:steps(3,end)}
+.fx-thunder i:nth-child(2n){left:calc(80% - var(--i) * 3%)}
+@keyframes aBolt{0%{opacity:0}20%{opacity:1}45%{opacity:.15}60%{opacity:1}100%{opacity:0}}
+.fx-petal i{left:calc(50% + var(--i) * 6%);top:calc(6% + var(--i) * 8%);border-radius:70% 0 70% 0;animation-name:aPetal;animation-duration:2.6s}
+@keyframes aPetal{0%{transform:translate(0,-12px) rotate(0deg);opacity:0}15%{opacity:1}100%{transform:translate(-26px,54px) rotate(300deg);opacity:0}}
+.fx-wind i{left:76%;top:34%;width:11%;height:5%;border-radius:50%;transform-origin:-30px 50%;animation-name:aWind;animation-duration:1.6s}
+@keyframes aWind{0%{transform:rotate(0deg) scaleX(.5);opacity:0}20%{opacity:1}100%{transform:rotate(340deg) scaleX(1.3);opacity:0}}
+.fx-spark i{left:70%;top:calc(4% + var(--i) * 4%);width:6%;height:4.4%;animation-name:aSpark;animation-duration:1.4s;animation-timing-function:steps(4,end)}
+.fx-spark i:nth-child(4n+1){left:58%}.fx-spark i:nth-child(4n+2){left:84%}.fx-spark i:nth-child(4n+3){left:64%;top:calc(10% + var(--i) * 3%)}
+@keyframes aSpark{0%,100%{transform:scale(.2);opacity:0}40%{transform:scale(1.4);opacity:1}70%{transform:scale(.6);opacity:.5}}
+@media (prefers-reduced-motion:reduce){.fx{display:none}}
+#coupon-list .acts{display:flex;gap:6px;align-items:center;flex-shrink:0}
+[hidden]{display:none!important}
+</style>
 
 <style>[hidden]{display:none!important}</style>
 </head>
@@ -618,7 +691,9 @@ body[data-mode="night"] .mini-step .rbtn{color:#fff}
     </div>
     <div class="stage">
       <canvas id="island" aria-hidden="true"></canvas><canvas id="islandfx" aria-hidden="true"></canvas>
+      <div class="hero-bg" id="title-bg"></div>
       <div class="hero-sprite" id="title-hero"></div>
+      <div class="hero-fx" id="title-fx"></div>
       <div class="pet-sprite" id="title-pet"></div>
     </div>
     <div class="title-bottom">
@@ -660,7 +735,9 @@ body[data-mode="night"] .mini-step .rbtn{color:#fff}
         <div class="look-opts">
           <div class="field-label">帽子</div><div class="swatch-row" id="sw-cap"></div>
           <div class="field-label">衣服</div><div class="swatch-row" id="sw-jacket"></div>
-          <div class="field-label">頭髮</div><div class="swatch-row" id="sw-hair"></div>
+          <div class="field-label">頭髮顏色</div><div class="swatch-row" id="sw-hair"></div>
+          <div class="field-label">髮型</div><div class="hs-row" id="cw-hairstyle"></div>
+          <div class="lash-row"><span>睫毛</span><button class="tgl" id="cw-lash" role="switch" aria-label="睫毛" onclick="toggleLash('cw')"></button></div>
         </div>
       </div>
       <div class="panel form-card photo-row">
@@ -722,6 +799,7 @@ body[data-mode="night"] .mini-step .rbtn{color:#fff}
       <button class="tile purple" onclick="goCalendar()"><span class="t-slot" data-ico="cal"></span><span class="t-label">冒險日曆</span><span class="t-badge" id="hub-cal-badge">0 天</span></button>
       <button class="tile blue" onclick="goBonus()"><span class="t-slot" data-ico="star"></span><span class="t-label">加分日誌</span><span class="t-badge" id="hub-bonus-badge">0 筆</span></button>
       <button class="tile teal" id="hub-shop-tile" hidden onclick="goShop()"><span class="t-slot" data-ico="shop"></span><span class="t-label">冒險商店</span><span class="t-badge" id="hub-shop-badge">0 件</span></button>
+      <button class="tile gold" id="hub-coupon-tile" hidden onclick="goCoupons('main')"><span class="t-slot" data-ico="ticket"></span><span class="t-label">我的券</span><span class="t-badge" id="hub-coupon-badge">0 張</span></button>
       <button class="tile red wide" id="hub-pen-tile" onclick="goPenalty('main')"><span class="t-slot" data-ico="lightning"></span><span class="t-label">扣寶石</span><span class="t-badge" id="hub-pen-badge">今天 −0</span></button>
     </div>
     <button class="btn stone" onclick="goTitle()" style="margin-top:4px"><span class="ico sm" data-ico="swap"></span>切換冒險者</button>
@@ -948,12 +1026,26 @@ body[data-mode="night"] .mini-step .rbtn{color:#fff}
         <span class="lab"><b>商品價格</b><small>便宜＝半價・貴＝兩倍</small></span>
         <span class="seg" id="seg-shop-price"><button data-v="cheap" onclick="setShopPrice('cheap')">便宜</button><button data-v="normal" onclick="setShopPrice('normal')">標準</button><button data-v="pricey" onclick="setShopPrice('pricey')">貴</button></span>
       </div>
+      <div class="set-row">
+        <span class="slot" data-ico="box"></span>
+        <span class="lab"><b>新商品上架</b><small id="wave-note">分三波，想給新東西的時候再往下開</small></span>
+        <span class="seg" id="seg-wave"><button data-v="1" onclick="setWave(1)">第一波</button><button data-v="2" onclick="setWave(2)">第二波</button><button data-v="3" onclick="setWave(3)">全開</button></span>
+      </div>
       <div class="set-row" id="row-lock-shop">
         <span class="slot" data-ico="lock"></span>
         <span class="lab"><b>買東西要家長密碼</b><small>孩子買商品前，由家長輸入密碼</small></span>
         <button class="tgl" id="tg-lock-shop" role="switch" aria-label="買東西要家長密碼" onclick="toggleLock('shop')"></button>
       </div>
+      <div class="set-row" id="row-lock-coupon">
+        <span class="slot" data-ico="lock"></span>
+        <span class="lab"><b>用券要家長密碼</b><small>孩子按「使用」時，由家長輸入密碼</small></span>
+        <button class="tgl" id="tg-lock-coupon" role="switch" aria-label="用券要家長密碼" onclick="toggleLock('coupon')"></button>
+      </div>
     </div>
+
+    <div class="set-head stroke"><i data-ico="ticket"></i>兌換券</div>
+    <div class="panel set-group" id="coupon-list"></div>
+    <button class="btn gold" onclick="openCouponEdit()" style="margin-top:10px"><span class="ico" data-ico="plus"></span>新增兌換券</button>
 
     <div class="set-head stroke"><i data-ico="star"></i>加分規則</div>
     <div class="panel set-group">
@@ -1049,7 +1141,9 @@ body[data-mode="night"] .mini-step .rbtn{color:#fff}
       <div class="look-opts">
         <div class="field-label">帽子</div><div class="swatch-row" id="ce-cap"></div>
         <div class="field-label">衣服</div><div class="swatch-row" id="ce-jacket"></div>
-        <div class="field-label">頭髮</div><div class="swatch-row" id="ce-hair"></div>
+        <div class="field-label">頭髮顏色</div><div class="swatch-row" id="ce-hair"></div>
+        <div class="field-label">髮型</div><div class="hs-row" id="ce-hairstyle"></div>
+        <div class="lash-row"><span>睫毛</span><button class="tgl" id="ce-lash" role="switch" aria-label="睫毛" onclick="toggleLash('ce')"></button></div>
       </div>
     </div>
     <div class="photo-row" style="display:flex;align-items:center;gap:14px">
@@ -1062,6 +1156,17 @@ body[data-mode="night"] .mini-step .rbtn{color:#fff}
   </div>
 </div>
 
+
+<!-- ═════════ COUPONS ═════════ -->
+<section id="screen-coupon" class="screen">
+  <div class="wrap wide">
+    <header class="bar"><button class="rbtn" onclick="couponBack()" data-ico="back" aria-label="返回"></button><h2 class="bar-title stroke"><i data-ico="ticket"></i>我的券</h2><span class="gem-badge"><i data-ico="ticket"></i><b id="cp-count">0</b></span></header>
+    <div class="panel hint"><i data-ico="ticket"></i><span>用券的時候要爸媽一起確認，用掉就不見了。</span></div>
+    <div class="cp-list" id="cp-list"></div>
+    <div class="panel empty" id="cp-empty" hidden><span class="slot" data-ico="ticket"></span><b>還沒有券</b><small>到冒險商店的「兌換券」分頁買一張吧</small></div>
+    <div id="cp-used-wrap" hidden><div class="section-label stroke">用過的券</div><div class="panel set-group" id="cp-used"></div></div>
+  </div>
+</section>
 
 <!-- ═════════ PENALTY ═════════ -->
 <section id="screen-penalty" class="screen">
@@ -1114,6 +1219,25 @@ body[data-mode="night"] .mini-step .rbtn{color:#fff}
       </div>
     </div>
     <div class="sheet-actions"><button class="btn stone" onclick="closeSheet('modal-rule')">取消</button><button class="btn red" onclick="saveRule()">儲存</button></div>
+  </div>
+</div>
+
+<div class="sheet" id="modal-coupon" onclick="if(event.target===this)closeSheet(this.id)">
+  <div class="panel sheet-body" role="dialog" aria-labelledby="coupon-title">
+    <div class="sheet-head"><h3 id="coupon-title">新增兌換券</h3><button class="rbtn sm" onclick="closeSheet('modal-coupon')" data-ico="close" aria-label="關閉"></button></div>
+    <div class="form-card" style="padding:0"><label class="field-label" for="cu-name">兌換券名稱</label><input id="cu-name" class="inp" type="text" maxlength="16" placeholder="例：遊戲時間 30 分鐘" autocomplete="off"></div>
+    <div><div class="field-label" style="margin-bottom:8px">選一個圖示</div><div class="icon-grid" id="cu-icons"></div></div>
+    <div>
+      <label class="field-label" for="cu-cost">要幾顆綠寶石（1–999）</label>
+      <div class="stepper" style="margin-top:8px">
+        <button class="btn stone" onclick="stepVal('cu-cost',-5,1,999)" aria-label="減少">−</button>
+        <span class="gem-i" data-ico="gem"></span>
+        <input id="cu-cost" class="inp" type="number" min="1" max="999" value="30" inputmode="numeric" style="color:var(--gem)">
+        <button class="btn" onclick="stepVal('cu-cost',5,1,999)" aria-label="增加">+</button>
+      </div>
+    </div>
+    <div class="note">兌換券是「會用掉」的商品：買了會進孩子的「我的券」，使用時由家長確認。</div>
+    <div class="sheet-actions"><button class="btn stone" onclick="closeSheet('modal-coupon')">取消</button><button class="btn gold" onclick="saveCoupon()">儲存</button></div>
   </div>
 </div>
 
@@ -1174,19 +1298,24 @@ body[data-mode="night"] .mini-step .rbtn{color:#fff}
   <div class="wrap wide">
     <header class="bar"><button class="rbtn" onclick="goMain()" data-ico="back" aria-label="回基地"></button><h2 class="bar-title stroke"><i data-ico="shop"></i>冒險商店</h2><span class="gem-badge"><i data-ico="gem"></i><b id="shop-bal">0</b></span></header>
     <div class="panel shop-top">
-      <div class="shop-stage"><div class="shop-hero" id="shop-hero"></div><div class="shop-pet" id="shop-pet"></div></div>
+      <div class="shop-stage"><div class="shop-bg" id="shop-bg"></div><div class="shop-hero" id="shop-hero"></div><div class="shop-fx" id="shop-fx"></div><div class="shop-pet" id="shop-pet"></div></div>
       <div class="shop-side">
         <div class="shop-info" id="shop-info"></div>
         <div id="shop-act"></div>
         <button class="link-btn" id="shop-reset" hidden onclick="shopReset()">還原成目前的穿搭</button>
       </div>
     </div>
-    <div class="panel filter-row" id="shop-tabs" style="grid-template-columns:repeat(3,1fr)">
+    <div class="panel sc-box" id="shop-colors" hidden></div>
+    <div class="panel filter-row" id="shop-tabs" style="grid-template-columns:repeat(6,1fr)">
       <button class="fchip" data-k="hat" onclick="shopTab('hat')"><i data-ico="crownI"></i>帽子</button>
       <button class="fchip" data-k="outfit" onclick="shopTab('outfit')"><i data-ico="shirt"></i>服裝</button>
+      <button class="fchip" data-k="weapon" onclick="shopTab('weapon')"><i data-ico="sword"></i>武器</button>
       <button class="fchip" data-k="pet" onclick="shopTab('pet')"><i data-ico="petI"></i>寵物</button>
+      <button class="fchip" data-k="bg" onclick="shopTab('bg')"><i data-ico="scene"></i>背景</button>
+      <button class="fchip" data-k="coupon" onclick="shopTab('coupon')"><i data-ico="ticket"></i>兌換券</button>
     </div>
     <div class="shop-grid" id="shop-grid"></div>
+    <div class="panel hint" id="shop-locked" hidden></div>
   </div>
 </section>
 
@@ -1556,7 +1685,7 @@ Object.assign(ICONS, {
   import: { m:["....KK....","...KBBK...","..KBBBBK..",".KBBBBBBK.","KKKKBBKKKK","...KBBK...","...KBBK...","...KKKK...","KK......KK","KWKKKKKKWK","KKKKKKKKKK"], p:{K,B:'#3a8ae0',W:'#ffffff'} }
 });
 
-const DEFAULT_SETTINGS = { sfx:true, sfxVol:.7, bgm:false, bgmVol:.4, vibrate:true, themeMode:null, motion:true, bigText:false, pinHash:null, lock:{ taskSettings:true, redeem:false, bonus:false, penalty:true, shop:false }, allowNegative:false, shopPrice:'normal', bonusRules:null, cloudSavedAt:null };
+const DEFAULT_SETTINGS = { sfx:true, sfxVol:.7, bgm:false, bgmVol:.4, vibrate:true, themeMode:null, motion:true, bigText:false, pinHash:null, lock:{ taskSettings:true, redeem:false, bonus:false, penalty:true, shop:false, coupon:true }, allowNegative:false, shopPrice:'normal', shopWave:1, coupons:null, bonusRules:null, cloudSavedAt:null };
 function normalizeState() {
   if (!S || typeof S !== 'object') S = { characters: [], curId: null };
   if (!Array.isArray(S.characters)) S.characters = [];
@@ -1566,6 +1695,8 @@ function normalizeState() {
   if (!Array.isArray(S.trash)) S.trash = [];
   if (!Array.isArray(S.books)) S.books = [];
   if (!Array.isArray(S.penalties)) S.penalties = DEFAULT_PENALTIES.map(x => ({ ...x }));
+  if (!Array.isArray(S.settings.coupons)) S.settings.coupons = DEFAULT_COUPONS.map(x => ({ ...x }));
+  S.settings.shopWave = Math.max(1, Math.min(3, S.settings.shopWave || 1));
   const cutoff = Date.now() - 30 * 864e5;
   S.trash = S.trash.filter(t => t && t.char && t.deletedAt > cutoff);
   S.characters.forEach(migrate);
@@ -1806,14 +1937,15 @@ function restoreChar(i) {
 let CE = null;
 function openCharEdit(id) {
   const c = S.characters.find(x => x.id === id); if (!c) return;
-  CE = { id, look: { ...(c.look || DEFAULT_LOOK.custom) }, photo: isPhoto(c) ? c.avatar : null };
+  CE = { id, look: { hairStyle:'short', lash:false, ...(c.look || DEFAULT_LOOK.custom) }, photo: isPhoto(c) ? c.avatar : null };
   $('#ce-name').value = c.name; $('#ce-file').value = '';
   renderCharEdit(); openSheet('modal-char');
 }
 function renderCharEdit() {
-  { const ch = S.characters.find(x => x.id === CE.id); $('#ce-preview').innerHTML = spriteSvg(CE.look, ch && ch.equip); }
+  { const ch = S.characters.find(x => x.id === CE.id); $('#ce-preview').innerHTML = spriteSvg(CE.look, ch && ch.equip, ch && ch.colors); }
   const sw = (list, key) => list.map((c, i) => `<button class="swatch" style="background:${c[1]}" aria-label="${c[0]}" aria-pressed="${CE.look[key] === i}" onclick="CE.look['${key}']=${i};playSound('click');renderCharEdit()"></button>`).join('');
-  $('#ce-cap').innerHTML = sw(CAPS, 'cap'); $('#ce-jacket').innerHTML = sw(JACKETS, 'jacket'); $('#ce-hair').innerHTML = sw(HAIRS, 'hair');
+  $('#ce-cap').innerHTML = sw(CAPS, 'cap'); $('#ce-jacket').innerHTML = sw(JACKETS, 'jacket'); $('#ce-hair').innerHTML = sw(HAIRS2, 'hair');
+  renderHairOpts('ce');
   const slot = $('#ce-slot'); slot.innerHTML = CE.photo ? `<img src="${CE.photo}" alt="">` : ic('camera'); slot.style.padding = CE.photo ? '3px' : '12px';
   $('#ce-clear').hidden = !CE.photo;
 }
@@ -2396,12 +2528,7 @@ const PETS = {
   penguin: { name:'企鵝', price:100, m:["...KKKKK....","..KDDDDDK...",".KDWWWWWDK..",".KDKWWWKDK..",".KDWWOWWDK..","KDDWWWWWDDK.","KDWWWWWWWDK.","KDWWWWWWWDK.",".KDWWWWWDK..",".KDDWWWDDK..","..KOOKOOK...","..KKKKKKK..."], p:{K,D:'#3a4060',W:'#f4f6fb',O:'#f0a020'} },
   dragon:  { name:'小飛龍', price:200, m:["..K.....K...",".KVK...KVK..",".KVVKKKVVK..","KVVVVVVVVVK.","KVKVVVVKVVK.","KVVVVVVVVVK.",".KVVVVVVVK..","KWKVLLLVKWK.","KWWKLLLKWWK.",".KKVLLLVKK..",".KVVKKKVVK..",".KKK...KKK.."], p:{K,V:'#9c6ce2',L:'#e0c8ff',W:'#c8a8ff'} }
 };
-const SHOP_CATS = [
-  { key:'hat', label:'帽子', icon:'crownI', items:HATS },
-  { key:'outfit', label:'服裝', icon:'shirt', items:OUTFITS },
-  { key:'pet', label:'寵物', icon:'petI', items:PETS }
-];
-const DEFAULT_EQUIP = { hat:'cap', outfit:'basic', pet:'cat' };
+const DEFAULT_EQUIP = { hat:'cap', outfit:'basic', pet:'cat', weapon:'none', bg:'none' };
 
 function stampRows(grid, rows, x0, y0, pal) {
   rows.forEach((row, y) => {
@@ -2453,7 +2580,6 @@ function petSvg(id) { const p = PETS[id] || PETS.cat; return pix(p.m, p.p); }
 
 /* ── 價格與擁有 ── */
 const shopMult = () => ({ cheap: .5, normal: 1, pricey: 2 })[ST().shopPrice] || 1;
-const priceOf = (cat, id) => { const it = SHOP_CATS.find(c => c.key === cat).items[id]; return it.price ? Math.max(1, Math.round(it.price * shopMult())) : 0; };
 function owns(c, cat, id) { const it = SHOP_CATS.find(x => x.key === cat).items[id]; if (!it) return false; if (!it.price) return true; return !!(c.owned && (c.owned[cat] || []).includes(id)); }
 
 /* ── 商店畫面 ── */
@@ -2553,7 +2679,6 @@ function renderShopRuleSettings() {
   [['diaryGems', b.diaryGems], ['diaryDaily', b.diaryDaily], ['readMinPerGem', b.readMinPerGem], ['readMaxPerTime', b.readMaxPerTime], ['readDailyMax', b.readDailyMax]]
     .forEach(([k, v]) => { const el = document.getElementById('br-' + k); if (el) el.textContent = v; });
 }
-const ownedCount = c => ['hat', 'outfit', 'pet'].reduce((s, k) => s + ((c.owned && c.owned[k]) || []).filter(id => SHOP_CATS.find(x => x.key === k).items[id] && SHOP_CATS.find(x => x.key === k).items[id].price).length, 0);
 async function toggleCharShop(id) {
   const c = S.characters.find(x => x.id === id); if (!c) return;
   if (!(await requirePin(`${c.shopEnabled ? '關閉' : '開啟'}「${c.name}」的商店`))) return;
@@ -2569,6 +2694,477 @@ async function stepRule(k, d) {
   if (!(await requirePin('調整加分規則'))) return;
   const [lo, hi] = BR_LIMITS[k];
   BR()[k] = Math.max(lo, Math.min(hi, (BR()[k] || 0) + d)); save(); playSound('click'); renderSettings();
+}
+</script>
+<script>
+/* ═══════════════════════════════════
+   V17 — 背景 / 髮型 / 新服裝 / 武器＋呼吸法 / 改色 / 上架波次 / 兌換券
+════════════════════════════════════ */
+Object.assign(ICONS, {
+  sword:  { m:["....KK..",".KKKWK..","KWWWK...",".KWWK...","KKWWWK..","K.KWWWK.","...KWWWK","....KWWK",".....KKK"], p:{K,W:'#e6eaf8'} },
+  scene:  { m:["KKKKKKKKKKKK","KBBBBBBBBBBK","KBBBYBBBBBBK","KBBBBBBBBBBK","KBBBBBGGBBBK","KBBGGGGGGGBK","KGGGGGGGGGGK","KgggggggggGK","KKKKKKKKKKKK"], p:{K,B:'#8ad0ff',Y:'#ffd23a',G:'#5bc236',g:'#3e9a22'} },
+  palette:{ m:["..KKKKKK....",".KWWWWWWK...","KWRKWWKBWK..","KWWWWWWWWK..","KWKYWWKGWWK.","KWWWWWWWWWK.",".KWWKWWKWWK.","..KKKKKKKK.."], p:{K,W:'#f6f2ff',R:'#e04848',B:'#3a8ae0',Y:'#ffd23a',G:'#5bc236'} },
+  ticket: { m:["KKKKKKKKKKKK","KYYYYKKYYYYK","KYYYYYYYYYYK","KKYYYYYYYYKK","KYYYWWWWYYYK","KKYYYYYYYYKK","KYYYYYYYYYYK","KYYYYKKYYYYK","KKKKKKKKKKKK"], p:{K,Y:'#ffd23a',W:'#fff6c0'} },
+  scissors:{ m:["KK.....KK",".KK...KK.","..KK.KK..","...KKK...","..KKKKK..",".KK.K.KK.","KWK.K.KWK",".K..K..K."], p:{K,W:'#e6eaf8'} }
+});
+
+/* ═══ 1. 背景（全部免費） ═══ */
+const BGW = 20, BGH = 28;
+const bgBlank = () => Array.from({ length: BGH }, () => Array(BGW).fill(null));
+function fillR(g, x0, y0, x1, y1, c) { for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) if (g[y] && x >= 0 && x < BGW) g[y][x] = c; }
+function dotB(g, x, y, c) { if (g[y] && x >= 0 && x < BGW) g[y][x] = c; }
+const BGS = {
+  none:   { name:'沒有背景', price:0, build() {} },
+  grass:  { name:'草原白天', price:0, build(g) {
+    fillR(g, 0, 0, 19, 19, '#8ad0ff');
+    [[2,3],[3,3],[4,3],[3,2],[13,6],[14,6],[15,6],[14,5]].forEach(([x,y]) => dotB(g,x,y,'#ffffff'));
+    [[0,15],[1,14],[2,13],[3,14],[4,15],[15,15],[16,14],[17,13],[18,14],[19,15]].forEach(([x,y]) => fillR(g,x,y,x,19,'#4a9a6a'));
+    fillR(g, 0, 20, 19, 20, '#5bc236'); fillR(g, 0, 21, 19, 21, '#3e9a22'); fillR(g, 0, 22, 19, 27, '#8a5a2a');
+    [[2,23],[7,24],[12,23],[16,25],[5,26],[14,26],[9,25]].forEach(([x,y]) => dotB(g,x,y,'#6a3f1a'));
+  } },
+  night:  { name:'星空夜晚', price:0, build(g) {
+    fillR(g, 0, 0, 19, 12, '#1b1436'); fillR(g, 0, 13, 19, 19, '#2a2050');
+    [[2,2],[6,4],[10,1],[14,3],[17,6],[4,8],[12,7],[18,10],[8,11],[1,6]].forEach(([x,y]) => dotB(g,x,y,'#fff6c0'));
+    [[15,1],[16,1],[15,2],[16,2],[17,2],[15,3],[16,3]].forEach(([x,y]) => dotB(g,x,y,'#fff2c0'));
+    fillR(g, 0, 20, 19, 20, '#2e7a1a'); fillR(g, 0, 21, 19, 21, '#1f5a12'); fillR(g, 0, 22, 19, 27, '#4a3418');
+    fillR(g, 1, 16, 1, 20, '#7a4a1e'); dotB(g,1,15,'#ffb02a'); dotB(g,1,14,'#fff3a0');
+    fillR(g, 18, 16, 18, 20, '#7a4a1e'); dotB(g,18,15,'#ffb02a'); dotB(g,18,14,'#fff3a0');
+  } },
+  cave:   { name:'礦坑洞窟', price:0, build(g) {
+    fillR(g, 0, 0, 19, 27, '#5a5a68');
+    for (let y = 0; y < 28; y++) for (let x = 0; x < 20; x++) if ((x * 7 + y * 5) % 11 === 0) dotB(g, x, y, '#46465a');
+    [[2,5,'#5ee85a'],[3,5,'#5ee85a'],[2,6,'#2aa83a'],[15,9,'#ffd23a'],[16,9,'#ffd23a'],[16,10,'#c8960a'],[4,18,'#e04848'],[5,18,'#e04848'],[17,20,'#8ad0ff'],[17,21,'#4a9ad0']].forEach(([x,y,c]) => dotB(g,x,y,c));
+    fillR(g, 0, 22, 19, 27, '#3e3e4c');
+    fillR(g, 1, 17, 1, 21, '#7a4a1e'); dotB(g,1,16,'#ffb02a'); dotB(g,1,15,'#fff3a0');
+  } },
+  sakura: { name:'櫻花林', price:0, build(g) {
+    fillR(g, 0, 0, 19, 19, '#ffe0ee'); fillR(g, 0, 0, 19, 6, '#f7b8d4');
+    [[1,7],[2,6],[17,6],[18,7]].forEach(([x,y]) => fillR(g,x,y,x,y+3,'#ff9ec4'));
+    fillR(g, 0, 11, 1, 19, '#8a5a2a'); fillR(g, 18, 11, 19, 19, '#8a5a2a');
+    [[6,4],[11,8],[8,13],[14,16],[5,17],[12,3],[15,11],[3,14]].forEach(([x,y]) => dotB(g,x,y,'#ffc4dc'));
+    fillR(g, 0, 20, 19, 21, '#7ec24a'); fillR(g, 0, 22, 19, 27, '#9a6a38');
+    [[3,22],[9,23],[15,22],[6,25],[13,26]].forEach(([x,y]) => dotB(g,x,y,'#ffc4dc'));
+  } },
+  lava:   { name:'熔岩洞', price:0, build(g) {
+    fillR(g, 0, 0, 19, 27, '#4a2020');
+    for (let y = 0; y < 28; y++) for (let x = 0; x < 20; x++) if ((x * 5 + y * 3) % 9 === 0) dotB(g, x, y, '#3a1616');
+    fillR(g, 0, 21, 19, 23, '#6a2a16'); fillR(g, 0, 24, 19, 27, '#f06424');
+    [[2,24],[7,25],[13,24],[17,26],[5,26],[10,27]].forEach(([x,y]) => dotB(g,x,y,'#ffd23a'));
+    [[3,14],[4,14],[3,15],[16,17],[17,17]].forEach(([x,y]) => dotB(g,x,y,'#f08a24'));
+  } },
+  snow:   { name:'雪原', price:0, build(g) {
+    fillR(g, 0, 0, 19, 19, '#bcd8f0');
+    [[2,3],[7,6],[12,2],[16,8],[5,11],[18,13],[9,9],[14,14],[1,16]].forEach(([x,y]) => dotB(g,x,y,'#ffffff'));
+    [[1,10],[18,11]].forEach(([bx,by]) => {
+      for (let i = 0; i < 5; i++) fillR(g, bx - Math.min(1, i), by + i * 2, bx + Math.min(1, i), by + i * 2 + 1, i % 2 ? '#2e7a4a' : '#3e9a5a');
+      fillR(g, bx, by + 10, bx, by + 10, '#6a3f1a');
+    });
+    fillR(g, 0, 20, 19, 22, '#ffffff'); fillR(g, 0, 23, 19, 27, '#e0ecf8');
+  } },
+  sunset: { name:'黃昏海邊', price:0, build(g) {
+    ['#5a3a8a','#8a4a90','#c0608a','#e88a6a','#f7b45a','#ffd88a'].forEach((c, i) => fillR(g, 0, i * 2, 19, i * 2 + 1, c));
+    fillR(g, 0, 12, 19, 18, '#ffd88a');
+    fillR(g, 1, 10, 4, 14, '#ff9a3a'); fillR(g, 2, 9, 3, 15, '#ff9a3a');
+    fillR(g, 0, 19, 19, 23, '#3a78b8'); fillR(g, 0, 24, 19, 27, '#2a5a94');
+    [[2,20],[6,21],[11,20],[15,22],[4,25],[13,25],[17,26]].forEach(([x,y]) => dotB(g,x,y,'#8ad0ff'));
+  } }
+};
+function bgGrid(id) { const b = BGS[id] || BGS.none; const g = bgBlank(); b.build(g); return g; }
+function bgSvg(id) { return (!id || id === 'none') ? '' : gridSvg(bgGrid(id)); }
+
+/* ═══ 2. 髮型（免費，建立／編輯角色時選） ═══ */
+function hrow(spans) { const a = Array(20).fill('.'); spans.forEach(([x0, x1, ch]) => { for (let x = x0; x <= x1; x++) a[x] = ch; }); return a.join(''); }
+function sideHair(y0, y1, w, opt) {
+  opt = opt || {};
+  const lK = 3 - w, lH0 = 4 - w, rH1 = 15 + w, rK = 16 + w;
+  const m = [];
+  for (let y = y0; y <= y1; y++) {
+    const ch = (opt.tie && y === opt.tie) ? 'T' : 'H';
+    const sp = [];
+    if (!opt.rightOnly) sp.push([lK, lK, 'K'], [lH0, 3, ch]);
+    sp.push([16, rH1, ch], [rK, rK, 'K']);
+    m.push(hrow(sp));
+  }
+  const endSp = [];
+  if (!opt.rightOnly) endSp.push([lK, 3, 'K']);
+  endSp.push([16, rK, 'K']);
+  m.push(hrow(endSp));
+  return { y: y0, m };
+}
+const HAIRSTYLES = {
+  short: { name:'短髮', back:null },
+  long:  { name:'長髮', back: sideHair(6, 17, 2) },
+  twin:  { name:'雙馬尾', back: sideHair(8, 16, 3, { tie: 8 }) },
+  bun:   { name:'丸子頭', back: { y:0, m:[hrow([[8,11,'K']]), hrow([[7,7,'K'],[8,11,'H'],[12,12,'K']]), hrow([[7,7,'K'],[8,11,'H'],[12,12,'K']]), hrow([[8,11,'K']])] } },
+  braid: { name:'側辮子', back: sideHair(7, 18, 2, { rightOnly: true, tie: 16 }) }
+};
+const HAIR_LIST = Object.keys(HAIRSTYLES);
+const HAIRS2 = [['深棕','#3a2418'],['棕','#7a4a22'],['黑','#2a2230'],['金','#d8a838'],['淺金','#f0d48a'],['紅棕','#a8442a'],['粉','#f07aa8'],['藍','#4a7ad8']];
+
+/* ═══ 3. 新服裝 ═══ */
+const NEW_OUTFITS = {
+  miner:  { name:'礦坑工人', price:70, wave:1, m:["....KUUUUUUK....","...KVUUUUUUVK...","..KVVVUUUUVVVK..",".KSVVVUUUVVVVSK.",".KSKVVUUUUVVK...","..KKTTTGGTTTTK..","...KVVUUUUVVK...","...KVVUUUUVVK...","...KGGGUUGGGK...","...KGGGKKGGGK...","...KGGK..KGGK...","..KNNNK..KNNNK..","..KKKKK..KKKKK.."], p:{K,S:'#f2c08a',U:'#e8d8b8',V:'#a8682e',G:'#6a7080',T:'#4a3020',N:'#3a3a4a'} },
+  haoriW: { name:'波紋羽織', price:80, wave:1, m:["....KUUUUUUK....","...KAUUUUUUAK...","..KBABUUUUABAK..",".KSABAUUUUABASK.",".KSKAAUUUUAAK...","..KKBUUUUUUBKK..","...KTTTTTTTTK...","...KAUUUUUUAK...","...KBUUUUUUBK...","...KAUUKKUUAK...","...KUUK..KUUK...","..KNNNK..KNNNK..","..KKKKK..KKKKK.."], p:{K,S:'#f2c08a',U:'#2a2f4a',A:'#3a8ae0',B:'#d8f0ff',T:'#1a4a80',N:'#2a2f4a'} },
+  haoriF: { name:'炎紋羽織', price:90, wave:1, m:["....KUUUUUUK....","...KAUUUUUUAK...","..KAAAUUUUAAAK..",".KSAAAUUUUAAASK.",".KSKAAUUUUAAK...","..KKBUUUUUUBKK..","...KTTTTTTTTK...","...KBUUUUUUBK...","...KBUUUUUUBK...","...KBUUKKUUBK...","...KUUK..KUUK...","..KNNNK..KNNNK..","..KKKKK..KKKKK.."], p:{K,S:'#f2c08a',U:'#2a1a1a',A:'#e04030',B:'#ffc23a',T:'#8a2010',N:'#2a1a1a'} },
+  haoriT: { name:'雷紋羽織', price:90, wave:2, m:["....KUUUUUUK....","...KAUUUUUUAK...","..KBBAUUUUAAAK..",".KSAAAUUUUAAASK.",".KSKAAUUUUBBK...","..KKAUUUUUUBKK..","...KTTTTTTTTK...","...KBUUUUUUAK...","...KAUUUUUUAK...","...KAUUKKUUBK...","...KUUK..KUUK...","..KNNNK..KNNNK..","..KKKKK..KKKKK.."], p:{K,S:'#f2c08a',U:'#241c3a',A:'#7a4ad0',B:'#ffe45a',T:'#3a2a6a',N:'#241c3a'} },
+  haoriP: { name:'花紋羽織', price:100, wave:2, m:["....KUUUUUUK....","...KAUUUUUUBK...","..KAAAUUUUAABK..",".KSBAAUUUUAAASK.",".KSKAAUUUUAAK...","..KKAUUUUUUBKK..","...KTTTTTTTTK...","...KAUUUUUUAK...","...KBUUUUUUAK...","...KAUUKKUUAK...","...KUUK..KUUK...","..KNNNK..KNNNK..","..KKKKK..KKKKK.."], p:{K,S:'#f2c08a',U:'#3a2030',A:'#f07aa8',B:'#fff0f6',T:'#a8406a',N:'#3a2030'} },
+  haoriG: { name:'風紋羽織', price:100, wave:3, m:["....KUUUUUUK....","...KAUUUUUUAK...","..KABAUUUUABAK..",".KSAAAUUUUAAASK.",".KSKAAUUUUAAK...","..KKBUUUUUUBKK..","...KTTTTTTTTK...","...KBUUUUUUBK...","...KAUUUUUUAK...","...KAUUKKUUAK...","...KUUK..KUUK...","..KNNNK..KNNNK..","..KKKKK..KKKKK.."], p:{K,S:'#f2c08a',U:'#1e3a38',A:'#35c8c0',B:'#eafffd',T:'#14706c',N:'#1e3a38'} },
+  sailor: { name:'水手學院服', price:70, wave:2, m:["....KUUUUUUK....","...KUUUUUUUUK...","..KUAAAUUAAAUK..",".KSUAAAUUAAAUSK.",".KSKUUATAUUUK...","..KKUUUTUUUUKK..","...KUUUUUUUUK...","..KAAAAAAAAAAK..",".KAAAAAAAAAAAAK.","KAAAAAAAAAAAAAAK","KKKKKKKKKKKKKKKK","...KLLK..KLLK...","..KKKKK..KKKKK.."], p:{K,S:'#f2c08a',U:'#f6f2ff',A:'#2a3a7a',T:'#e04848',L:'#f6f2ff'} },
+  magic:  { name:'魔法少女袍', price:90, wave:3, m:["....KUUUUUUK....","...KAUUUUUUAK...","..KAAAUUUUAAAK..",".KSAAAUUUUAAASK.",".KSKAAUYUAAAK...","..KKTTTTTTTTKK..","...KAAAAAAAAK...","..KAAAAWWAAAAK..",".KAAAWAAAAWAAAK.","KAAAAAAAAAAAAAAK","KKKKKKKKKKKKKKKK","...KLLK..KLLK...","..KKKKK..KKKKK.."], p:{K,S:'#f2c08a',U:'#fff0f6',A:'#f07aa8',W:'#fff0f6',Y:'#ffd23a',T:'#ffd23a',L:'#fbfbff'} },
+  princess:{ name:'公主鎧甲', price:130, wave:3, m:["....KUUUUUUK....","...KAAUUUUAAK...","..KAAAUUUUAAAK..",".KSAAAUYUAAAASK.",".KSKAAUUUAAAK...","..KKTTTTTTTTKK..","...KBBBBBBBBK...","..KBBBAABBBBBK..",".KBBBBBBAABBBBK.","KBBBBBBBBBBBBBBK","KKKKKKKKKKKKKKKK","...KLLK..KLLK...","..KKKKK..KKKKK.."], p:{K,S:'#f2c08a',U:'#e8eef8',A:'#c8d0e0',B:'#5a8ad8',Y:'#ffd23a',T:'#ffd23a',L:'#e8eef8'} }
+};
+
+/* ═══ 4. 武器＋呼吸法特效 ═══ */
+function katana(p, top) {
+  const m = [];
+  for (let y = 0; y < 22; y++) m.push(y < top ? '......' : y === top ? '..KK..' : y < 17 ? '.KEBK.' : y === 17 ? 'KKGGKK' : y < 21 ? '.KHHK.' : '.KKKK.');
+  return { m, p };
+}
+const WEAPONS = {
+  none:   { name:'空手', price:0 },
+  wood:   { name:'木劍', price:0, wave:1, ...katana({K,E:'#d8a860',B:'#a8763a',G:'#8a5a2a',H:'#6a3f1a'}, 8) },
+  pick:   { name:'鐵鎬', price:40, wave:1, m:["......","......","......","......","......","KKKKKK","KEEEEK","KKEEKK",".KEEK.",".KEEK.",".KHHK.",".KHHK.",".KHHK.",".KHHK.",".KHHK.",".KHHK.",".KHHK.",".KHHK.",".KHHK.",".KHHK.",".KHHK.",".KKKK."], p:{K,E:'#c8d0e0',H:'#8a5a2a'} },
+  blade:  { name:'冒險長刀', price:60, wave:1, ...katana({K,E:'#eef4ff',B:'#aab4c8',G:'#ffd23a',H:'#3a3a4a'}, 2) },
+  water:  { name:'水紋之刃', price:90, wave:1, fx:'water', ...katana({K,E:'#d8f4ff',B:'#3fa8e8',G:'#c8d0e0',H:'#1a4a80'}, 1) },
+  flame:  { name:'炎紋之刃', price:90, wave:2, fx:'flame', ...katana({K,E:'#ffd23a',B:'#f06424',G:'#ffd23a',H:'#7a2010'}, 1) },
+  thunder:{ name:'雷紋之刃', price:100, wave:2, fx:'thunder', ...katana({K,E:'#fffbe0',B:'#f0d030',G:'#9c6ce2',H:'#3a2a6a'}, 1) },
+  petal:  { name:'花紋之刃', price:100, wave:3, fx:'petal', ...katana({K,E:'#ffe0ec',B:'#f07aa8',G:'#ffd23a',H:'#7a3050'}, 1) },
+  wind:   { name:'風紋之刃', price:100, wave:3, fx:'wind', ...katana({K,E:'#e0fffb',B:'#35c8c0',G:'#c8d0e0',H:'#14706c'}, 1) },
+  staff:  { name:'星光法杖', price:80, wave:2, fx:'spark', m:["..KK..",".KYYK.","KYWWYK","KYWWYK",".KYYK.","..KK..",".KHHK.",".KHHK.",".KHHK.",".KHHK.",".KHHK.",".KHHK.",".KHHK.",".KHHK.",".KHHK.",".KHHK.",".KHHK.",".KHHK.",".KHHK.",".KHHK.",".KHHK.",".KKKK."], p:{K,Y:'#ffd23a',W:'#fffbe0',H:'#8a5a2a'} },
+  bow:    { name:'長弓', price:70, wave:2, m:["......","..KK..",".KBBK.","KBBBK.","KBBK.S","KBBK.S","KBBK.S","KBBK.S","KBBK.S","KBBK.S","KBBK.S","KBBK.S","KBBK.S","KBBK.S","KBBK.S","KBBK.S","KBBK.S","KBBBK.",".KBBK.","..KK..","......","......"], p:{K,B:'#a8763a',S:'#e8e8f0'} },
+  naginata:{ name:'薙刀', price:90, wave:3, fx:'wind', m:["....KK","...KBK","..KBBK","..KBBK",".KBBK.",".KGGK.",".KHHK.",".KHHK.",".KHHK.",".KHHK.",".KHHK.",".KHHK.",".KHHK.",".KHHK.",".KHHK.",".KHHK.",".KHHK.",".KHHK.",".KHHK.",".KHHK.",".KHHK.",".KKKK."], p:{K,B:'#dfe8ff',G:'#ffd23a',H:'#6a3f1a'} },
+  twin:   { name:'雙刀', price:110, wave:3, fx:'petal', m:["......","......","......","......","KK..KK","KBKKBK","KBKKBK","KBKKBK","KBKKBK","KBKKBK","KBKKBK","KBKKBK","KBKKBK","KBKKBK","KBKKBK","KGKKGK","KHKKHK","KHKKHK","KHKKHK","KHKKHK","KKKKKK","......"], p:{K,B:'#ffd8e8',G:'#ffd23a',H:'#a8406a'} }
+};
+const FX_DEF = {
+  water:  { n:7, c:['#8ad0ff','#d8f4ff','#3fa8e8'] },
+  flame:  { n:8, c:['#ffd23a','#f06424','#fff3a0'] },
+  thunder:{ n:6, c:['#ffe45a','#fffbe0','#9c6ce2'] },
+  petal:  { n:8, c:['#f07aa8','#ffd8e8','#fff0f6'] },
+  wind:   { n:7, c:['#35c8c0','#eafffd','#8ad0ff'] },
+  spark:  { n:8, c:['#ffd23a','#fffbe0','#ffffff'] }
+};
+function fxHtml(kind) {
+  const d = FX_DEF[kind]; if (!d || RM || ST().motion === false) return '';
+  let out = `<div class="fx fx-${kind}">`;
+  for (let i = 0; i < d.n; i++) out += `<i style="--i:${i};--c:${d.c[i % d.c.length]}"></i>`;
+  return out + '</div>';
+}
+const weaponFx = e => { const w = WEAPONS[(e || {}).weapon]; return w && w.fx ? fxHtml(w.fx) : ''; };
+
+/* ═══ 5. 改色（免費） ═══ */
+const PALETTE = [['膚色','#f2c08a'],['深膚','#c08a50'],['白','#fbfbff'],['灰','#9aa2b8'],['黑','#34344a'],['紅','#e04848'],['橘','#f08a24'],['黃','#ffd23a'],['綠','#5bc236'],['青','#35c8c0'],['藍','#3a8ae0'],['紫','#9c6ce2'],['粉','#f5a0b8'],['咖啡','#8a5a2a']];
+const COLOR_SLOTS = {
+  hat: { cat:{F:'耳朵',P:'內耳'}, fox:{F:'耳朵',P:'內耳'}, bunny:{W:'外層',P:'內層'}, bear:{B:'耳朵',P:'內耳'}, phones:{G:'耳機'}, wizard:{V:'帽子',Y:'星星'}, crown:{Y:'皇冠',R:'寶石'} },
+  outfit: { ninja:{D:'主色',R:'腰帶'}, dino:{G:'主色',Y:'肚子'}, wizard:{V:'長袍',Y:'星星'}, astro:{W:'太空衣',B:'面罩'}, knight:{A:'鎧甲',R:'披風'},
+            miner:{V:'背心',G:'褲子'}, haoriW:{A:'羽織',B:'花紋'}, haoriF:{A:'羽織',B:'花紋'}, haoriT:{A:'羽織',B:'花紋'}, haoriP:{A:'羽織',B:'花紋'}, haoriG:{A:'羽織',B:'花紋'},
+            sailor:{A:'裙子',T:'領巾'}, magic:{A:'裙子',T:'腰帶'}, princess:{B:'裙子',A:'鎧甲'} },
+  weapon: { wood:{B:'刀身',H:'握柄'}, pick:{E:'鎬頭',H:'握柄'}, blade:{B:'刀身',H:'握柄'}, water:{B:'刀身',H:'握柄'}, flame:{B:'刀身',H:'握柄'}, thunder:{B:'刀身',H:'握柄'}, petal:{B:'刀身',H:'握柄'}, wind:{B:'刀身',H:'握柄'}, staff:{Y:'寶石',H:'杖身'}, bow:{B:'弓身'}, naginata:{B:'刀身',H:'杖身'}, twin:{B:'刀身',H:'握柄'} },
+  pet: { cat:{O:'毛色'}, chick:{Y:'毛色'}, turtle:{G:'龜殼'}, dog:{W:'毛色'}, bunny:{W:'毛色',P:'耳朵'}, penguin:{D:'背部'}, dragon:{V:'鱗片'} }
+};
+const slotsOf = (cat, id) => (COLOR_SLOTS[cat] || {})[id] || null;
+const colorsOf = (c, cat, id) => ((c && c.colors && c.colors[cat]) || {})[id] || null;
+function tint(pal, over) { return over ? { ...pal, ...over } : pal; }
+
+/* ═══ 6. 商店分類與上架波次 ═══ */
+const SHOP_CATS = [
+  { key:'hat',    label:'帽子', icon:'crownI',  items:HATS },
+  { key:'outfit', label:'服裝', icon:'shirt',   items:{ ...OUTFITS, ...NEW_OUTFITS } },
+  { key:'weapon', label:'武器', icon:'sword',   items:WEAPONS },
+  { key:'pet',    label:'寵物', icon:'petI',    items:PETS },
+  { key:'bg',     label:'背景', icon:'scene',   items:BGS },
+  { key:'coupon', label:'兌換券', icon:'ticket', items:null }
+];
+const WEAR_CATS = ['hat', 'outfit', 'weapon', 'pet', 'bg'];
+const catItems = k => (SHOP_CATS.find(x => x.key === k) || {}).items || {};
+const waveOf = it => it.wave || 0;
+const inWave = it => waveOf(it) <= (ST().shopWave || 1);
+function waveCount(n) {
+  let c = 0;
+  WEAR_CATS.forEach(k => Object.values(catItems(k)).forEach(it => { if (waveOf(it) === n) c++; }));
+  return c;
+}
+
+/* ═══ 7. 兌換券 ═══ */
+const DEFAULT_COUPONS = [
+  { id:'c1', name:'遊戲時間 30 分鐘', icon:'play',  price:40 },
+  { id:'c2', name:'今天晚餐我決定',   icon:'flask', price:30 },
+  { id:'c3', name:'免做一次家事',     icon:'broom', price:50 },
+  { id:'c4', name:'週末晚睡 30 分鐘', icon:'moon',  price:60 },
+  { id:'c5', name:'點心自己選',       icon:'heart', price:25 },
+  { id:'c6', name:'和爸媽單獨出去一次', icon:'star', price:120 }
+];
+const CP = () => ST().coupons || (ST().coupons = DEFAULT_COUPONS.map(x => ({ ...x })));
+const myCoupons = c => (c.coupons || []).filter(x => !x.usedAt);
+
+/* ═══ 8. 組圖 ═══ */
+function composeGrid(look, equip, colors) {
+  const e = { ...DEFAULT_EQUIP, ...(equip || {}) };
+  const L = look || DEFAULT_LOOK.custom;
+  const pal = lookPal(L);
+  const grid = Array.from({ length: 28 }, () => Array(20).fill(null));
+  const hs = HAIRSTYLES[L.hairStyle] || HAIRSTYLES.short;
+  const hairPal = { K, H: pal.H, T: pal.R };
+  if (hs.back) stampRows(grid, hs.back.m, 0, hs.back.y, hairPal);
+  const hat = HATS[e.hat] && HATS[e.hat].m ? HATS[e.hat] : null;
+  const head = SPRITE.slice(0, 11).map((r, i) => (hat && i < 4) ? HAIR_TOP[i] : r);
+  stampRows(grid, head, 2, 4, pal);
+  if (L.lash) { grid[9][6] = K; grid[9][12] = K; }
+  const OUT = catItems('outfit');
+  const outfit = OUT[e.outfit] && OUT[e.outfit].m ? OUT[e.outfit] : null;
+  const wp = WEAPONS[e.weapon] && WEAPONS[e.weapon].m ? WEAPONS[e.weapon] : null;
+  if (outfit) stampRows(grid, outfit.m, 2, 15, tint(outfit.p, colorsOf({ colors }, 'outfit', e.outfit)));
+  else {
+    let body = SPRITE.slice(11);
+    if (wp) body = body.map(r => r.replace(/[Mm]/g, '.'));
+    stampRows(grid, body, 2, 15, pal);
+  }
+  if (hat) stampRows(grid, hat.m, hat.x, hat.y, tint(hat.p, colorsOf({ colors }, 'hat', e.hat)));
+  if (wp) stampRows(grid, wp.m, 14, 0, tint(wp.p, colorsOf({ colors }, 'weapon', e.weapon)));
+  return grid;
+}
+function spriteSvg(look, equip, colors) { return gridSvg(composeGrid(look, equip, colors)); }
+function headSvg(look, equip, colors) {
+  const g = composeGrid(look, equip, colors);
+  let top = 0; while (top < 15 && !g[top].some(Boolean)) top++;
+  top = Math.min(top, 4);
+  const h = 15 - top, w = Math.max(16, h);
+  const x0 = Math.max(0, Math.floor((20 - w) / 2));
+  return gridSvg(g, top, 15, x0, Math.min(20, x0 + w));
+}
+function petSvg(id, colors) { const p = PETS[id] || PETS.cat; return pix(p.m, tint(p.p, colorsOf({ colors }, 'pet', id))); }
+const heroStage = c => `${bgSvg(c && c.equip ? c.equip.bg : 'none')}`;
+
+/* 幫舊的呼叫補上 colors */
+function spriteOf(c, over) { return spriteSvg(c.look, { ...c.equip, ...(over || {}) }, c.colors); }
+</script>
+<script>
+/* ═══════════════════════════════════
+   V17 — 商店畫面（6 分頁）、改色、兌換券、設定
+════════════════════════════════════ */
+
+/* ── 建立／編輯角色：髮型與睫毛 ── */
+function renderHairOpts(who) {
+  const L = who === 'cw' ? CW.look : CE.look;
+  const box = $('#' + who + '-hairstyle'); if (!box) return;
+  box.innerHTML = HAIR_LIST.map(k => `<button class="hs-chip" aria-pressed="${(L.hairStyle || 'short') === k}" onclick="setHair('${who}','${k}')">
+    <span class="hs-pic">${gridSvg(composeGrid({ ...L, hairStyle: k }, { hat: 'cap', outfit: 'basic', weapon: 'none' }), 0, 16, 0, 20)}</span>
+    <span class="hs-n">${HAIRSTYLES[k].name}</span></button>`).join('');
+  const t = $('#' + who + '-lash'); if (t) t.setAttribute('aria-checked', String(!!L.lash));
+}
+function setHair(who, k) { const L = who === 'cw' ? CW.look : CE.look; L.hairStyle = k; playSound('click'); who === 'cw' ? renderLook() : renderCharEdit(); }
+function toggleLash(who) { const L = who === 'cw' ? CW.look : CE.look; L.lash = !L.lash; playSound('click'); who === 'cw' ? renderLook() : renderCharEdit(); }
+
+/* ── 商店 ── */
+const ownedCount = c => WEAR_CATS.reduce((s, k) => s + ((c.owned && c.owned[k]) || []).filter(id => catItems(k)[id] && catItems(k)[id].price).length, 0);
+function owns(c, cat, id) {
+  const it = catItems(cat)[id]; if (!it) return false;
+  if (!it.price) return true;
+  return !!(c.owned && (c.owned[cat] || []).includes(id));
+}
+const priceOf = (cat, id) => { const it = catItems(cat)[id]; return it && it.price ? Math.max(1, Math.round(it.price * shopMult())) : 0; };
+
+function goShop() {
+  const c = cur(); if (!c) return goTitle();
+  if (!c.shopEnabled) { toast('這位冒險者的商店沒有開啟', 'shop'); return; }
+  migrate(c);
+  SHOP = { tab: SHOP ? SHOP.tab : 'hat', sel: null, tr: { ...c.equip } };
+  renderShop(); show('shop');
+}
+function shopThumb(c, key, id) {
+  if (key === 'pet') return petSvg(id, c.colors);
+  if (key === 'bg') return bgSvg(id) || '<span class="bg-none">無</span>';
+  if (key === 'hat') return headSvg(c.look, { ...c.equip, hat: id }, c.colors);
+  return spriteSvg(c.look, { ...c.equip, [key]: id }, c.colors);
+}
+function renderShop() {
+  const c = cur(); if (!c || !SHOP) return;
+  $('#shop-bal').textContent = c.emeralds || 0;
+  $('#shop-hero').innerHTML = spriteSvg(c.look, SHOP.tr, c.colors);
+  $('#shop-pet').innerHTML = petSvg(SHOP.tr.pet, c.colors);
+  $('#shop-bg').innerHTML = bgSvg(SHOP.tr.bg);
+  $('#shop-fx').innerHTML = weaponFx(SHOP.tr);
+  const changed = WEAR_CATS.some(k => SHOP.tr[k] !== c.equip[k]);
+  $('#shop-reset').hidden = !changed;
+  $$('#shop-tabs .fchip').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.k === SHOP.tab)));
+  if (SHOP.tab === 'coupon') return renderCouponShop(c);
+  const key = SHOP.tab, items = Object.entries(catItems(key)).filter(([, it]) => inWave(it));
+  $('#shop-grid').className = 'shop-grid' + (key === 'bg' ? ' bgs' : '');
+  $('#shop-grid').innerHTML = items.map(([id, it]) => {
+    const own = owns(c, key, id), on = c.equip[key] === id, sel = SHOP.sel === id;
+    const tag = on ? '<span class="sh-tag on">使用中</span>' : own ? '<span class="sh-tag own">已擁有</span>' : `<span class="reward-chip"><i>${ic('gem')}</i>${priceOf(key, id)}</span>`;
+    return `<button class="panel sh-item${sel ? ' sel' : ''}${own ? ' own' : ''}" onclick="shopPick('${id}')" aria-pressed="${sel}"><span class="sh-thumb ${key}">${shopThumb(c, key, id)}</span><span class="sh-name">${esc(it.name)}</span>${tag}</button>`;
+  }).join('');
+  const hidden = Object.values(catItems(key)).filter(it => !inWave(it)).length;
+  $('#shop-locked').hidden = !hidden;
+  if (hidden) $('#shop-locked').innerHTML = `<span class="slot">${ic('box')}</span><span><b>還有 ${hidden} 件新商品沒上架</b><small>爸媽可以在「設定 → 冒險商店 → 新商品上架」打開下一波</small></span>`;
+  const act = $('#shop-act'), info = $('#shop-info');
+  $('#shop-colors').hidden = true;
+  if (!SHOP.sel) { info.textContent = '點一個商品，先試穿看看！'; act.innerHTML = ''; return; }
+  const it = catItems(key)[SHOP.sel], own = owns(c, key, SHOP.sel), on = c.equip[key] === SHOP.sel, price = priceOf(key, SHOP.sel);
+  info.innerHTML = `<b>${esc(it.name)}</b>・${own ? (it.price ? '已擁有' : '免費') : `價格 ${price} 顆`}`;
+  if (on) act.innerHTML = `<button class="btn stone" disabled><span class="ico">${ic('check')}</span>使用中</button>`;
+  else if (own) act.innerHTML = `<button class="btn" onclick="shopEquip()"><span class="ico">${ic('check')}</span>${key === 'pet' ? '帶牠出門' : key === 'bg' ? '換這個背景' : '穿上'}</button>`;
+  else if ((c.emeralds || 0) >= price) act.innerHTML = `<button class="btn gold" onclick="shopBuy()"><span class="ico">${ic('gem')}</span>買下（${price} 顆）</button>`;
+  else act.innerHTML = `<button class="btn stone" disabled>還差 ${price - Math.max(0, c.emeralds || 0)} 顆</button>`;
+  if (own) renderColorPicker(c, key, SHOP.sel);
+}
+function renderColorPicker(c, cat, id) {
+  const slots = slotsOf(cat, id); const box = $('#shop-colors');
+  if (!slots) { box.hidden = true; return; }
+  const cur0 = colorsOf(c, cat, id) || {};
+  const base = (catItems(cat)[id] || {}).p || {};
+  box.hidden = false;
+  box.innerHTML = `<div class="sc-head"><i>${ic('palette')}</i>自己換顏色（免費）</div>` + Object.entries(slots).map(([k, label]) => {
+    const now = cur0[k] || base[k];
+    return `<div class="sc-row"><span class="sc-lab">${esc(label)}</span><span class="sc-sw">${PALETTE.map(([n, hex]) =>
+      `<button class="csw${now && now.toLowerCase() === hex.toLowerCase() ? ' on' : ''}" style="background:${hex}" aria-label="${n}" onclick="setColor('${cat}','${id}','${k}','${hex}')"></button>`).join('')}</span></div>`;
+  }).join('') + `<button class="link-btn" onclick="resetColor('${cat}','${id}')">恢復原本的顏色</button>`;
+}
+function setColor(cat, id, slot, hex) {
+  const c = cur(); if (!c) return;
+  c.colors = c.colors || {}; c.colors[cat] = c.colors[cat] || {};
+  c.colors[cat][id] = { ...(c.colors[cat][id] || {}), [slot]: hex };
+  save(); playSound('click'); renderShop();
+}
+function resetColor(cat, id) {
+  const c = cur(); if (!c || !c.colors || !c.colors[cat]) return;
+  delete c.colors[cat][id]; save(); playSound('click'); toast('顏色恢復原本的樣子', 'palette'); renderShop();
+}
+function shopTab(k) { SHOP.tab = k; SHOP.sel = null; playSound('click'); renderShop(); }
+function shopPick(id) { SHOP.sel = id; SHOP.tr[SHOP.tab] = id; playSound('click'); renderShop(); }
+function shopReset() { const c = cur(); SHOP.tr = { ...c.equip }; SHOP.sel = null; playSound('click'); renderShop(); }
+function shopEquip() {
+  const c = cur(), k = SHOP.tab, id = SHOP.sel; if (!owns(c, k, id)) return;
+  c.equip[k] = id; SHOP.tr[k] = id; save(); playSound('complete');
+  toast(`${k === 'bg' ? '換上背景「' : k === 'pet' ? '帶著「' : '換上「'}${catItems(k)[id].name}」`, 'star'); renderShop();
+}
+async function shopBuy() {
+  const c = cur(), k = SHOP.tab, id = SHOP.sel; if (!id || owns(c, k, id)) return;
+  const it = catItems(k)[id], price = priceOf(k, id);
+  if ((c.emeralds || 0) < price) return;
+  const ok = await confirmSheet({ title: `買下「${it.name}」？`, icon: 'shop', ok: `買下 ${price} 顆`, okClass: 'gold',
+    body: `<div class="warn-card"><span class="slot sh-confirm ${k}">${shopThumb(c, k, id)}</span><span><b>${esc(it.name)}</b><small>會從錢包扣 ${price} 顆（錢包有 ${c.emeralds || 0} 顆）</small></span></div>` });
+  if (!ok) return;
+  if (ST().lock.shop && !(await requirePin(`買「${it.name}」，請家長確認`))) return;
+  if ((c.emeralds || 0) < price) return;
+  c.emeralds -= price;
+  c.owned[k] = [...new Set([...(c.owned[k] || []), id])];
+  c.equip[k] = id; SHOP.tr[k] = id;
+  (c.shopLogs = c.shopLogs || []).push({ id: uid(), cat: k, item: id, name: it.name, price, at: Date.now(), date: todayKey() });
+  save(); playSound('redeem'); buzz([40, 60, 40]); burst(innerWidth / 2, innerHeight * .35, 26);
+  toast(`買到「${it.name}」了！`, 'shop'); renderShop();
+}
+
+/* ── 兌換券 ── */
+function renderCouponShop(c) {
+  $('#shop-grid').className = 'shop-grid coupons';
+  $('#shop-locked').hidden = true; $('#shop-colors').hidden = true;
+  $('#shop-info').innerHTML = `<b>兌換券</b>・買了會進「我的券」，用掉就沒了`;
+  $('#shop-act').innerHTML = `<button class="btn stone" onclick="goCoupons()"><span class="ico">${ic('ticket')}</span>我的券（${myCoupons(c).length}）</button>`;
+  $('#shop-grid').innerHTML = CP().map(t => {
+    const price = Math.max(1, Math.round(t.price * shopMult())), can = (c.emeralds || 0) >= price;
+    const have = (c.coupons || []).filter(x => !x.usedAt && x.cid === t.id).length;
+    return `<button class="panel sh-item cp${can ? '' : ' poor'}" onclick="buyCoupon('${t.id}')">
+      <span class="sh-thumb cp">${ic(t.icon || 'ticket')}</span><span class="sh-name">${esc(t.name)}</span>
+      ${have ? `<span class="sh-tag own">有 ${have} 張</span>` : ''}
+      <span class="reward-chip"><i>${ic('gem')}</i>${price}</span></button>`;
+  }).join('') || '<div class="panel empty"><b>還沒有兌換券</b><small>爸媽可以在設定裡新增</small></div>';
+}
+async function buyCoupon(cid) {
+  const c = cur(), t = CP().find(x => x.id === cid); if (!t) return;
+  const price = Math.max(1, Math.round(t.price * shopMult()));
+  if ((c.emeralds || 0) < price) { toast(`還差 ${price - Math.max(0, c.emeralds || 0)} 顆`, 'gem'); playSound('click'); return; }
+  const ok = await confirmSheet({ title: `買「${t.name}」？`, icon: 'ticket', ok: `買下 ${price} 顆`, okClass: 'gold',
+    body: `<div class="warn-card"><span class="slot">${ic(t.icon || 'ticket')}</span><span><b>${esc(t.name)}</b><small>會從錢包扣 ${price} 顆（錢包有 ${c.emeralds || 0} 顆）<br>買了之後在「我的券」裡，用的時候要爸媽確認</small></span></div>` });
+  if (!ok) return;
+  if (ST().lock.shop && !(await requirePin(`買「${t.name}」，請家長確認`))) return;
+  if ((c.emeralds || 0) < price) return;
+  c.emeralds -= price;
+  (c.coupons = c.coupons || []).push({ id: uid(), cid, name: t.name, icon: t.icon, price, at: Date.now(), date: todayKey() });
+  save(); playSound('redeem'); buzz([40, 60, 40]); burst(innerWidth / 2, innerHeight * .35, 22);
+  toast(`拿到「${t.name}」！在「我的券」裡`, 'ticket'); renderShop();
+}
+let CPBACK = 'main';
+function goCoupons(from) { CPBACK = from || (SHOP && $('#screen-shop').classList.contains('active') ? 'shop' : 'main'); renderCoupons(); show('coupon'); }
+function couponBack() { CPBACK === 'shop' ? (renderShop(), show('shop')) : goMain(); }
+function renderCoupons() {
+  const c = cur(); if (!c) return goTitle();
+  const mine = myCoupons(c), used = (c.coupons || []).filter(x => x.usedAt).sort((a, b) => b.usedAt - a.usedAt).slice(0, 20);
+  $('#cp-count').textContent = mine.length;
+  $('#cp-list').innerHTML = mine.map(x => `<div class="panel cp-card"><span class="slot">${ic(x.icon || 'ticket')}</span>
+    <span class="lab"><b>${esc(x.name)}</b><small>${new Date(x.at).toLocaleDateString('zh-TW', { month:'numeric', day:'numeric' })} 買的</small></span>
+    <button class="btn gold sm" style="width:auto" onclick="useCoupon('${x.id}')"><span class="ico">${ic('check')}</span>使用</button></div>`).join('');
+  $('#cp-empty').hidden = mine.length > 0;
+  $('#cp-used').innerHTML = used.map(x => `<div class="set-row"><span class="slot">${ic(x.icon || 'ticket')}</span>
+    <span class="lab"><b>${esc(x.name)}</b><small>${new Date(x.usedAt).toLocaleDateString('zh-TW', { month:'numeric', day:'numeric' })} 用掉了</small></span></div>`).join('');
+  $('#cp-used-wrap').hidden = !used.length;
+}
+async function useCoupon(id) {
+  const c = cur(), x = (c.coupons || []).find(y => y.id === id && !y.usedAt); if (!x) return;
+  const ok = await confirmSheet({ title: `要用「${x.name}」嗎？`, icon: 'ticket', ok: '用掉這張券', okClass: 'gold',
+    body: `<div class="warn-card"><span class="slot">${ic(x.icon || 'ticket')}</span><span><b>${esc(x.name)}</b><small>用掉之後就不見了，不會退寶石</small></span></div><div class="note">請爸媽在旁邊一起按。</div>` });
+  if (!ok) return;
+  if (ST().lock.coupon && !(await requirePin(`使用「${x.name}」，請家長確認`))) return;
+  x.usedAt = Date.now(); save(); playSound('levelup'); buzz([40, 60, 40]);
+  burst(innerWidth / 2, innerHeight * .4, 20); toast(`「${x.name}」用掉囉！`, 'ticket'); renderCoupons();
+}
+
+/* ── 設定：商店 ── */
+function renderShopRuleSettings() {
+  $('#shop-char-toggles').innerHTML = S.characters.map(c => `<div class="set-row"><span class="slot">${avatarInner(c)}</span>
+    <span class="lab"><b>${esc(c.name)} 的商店</b><small>${c.shopEnabled ? `已開啟・擁有 ${ownedCount(c)} 件` : '關閉中・冒險基地不會出現商店'}</small></span>
+    <button class="tgl" role="switch" aria-checked="${!!c.shopEnabled}" aria-label="${esc(c.name)} 的商店" onclick="toggleCharShop('${c.id}')"></button></div>`).join('')
+    || '<div class="set-row"><span class="lab"><small>還沒有冒險者</small></span></div>';
+  $$('#seg-shop-price button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === (ST().shopPrice || 'normal'))));
+  $$('#seg-wave button').forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.v === (ST().shopWave || 1))));
+  const w = ST().shopWave || 1;
+  $('#wave-note').textContent = w >= 3 ? `全部新商品都上架了（共 ${waveCount(1) + waveCount(2) + waveCount(3)} 件）`
+    : `已上架 ${[1,2,3].filter(n => n <= w).reduce((s, n) => s + waveCount(n), 0)} 件，下一波還有 ${waveCount(w + 1)} 件`;
+  setTgl('tg-lock-shop', !!ST().pinHash && ST().lock.shop); $('#row-lock-shop').classList.toggle('off', !ST().pinHash);
+  setTgl('tg-lock-coupon', !!ST().pinHash && ST().lock.coupon); $('#row-lock-coupon').classList.toggle('off', !ST().pinHash);
+  $('#coupon-list').innerHTML = CP().map((t, i) => `<div class="set-row"><span class="slot">${ic(t.icon || 'ticket')}</span>
+    <span class="lab"><b>${esc(t.name)}</b><small>${t.price} 顆綠寶石</small></span>
+    <span class="acts"><button class="rbtn sm" onclick="openCouponEdit('${t.id}')" aria-label="編輯">${ic('pencil')}</button><button class="rbtn sm danger" onclick="deleteCoupon('${t.id}')" aria-label="刪除">${ic('trash')}</button></span></div>`).join('')
+    || '<div class="set-row"><span class="lab"><small>還沒有兌換券</small></span></div>';
+  const b = BR();
+  [['diaryGems', b.diaryGems], ['diaryDaily', b.diaryDaily], ['readMinPerGem', b.readMinPerGem], ['readMaxPerTime', b.readMaxPerTime], ['readDailyMax', b.readDailyMax]]
+    .forEach(([k, v]) => { const el = document.getElementById('br-' + k); if (el) el.textContent = v; });
+}
+async function setWave(n) {
+  if (!(await requirePin('調整新商品上架進度'))) return;
+  ST().shopWave = Math.max(1, Math.min(3, n)); save(); playSound('complete');
+  toast(n >= 3 ? '全部新商品都上架了！' : `第 ${n} 波上架（共 ${[1,2,3].filter(k => k <= n).reduce((s, k) => s + waveCount(k), 0)} 件）`, 'shop');
+  renderSettings();
+}
+let CU = null;
+function openCouponEdit(id) {
+  const t = id ? CP().find(x => x.id === id) : null;
+  CU = { id: id || null, icon: t ? (t.icon || 'ticket') : 'ticket' };
+  $('#coupon-title').textContent = t ? '編輯兌換券' : '新增兌換券';
+  $('#cu-name').value = t ? t.name : '';
+  $('#cu-cost').value = t ? t.price : 30;
+  $('#cu-icons').innerHTML = ['ticket','play','moon','broom','flask','ball','star','heart','door','globe','book','chest'].map(k =>
+    `<button class="icon-opt" aria-pressed="${CU.icon === k}" onclick="CU.icon='${k}';openCouponIcons()">${ic(k)}</button>`).join('');
+  openSheet('modal-coupon'); playSound('click');
+}
+function openCouponIcons() { $$('#cu-icons .icon-opt').forEach((b, i) => b.setAttribute('aria-pressed', String(['ticket','play','moon','broom','flask','ball','star','heart','door','globe','book','chest'][i] === CU.icon))); playSound('click'); }
+async function saveCoupon() {
+  const name = $('#cu-name').value.trim(); if (!name) { toast('請輸入名稱！', 'close'); return; }
+  const price = Math.max(1, Math.min(999, parseInt($('#cu-cost').value) || 30));
+  closeSheet('modal-coupon');
+  if (!(await requirePin(CU.id ? '修改兌換券' : '新增兌換券'))) return;
+  if (CU.id) { const t = CP().find(x => x.id === CU.id); if (t) { t.name = name; t.price = price; t.icon = CU.icon; } }
+  else CP().push({ id: uid(), name, price, icon: CU.icon });
+  save(); playSound('complete'); toast(`「${name}」已儲存`, 'ticket'); renderSettings();
+}
+async function deleteCoupon(id) {
+  const t = CP().find(x => x.id === id); if (!t) return;
+  if (!(await requirePin(`刪除「${t.name}」`))) return;
+  const ok = await confirmSheet({ title: '刪除這張兌換券？', icon: 'trash', ok: '刪除', okClass: 'red',
+    body: `<div class="warn-card"><span class="slot">${ic(t.icon || 'ticket')}</span><span><b>${esc(t.name)}</b><small>已經買到的券不受影響</small></span></div>` });
+  if (!ok) return;
+  ST().coupons = CP().filter(x => x.id !== id);
+  save(); playSound('click'); toast('已刪除', 'trash'); renderSettings();
 }
 </script>
 <script>
@@ -2628,9 +3224,14 @@ function migrate(c) {
   if (!Array.isArray(c.penaltyLogs)) c.penaltyLogs = [];
   c.wishes.forEach(w => { if (w.saved === undefined) w.saved = w.redeemed ? (w.cost || 0) : 0; if (!w.mode) w.mode = 'shared'; });
   if (!c.equip) c.equip = { ...DEFAULT_EQUIP }; else c.equip = { ...DEFAULT_EQUIP, ...c.equip };
-  if (!c.owned) c.owned = { hat: [], outfit: [], pet: [] };
+  if (!c.owned) c.owned = {};
+  WEAR_CATS.forEach(k => { if (!Array.isArray(c.owned[k])) c.owned[k] = []; });
+  if (!c.colors) c.colors = {};
+  if (!Array.isArray(c.coupons)) c.coupons = [];
   if (c.shopEnabled === undefined) c.shopEnabled = false;
   if (!c.look) c.look = { ...(DEFAULT_LOOK[c.type] || DEFAULT_LOOK.custom) };
+  if (!c.look.hairStyle) c.look.hairStyle = 'short';
+  if (c.look.lash === undefined) c.look.lash = false;
   c.tasks.forEach(t => { if (t.icon === undefined) t.icon = ICON_BY_ID[t.id] || ICON_BY_EMOJI[t.emoji] || null; });
 }
 function save() {
@@ -2653,7 +3254,7 @@ function progress(c) {
 const dailyMax = c => activeTasks(c).reduce((s, t) => s + (t.reward || 0), 0);
 function dailyReset(c) { const k = todayKey(); if (c.lastReset !== k) { c.completedToday = []; c.lastReset = k; } }
 const isPhoto = c => !!(c && c.avatar && String(c.avatar).startsWith('data:'));
-const avatarInner = c => isPhoto(c) ? `<img src="${esc(c.avatar)}" alt="">` : headSvg(c && c.look, c && c.equip);
+const avatarInner = c => isPhoto(c) ? `<img src="${esc(c.avatar)}" alt="">` : headSvg(c && c.look, c && c.equip, c && c.colors);
 const taskIcon = t => (t.icon && ICONS[t.icon]) ? ic(t.icon) : `<span class="emo">${esc(t.emoji || '⭐')}</span>`;
 function calcStreak(c) {
   const H = c.completionHistory || {}; const d = new Date();
@@ -2760,8 +3361,10 @@ function renderTitle() {
   const row = $('#hero-row');
   row.style.gridTemplateColumns = `repeat(${Math.min(items.length, 3)},1fr)`;
   row.innerHTML = items.join('');
-  $('#title-hero').innerHTML = spriteSvg(sel ? sel.look : DEFAULT_LOOK.older, sel && sel.equip);
-  $('#title-pet').innerHTML = petSvg(sel && sel.equip ? sel.equip.pet : 'cat');
+  $('#title-hero').innerHTML = spriteSvg(sel ? sel.look : DEFAULT_LOOK.older, sel && sel.equip, sel && sel.colors);
+  $('#title-pet').innerHTML = petSvg(sel && sel.equip ? sel.equip.pet : 'cat', sel && sel.colors);
+  $('#title-bg').innerHTML = bgSvg(sel && sel.equip ? sel.equip.bg : 'none');
+  $('#title-fx').innerHTML = sel ? weaponFx(sel.equip) : '';
 }
 function pickChar(id) {
   if (S.curId === id) { playSound('click'); goMain(); return; }
@@ -2775,14 +3378,14 @@ function titleGo() {
 
 /* ═══ CREATE ═══ */
 function startCreate() {
-  CW = { type: null, name: '', look: { ...DEFAULT_LOOK.custom }, photo: null, step: 0 };
+  CW = { type: null, name: '', look: { ...DEFAULT_LOOK.custom, hairStyle: 'short', lash: false }, photo: null, step: 0 };
   $('#av-file').value = '';
   renderCreateStep(0);
 }
 function pickType(type) {
   CW.type = type;
   CW.name = type === 'older' ? '大勇士' : type === 'younger' ? '小冒險家' : '';
-  CW.look = { ...DEFAULT_LOOK[type] };
+  CW.look = { ...DEFAULT_LOOK[type], hairStyle: CW.look.hairStyle || 'short', lash: !!CW.look.lash };
   stepNext();
 }
 function renderCreateStep(step) {
@@ -2796,10 +3399,11 @@ function renderCreateStep(step) {
 }
 function renderLook() {
   $('#look-preview').innerHTML = spriteSvg(CW.look);
+  renderHairOpts('cw');
   const sw = (list, key) => list.map((c, i) => `<button class="swatch" style="background:${c[1]}" aria-label="${c[0]}" aria-pressed="${CW.look[key] === i}" onclick="setLook('${key}',${i})"></button>`).join('');
   $('#sw-cap').innerHTML = sw(CAPS, 'cap');
   $('#sw-jacket').innerHTML = sw(JACKETS, 'jacket');
-  $('#sw-hair').innerHTML = sw(HAIRS, 'hair');
+  $('#sw-hair').innerHTML = sw(HAIRS2, 'hair');
   const slot = $('#av-slot');
   slot.innerHTML = CW.photo ? `<img src="${CW.photo}" alt="">` : ic('camera');
   slot.classList.toggle('has', !!CW.photo);
@@ -2853,6 +3457,10 @@ function renderHub() {
   $('#hub-shop-tile').hidden = !c.shopEnabled;
   $('#hub-pen-tile').classList.toggle('wide', !c.shopEnabled);
   $('#hub-shop-badge').textContent = `${ownedCount(c)} 件`;
+  { const n = myCoupons(c).length; const t = $('#hub-coupon-tile');
+    t.hidden = !(c.shopEnabled || n); $('#hub-coupon-badge').textContent = `${n} 張`;
+    const before = 4 + (c.shopEnabled ? 1 : 0) + (t.hidden ? 0 : 1);
+    $('#hub-pen-tile').classList.toggle('wide', before % 2 === 0); }
   $('#hub-streak').textContent = c.streak;
   const { done, total } = progress(c);
   $('#hub-xp-num').textContent = `${done}/${total}`;
